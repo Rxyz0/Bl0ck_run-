@@ -2624,285 +2624,106 @@
   box-shadow: 3px 3px 0 #4c1d95, inset -2px -2px 0 rgba(0,0,0,0.2);
 }
 
-/* Multiplayer screens */
-#mpSetup, #mpLobby, #mpMapSelect { background: #0a0a0a; }
+#mpSetup, #mpLobby { background: #0a0a0a; }
 
 .mp-container {
   width: 90%; max-width: 420px;
-  padding: 60px 20px 30px;
+  padding: 50px 16px 20px;
   text-align: center;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 .mp-input {
   font-family: 'Press Start 2P', monospace;
-  font-size: 13px;
+  font-size: 12px;
   background: #1a1a1a;
   border: 4px solid #a855f7;
   color: #fff;
-  padding: 12px 16px;
+  padding: 10px 14px;
   width: 100%;
   box-shadow: 4px 4px 0 #4c1d95;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   outline: none;
   letter-spacing: 2px;
   text-transform: uppercase;
+  box-sizing: border-box;
 }
-.mp-input::placeholder { color: #555; text-transform: uppercase; }
+.mp-input::placeholder { color: #555; }
 
-.mp-divider {
-  color: #555; font-size: 10px;
-  margin: 16px 0;
-  font-family: 'Press Start 2P', monospace;
-}
+.mp-divider { color: #555; font-size: 9px; margin: 12px 0; font-family: 'Press Start 2P', monospace; }
 
 .lobby-player-card {
-  background: #1a1a1a;
-  border: 4px solid #a855f7;
-  box-shadow: 4px 4px 0 #4c1d95;
-  padding: 16px;
-  margin: 10px 0;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  position: relative;
+  background: #1a1a1a; border: 4px solid #a855f7;
+  box-shadow: 4px 4px 0 #4c1d95; padding: 12px;
+  margin: 8px 0; display: flex; align-items: center; gap: 12px;
 }
-.lobby-player-card.waiting {
-  border-color: #444;
-  box-shadow: 4px 4px 0 #222;
-}
+.lobby-player-card.waiting { border-color: #444; box-shadow: 4px 4px 0 #222; }
+
 .lobby-skin-preview {
-  width: 52px; height: 52px;
-  border: 3px solid #a855f7;
+  width: 44px; height: 44px; border: 3px solid #a855f7;
   display: flex; align-items: center; justify-content: center;
-  font-size: 28px;
-  background: #111;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-.lobby-player-name {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px; color: #fff;
-  text-align: left; flex: 1;
-}
-.lobby-ready-badge {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  padding: 4px 8px;
-  background: #00ff88; color: #000;
-  border: 2px solid #006644;
-}
-.lobby-waiting-badge {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px; color: #555;
+  background: #111; flex-shrink: 0;
 }
 
-.mp-room-code {
+.lobby-player-name {
   font-family: 'Press Start 2P', monospace;
-  font-size: 28px; letter-spacing: 8px;
-  color: #a855f7;
-  text-shadow: 4px 4px 0 #4c1d95;
-  background: #1a1a1a;
-  border: 4px solid #a855f7;
-  padding: 16px 24px;
-  margin: 16px 0;
-  box-shadow: 6px 6px 0 #4c1d95;
+  font-size: 9px; color: #fff; text-align: left;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+}
+
+.lobby-ready-badge {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  padding: 3px 6px; background: #00ff88; color: #000; border: 2px solid #006644;
+  white-space: nowrap;
+}
+.lobby-waiting-badge { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #555; }
+
+.mp-room-code {
+  font-family: 'Press Start 2P', monospace; font-size: 24px; letter-spacing: 6px;
+  color: #a855f7; text-shadow: 3px 3px 0 #4c1d95;
+  background: #1a1a1a; border: 4px solid #a855f7;
+  padding: 12px 20px; margin: 10px 0; box-shadow: 5px 5px 0 #4c1d95;
 }
 
 .mp-hint {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px; color: #555;
-  line-height: 2; margin: 10px 0;
+  font-size: 7px; color: #555; line-height: 2; margin: 6px 0;
 }
 
-.swap-countdown {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(168, 85, 247, 0.95);
-  border: 4px solid #fff;
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
-  padding: 16px 28px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 14px; color: #fff;
-  z-index: 200;
-  display: none;
-  text-align: center;
+/* Small map cards in lobby */
+.mp-map-card-sm {
+  padding: 8px 4px; border: 3px solid #000; cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.8); display: flex;
+  flex-direction: column; align-items: center; justify-content: center;
+  transition: all 0.1s; font-size: 18px; border-radius: 0;
 }
+.mp-map-card-sm div {
+  font-family: 'Press Start 2P', monospace; font-size: 5px;
+  color: #fff; margin-top: 4px; text-align: center;
+}
+.mp-map-card-sm:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.8); }
 
-/* Opponent HUD */
-#opponentHud {
-  position: fixed;
-  top: 80px; left: 10px;
-  background: rgba(0,0,0,0.75);
-  border: 3px solid #a855f7;
-  box-shadow: 3px 3px 0 #4c1d95;
-  padding: 8px 12px;
-  display: none;
-  z-index: 150;
-  min-width: 130px;
+/* Setting chips */
+.mp-setting-chip {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  padding: 4px 8px; background: #333; color: #555;
+  border: 2px solid #444; cursor: pointer; transition: all 0.1s;
 }
-#opponentHud.visible { display: block; }
-.opp-name {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px; color: #a855f7;
-  margin-bottom: 6px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 120px;
-}
-.opp-lives {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px; color: #ff6b6b;
-  margin-bottom: 4px;
-}
-.opp-score {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px; color: #00ff88;
-}
-.opp-position {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px; color: #FFD700;
-  margin-top: 4px;
-}
-.opp-status {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px; color: #ff6b6b;
-  margin-top: 4px;
-}
+.mp-setting-chip.on { background: #4c1d95; color: #fff; border-color: #a855f7; }
 
-/* Position badge during gameplay */
-#myPositionBadge {
-  position: fixed;
-  bottom: 130px; left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  padding: 6px 14px;
-  border: 3px solid #fff;
-  display: none;
-  z-index: 150;
-  pointer-events: none;
-}
-#myPositionBadge.front {
-  background: rgba(255, 100, 100, 0.85);
-  color: #fff;
-}
-#myPositionBadge.back {
-  background: rgba(100, 149, 237, 0.85);
-  color: #fff;
-}
-
-/* Respawn overlay */
-#respawnOverlay {
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.9);
-  border: 4px solid #ff6b6b;
-  box-shadow: 6px 6px 0 #cc5555;
-  padding: 20px 30px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 12px; color: #ff6b6b;
-  z-index: 200;
-  display: none;
-  text-align: center;
-}
-
-/* MP notification toast */
-#mpToast {
-  position: fixed;
-  top: 20px; left: 50%;
-  transform: translateX(-50%);
-  background: #a855f7;
-  border: 3px solid #fff;
-  box-shadow: 4px 4px 0 #4c1d95;
-  padding: 10px 20px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px; color: #fff;
-  z-index: 300;
-  display: none;
-  white-space: nowrap;
-}
-
-/* Swap flash animation */
-@keyframes swapFlash {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.swap-flash {
-  animation: swapFlash 0.3s ease 3;
-}
-
-/* Map select grid for multiplayer */
-.mp-map-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  margin: 20px 0;
-}
-.mp-map-card {
-  padding: 12px 8px;
-  border: 4px solid #000;
-  cursor: pointer;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.8);
-  display: flex; flex-direction: column;
+/* Swap flash */
+#swapFlashOverlay {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 199;
   align-items: center; justify-content: center;
-  transition: all 0.1s;
-  min-height: 90px;
-}
-.mp-map-card:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 rgba(0,0,0,0.8); }
-.mp-map-card .map-icon { font-size: 24px; margin-bottom: 6px; }
-.mp-map-card h4 { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #fff; text-align: center; }
-
-/* In-game MP settings toggle */
-#mpSettingsBtn {
-  position: fixed;
-  bottom: 130px; right: 10px;
-  width: 36px; height: 36px;
-  background: rgba(168, 85, 247, 0.8);
-  border: 3px solid #a855f7;
-  box-shadow: 3px 3px 0 #4c1d95;
-  font-size: 16px;
-  display: none;
-  align-items: center; justify-content: center;
-  cursor: pointer;
-  z-index: 150;
-}
-#mpSettingsPanel {
-  position: fixed;
-  bottom: 175px; right: 10px;
-  background: rgba(0,0,0,0.92);
-  border: 3px solid #a855f7;
-  box-shadow: 4px 4px 0 #4c1d95;
-  padding: 12px;
-  display: none;
-  z-index: 160;
-  min-width: 160px;
-}
-#mpSettingsPanel.open { display: block; }
-.mp-toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 8px; gap: 10px;
-}
-.mp-toggle-label {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px; color: #ccc;
+  font-size: 16px; color: #fff;
+  text-shadow: 3px 3px 0 #000;
+  background: rgba(168,85,247,0.25);
 }
-.mp-toggle-switch {
-  width: 32px; height: 16px;
-  background: #333; border: 2px solid #555;
-  cursor: pointer; position: relative; flex-shrink: 0;
-}
-.mp-toggle-switch.on { background: #a855f7; border-color: #7c3aed; }
-.mp-toggle-switch::after {
-  content: '';
-  position: absolute;
-  top: 1px; left: 1px;
-  width: 10px; height: 10px;
-  background: #fff; transition: left 0.1s;
-}
-.mp-toggle-switch.on::after { left: 17px; }
 </style>
+
 
 <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -3827,8 +3648,9 @@
                         <span id="coinIcon">🔺</span>
                         <span id="coinCount">0</span>
                     </div>
-                    <div id="livesDisplay" style="display: none; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 10px; margin-top: 4px; font-size: 11px; font-family: 'Press Start 2P', monospace; color: #ff6b6b;">
-                        ❤️ <span id="livesCount">1</span>
+                    <div id="livesDisplay" style="display: none; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 10px; margin-top: 4px; font-size: 11px; font-family: 'Press Start 2P', monospace; color: #ff6b6b; display: flex; align-items: center; gap: 8px;">
+                        <span>❤️ <span id="livesCount">1</span></span>
+                        <span id="teammLivesDisplay" style="display:none; color: #a855f7; font-size: 9px;">| 👥 <span id="teammLivesCount">1</span></span>
                     </div>
                 </div>
             </div>
@@ -14584,15 +14406,15 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
 <div id="mpSetup" class="screen">
   <div class="mp-container">
     <button class="close-btn" onclick="showMenu()">×</button>
-    <div class="page-title" style="color:#a855f7; text-shadow: 3px 3px 0 #4c1d95;">MULTIPLAYER</div>
-    <div style="margin-bottom: 16px;">
+    <div class="page-title" style="color:#a855f7; text-shadow: 3px 3px 0 #4c1d95; font-size:14px;">MULTIPLAYER</div>
+    <div style="margin-bottom: 12px;">
       <input class="mp-input" id="mpNameInput" type="text" placeholder="NAMA KAMU" maxlength="12">
     </div>
     <button class="btn multiplayer-btn" onclick="mpCreateRoom()" style="width:100%;">⚔️ BUAT ROOM</button>
     <div class="mp-divider">— ATAU —</div>
-    <input class="mp-input" id="mpCodeInput" type="text" placeholder="KODE ROOM" maxlength="4" style="text-align:center; letter-spacing:6px;">
-    <button class="btn" onclick="mpJoinRoom()" style="width:100%;">🚪 JOIN ROOM</button>
-    <div class="mp-hint">Skin yang aktif sekarang akan dipakai saat main</div>
+    <input class="mp-input" id="mpCodeInput" type="text" placeholder="KODE ROOM" maxlength="4" style="text-align:center; letter-spacing:6px; text-transform:uppercase;">
+    <button class="btn" onclick="mpJoinRoom()" style="width:100%; background:#4CAF50; box-shadow:4px 4px 0 #2e7d32;">🚪 JOIN ROOM</button>
+    <div class="mp-hint">Skin aktif kamu yang akan dipakai</div>
   </div>
 </div>
 
@@ -14600,177 +14422,337 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
 <div id="mpLobby" class="screen">
   <div class="mp-container" style="width:95%; max-width:460px;">
     <button class="close-btn" onclick="mpLeaveRoom()">×</button>
-    <div class="page-title" style="color:#a855f7; font-size:12px; text-shadow: 2px 2px 0 #4c1d95;">LOBBY</div>
+    <div class="page-title" style="color:#a855f7; font-size:11px; text-shadow: 2px 2px 0 #4c1d95; margin-bottom:10px;">LOBBY CO-OP</div>
+    
+    <!-- Room code -->
     <div class="mp-room-code" id="mpRoomCodeDisplay">----</div>
-    <div class="mp-hint" id="mpLobbyHint">Bagikan kode ini ke temanmu!</div>
+    <div class="mp-hint">Bagikan kode ini ke temanmu!</div>
+
+    <!-- Map selection (host only) -->
+    <div id="mpMapSelectInLobby" style="margin: 10px 0;">
+      <div class="mp-hint" style="color:#FFD700; margin-bottom:8px;" id="mpMapLabel">👑 Pilih Map:</div>
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:6px;" id="mpMapBtns">
+        <div class="mp-map-card-sm" style="background:linear-gradient(135deg,#f4a460,#cd853f);" onclick="mpSelectMap('egypt')">🏜️<div>EGY</div></div>
+        <div class="mp-map-card-sm" style="background:linear-gradient(135deg,#ffd700,#ff8c00);" onclick="mpSelectMap('day')">☀️<div>DAY</div></div>
+        <div class="mp-map-card-sm" style="background:linear-gradient(135deg,#1a1a3e,#000080);" onclick="mpSelectMap('night')">🌙<div>NIGHT</div></div>
+        <div class="mp-map-card-sm" style="background:linear-gradient(135deg,#4682B4,#00CED1);" onclick="mpSelectMap('ocean')">🌊<div>OCN</div></div>
+        <div class="mp-map-card-sm" style="background:linear-gradient(135deg,#FFB7C5,#FF69B4);" onclick="mpSelectMap('sakura')">🌸<div>SKR</div></div>
+      </div>
+      <div class="mp-hint" id="mpSelectedMapLabel">Belum dipilih</div>
+    </div>
+
+    <!-- HUD Settings in lobby -->
+    <div style="background:#1a1a1a; border:2px solid #333; padding:8px 10px; margin:8px 0;">
+      <div class="mp-hint" style="color:#aaa; margin-bottom:6px;">⚙️ TAMPILKAN SAAT GAME:</div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px;">
+        <div class="mp-setting-chip on" id="chipOppName" onclick="toggleMpSetting('oppName')">NAMA</div>
+        <div class="mp-setting-chip on" id="chipOppLives" onclick="toggleMpSetting('oppLives')">HP LAWAN</div>
+        <div class="mp-setting-chip on" id="chipOppScore" onclick="toggleMpSetting('oppScore')">SCORE</div>
+        <div class="mp-setting-chip on" id="chipOppPos" onclick="toggleMpSetting('oppPosition')">POSISI</div>
+      </div>
+    </div>
+
+    <!-- Player cards -->
     <div id="mpLobbyP1Card" class="lobby-player-card">
-      <div class="lobby-skin-preview" id="mpLobbyP1Skin">❓</div>
+      <div class="lobby-skin-preview" id="mpLobbyP1Skin" style="font-size:22px;">🟩</div>
       <div style="flex:1; text-align:left;">
         <div class="lobby-player-name" id="mpLobbyP1Name">---</div>
-        <div class="mp-hint" style="margin:4px 0; text-align:left;" id="mpLobbyP1Sub">Kamu</div>
+        <div class="mp-hint" style="margin:2px 0; text-align:left; font-size:7px;" id="mpLobbyP1Sub">Kamu</div>
       </div>
-      <div id="mpLobbyP1Badge" class="lobby-waiting-badge">MENUNGGU...</div>
+      <div id="mpLobbyP1Badge" class="lobby-waiting-badge">...</div>
     </div>
+
     <div id="mpLobbyP2Card" class="lobby-player-card waiting">
-      <div class="lobby-skin-preview" id="mpLobbyP2Skin">👤</div>
+      <div class="lobby-skin-preview" id="mpLobbyP2Skin" style="font-size:22px;">👤</div>
       <div style="flex:1; text-align:left;">
-        <div class="lobby-player-name" id="mpLobbyP2Name">MENUNGGU PLAYER...</div>
-        <div class="mp-hint" style="margin:4px 0; text-align:left;" id="mpLobbyP2Sub"></div>
+        <div class="lobby-player-name" id="mpLobbyP2Name">MENUNGGU...</div>
+        <div class="mp-hint" style="margin:2px 0; text-align:left; font-size:7px;" id="mpLobbyP2Sub"></div>
       </div>
       <div id="mpLobbyP2Badge" class="lobby-waiting-badge"></div>
     </div>
-    <div style="display:flex; gap:10px; margin-top:16px;">
-      <button class="btn" id="mpReadyBtn" onclick="mpToggleReady()" style="flex:1; background:#a855f7; box-shadow:4px 4px 0 #4c1d95;">✅ READY</button>
-    </div>
-    <div class="mp-hint" id="mpLobbyStatus">Tunggu temanmu join dulu...</div>
+
+    <!-- Start countdown display -->
+    <div id="mpStartCountdown" style="display:none; font-family:'Press Start 2P',monospace; font-size:32px; color:#00ff88; text-align:center; margin:10px 0; text-shadow:4px 4px 0 #006644;">3</div>
+
+    <button class="btn" id="mpReadyBtn" onclick="mpToggleReady()" style="width:100%; margin-top:10px; background:#a855f7; box-shadow:4px 4px 0 #4c1d95;">✅ READY</button>
+    <div class="mp-hint" id="mpLobbyStatus">Pilih map dulu, lalu tunggu teman join...</div>
   </div>
 </div>
 
-<!-- MP Map Select Screen -->
-<div id="mpMapSelect" class="screen">
-  <div class="mp-container" style="width:95%; max-width:460px;">
-    <div class="page-title" style="color:#a855f7; font-size:12px; text-shadow: 2px 2px 0 #4c1d95;">PILIH MAP</div>
-    <div class="mp-hint" id="mpMapHint">Host memilih map...</div>
-    <div class="mp-map-grid" id="mpMapGrid">
-      <div class="mp-map-card" style="background:linear-gradient(135deg,#f4a460,#cd853f);" onclick="mpSelectMap('egypt')"><div class="map-icon">🏜️</div><h4>EGYPT</h4></div>
-      <div class="mp-map-card" style="background:linear-gradient(135deg,#ffd700,#ff8c00);" onclick="mpSelectMap('day')"><div class="map-icon">☀️</div><h4>DAY</h4></div>
-      <div class="mp-map-card" style="background:linear-gradient(135deg,#1a1a3e,#000080);" onclick="mpSelectMap('night')"><div class="map-icon">🌙</div><h4>NIGHT</h4></div>
-      <div class="mp-map-card" style="background:linear-gradient(135deg,#4682B4,#00CED1);" onclick="mpSelectMap('ocean')"><div class="map-icon">🌊</div><h4>OCEAN</h4></div>
-      <div class="mp-map-card" style="background:linear-gradient(135deg,#FFB7C5,#FF69B4);" onclick="mpSelectMap('sakura')"><div class="map-icon">🌸</div><h4>SAKURA</h4></div>
-    </div>
-    <div class="mp-hint" id="mpMapWait" style="display:none;">Menunggu host memilih map...</div>
-  </div>
-</div>
+<!-- Swap countdown (small, under FPS) -->
+<div id="mpSwapBadge" style="
+  position:fixed; display:none; z-index:151;
+  font-family:'Press Start 2P',monospace; font-size:7px;
+  padding:3px 7px; border:2px solid #a855f7;
+  background:rgba(0,0,0,0.8); color:#a855f7;
+  pointer-events:none;
+"></div>
 
-<!-- Opponent HUD -->
-<div id="opponentHud">
-  <div class="opp-name" id="oppName">---</div>
-  <div class="opp-lives" id="oppLives">❤️ ---</div>
-  <div class="opp-score" id="oppScore">RUN: 0</div>
-  <div class="opp-position" id="oppPosition">⬡ ---</div>
-  <div class="opp-status" id="oppStatus"></div>
-</div>
-
-<!-- My position badge -->
-<div id="myPositionBadge">⚔️ DEPAN</div>
-
-<!-- Swap overlay -->
-<div class="swap-countdown" id="swapCountdown">
-  🔄 POSISI SWAP!<br>
-  <span id="swapCountdownText" style="font-size:20px; margin-top:8px; display:block;"></span>
-</div>
+<!-- Swap flash overlay -->
+<div id="swapFlashOverlay" style="
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:199; display:none;
+  font-family:'Press Start 2P',monospace;
+  display:none; align-items:center; justify-content:center;
+  font-size:18px; color:#fff;
+  text-shadow:3px 3px 0 #000;
+  background:rgba(168,85,247,0.3);
+"></div>
 
 <!-- Respawn overlay -->
-<div id="respawnOverlay">
+<div id="respawnOverlay" style="
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.9); border:4px solid #ff6b6b;
+  box-shadow:6px 6px 0 #cc5555; padding:20px 30px;
+  font-family:'Press Start 2P',monospace; font-size:11px; color:#ff6b6b;
+  z-index:200; display:none; text-align:center;
+">
   💀 KAMU MATI<br>
-  <span style="font-size:10px; color:#fff; margin-top:8px; display:block;">Respawn dalam <span id="respawnCountdown">25</span>s</span>
+  <span style="font-size:9px; color:#fff; margin-top:8px; display:block;">Respawn dalam <span id="respawnCountdown">25</span>s</span>
+  <span style="font-size:7px; color:#aaa; margin-top:6px; display:block;">Teman masih bertahan!</span>
 </div>
 
-<!-- MP Toast -->
-<div id="mpToast"></div>
-
-<!-- In-game MP settings -->
-<div id="mpSettingsBtn" onclick="toggleMpSettingsPanel()">⚙️</div>
-<div id="mpSettingsPanel">
-  <div class="mp-toggle-row">
-    <span class="mp-toggle-label">NAMA LAWAN</span>
-    <div class="mp-toggle-switch on" id="toggleOppName" onclick="toggleMpSetting('oppName')"></div>
-  </div>
-  <div class="mp-toggle-row">
-    <span class="mp-toggle-label">HP LAWAN</span>
-    <div class="mp-toggle-switch on" id="toggleOppLives" onclick="toggleMpSetting('oppLives')"></div>
-  </div>
-  <div class="mp-toggle-row">
-    <span class="mp-toggle-label">SCORE LAWAN</span>
-    <div class="mp-toggle-switch on" id="toggleOppScore" onclick="toggleMpSetting('oppScore')"></div>
-  </div>
-  <div class="mp-toggle-row">
-    <span class="mp-toggle-label">POSISI</span>
-    <div class="mp-toggle-switch on" id="toggleOppPosition" onclick="toggleMpSetting('oppPosition')"></div>
-  </div>
-</div>
+<!-- MP Toast notification -->
+<div id="mpToast" style="
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  background:#a855f7; border:3px solid #fff; box-shadow:4px 4px 0 #4c1d95;
+  padding:8px 16px; font-family:'Press Start 2P',monospace;
+  font-size:8px; color:#fff; z-index:300; display:none; white-space:nowrap;
+  max-width:90vw; text-align:center;
+"></div>
 
 <script>
-// =====================
-// MP STATE
-// =====================
+// =============================================
+// MULTIPLAYER v2 - Full Co-op Implementation
+// =============================================
+
 let socket = null;
 let mpState = {
   connected: false, inRoom: false, roomCode: null, myId: null,
-  isHost: false, myName: '', mySkin: '', opponentId: null,
-  opponentName: '', opponentSkin: '', opponentLives: 1,
-  opponentScore: 0, opponentPosition: 'back', ready: false,
-  isMultiplayerGame: false, myPosition: 'front', myAlive: true,
-  respawnInterval: null
+  isHost: false, myName: '', mySkinId: '', mySkinColor: '#fff', mySkinGradient: null,
+  opponentId: null, opponentName: '', opponentSkinId: '', opponentSkinColor: '#a855f7', opponentSkinGradient: null,
+  opponentLives: 1, opponentScoreRun: 0, opponentScoreJump: 0,
+  opponentPosition: 'back', opponentY: 0, opponentIsJumping: false, opponentIsDucking: false,
+  ready: false, selectedMode: null,
+  isMultiplayerGame: false,
+  myPosition: 'front', myAlive: true,
+  respawnInterval: null, swapTimerDisplay: 12,
 };
+
 const mpSettings = { oppName: true, oppLives: true, oppScore: true, oppPosition: true };
 
+// Opponent "ghost" player object for rendering
+let opponentGhost = {
+  x: 150, y: 0, width: 40, height: 40,
+  isJumping: false, isDucking: false,
+  name: '', skinColor: '#a855f7', skinGradient: null, skinId: ''
+};
+
+// =====================
+// SKIN EMOJI MAP
+// =====================
+function getSkinEmoji(skinId) {
+  const map = {
+    white:'⬜',blue:'🟦',red:'🟥',pink:'🟪',
+    egypt_common:'🟫',egypt_rare:'🌪️',egypt_epic:'👑',egypt_legendary:'🔱',
+    day_common:'🟡',day_rare:'🟠',day_epic:'⭐',day_legendary:'☀️',
+    night_common:'⬛',night_rare:'💜',night_epic:'🌑',night_legendary:'🌒',
+    snow_common:'⬜',snow_rare:'🔵',snow_epic:'❄️',snow_legendary:'🧊',
+    ocean_common:'🩵',ocean_rare:'🔵',ocean_epic:'🌊',ocean_legendary:'🐋',
+    valentine_limited:'💝',sakura_common:'🌸',
+  };
+  return map[skinId] || '🟩';
+}
+
+function getMySkinData() {
+  if (typeof getCurrentSkin !== 'undefined') {
+    try {
+      const skin = getCurrentSkin();
+      mpState.mySkinId = skin.id || 'white';
+      mpState.mySkinColor = skin.color || '#fff';
+      mpState.mySkinGradient = skin.gradient || null;
+      mpState.myLives = skin.lives || 1;
+      return skin;
+    } catch(e) {}
+  }
+  return { id: 'white', color: '#fff', gradient: null, lives: 1 };
+}
+
+function getSkinById(skinId) {
+  const allSkins = [
+    ...(typeof defaultSkins !== 'undefined' ? defaultSkins : []),
+    ...(typeof egyptSkins !== 'undefined' ? egyptSkins : []),
+    ...(typeof daySkins !== 'undefined' ? daySkins : []),
+    ...(typeof nightSkins !== 'undefined' ? nightSkins : []),
+    ...(typeof snowSkins !== 'undefined' ? snowSkins : []),
+    ...(typeof oceanSkins !== 'undefined' ? oceanSkins : []),
+    ...(typeof valentineSkins !== 'undefined' ? valentineSkins : []),
+  ];
+  return allSkins.find(s => s.id === skinId) || { id: skinId, color: '#a855f7', name: '???' };
+}
+
+// =====================
+// CONNECT SOCKET
+// =====================
 function connectSocket() {
   if (socket && socket.connected) return;
   socket = io();
+
   socket.on('connect', () => { mpState.connected = true; mpState.myId = socket.id; });
   socket.on('disconnect', () => { mpState.connected = false; showMpToast('❌ Terputus dari server!'); });
-  socket.on('room_created', ({ code, playerId }) => {
-    mpState.myId = playerId; mpState.roomCode = code;
-    mpState.isHost = true; mpState.inRoom = true; showMpLobby();
+
+  socket.on('room_created', ({ code }) => {
+    mpState.roomCode = code; mpState.isHost = true; mpState.inRoom = true; showMpLobby();
   });
   socket.on('join_error', ({ msg }) => showMpToast('❌ ' + msg));
-  socket.on('room_joined', ({ code, playerId, players }) => {
-    mpState.myId = playerId; mpState.roomCode = code;
-    mpState.isHost = false; mpState.inRoom = true;
+  socket.on('room_joined', ({ code, players }) => {
+    mpState.roomCode = code; mpState.isHost = false; mpState.inRoom = true;
     updateLobbyPlayers(players); showMpLobby();
   });
   socket.on('player_joined', ({ players }) => { updateLobbyPlayers(players); showMpToast('🎮 Teman sudah join!'); });
   socket.on('lobby_update', ({ players }) => updateLobbyPlayers(players));
-  socket.on('player_left', ({ players }) => {
-    updateLobbyPlayers(players); showMpToast('👋 Teman meninggalkan room');
-    mpState.opponentId = null;
+  socket.on('player_left', ({ players }) => { updateLobbyPlayers(players); showMpToast('👋 Teman keluar'); mpState.opponentId = null; });
+
+  socket.on('map_selected', ({ mode }) => {
+    mpState.selectedMode = mode;
+    document.getElementById('mpSelectedMapLabel').textContent = 'Map: ' + mode.toUpperCase() + ' ✅';
+    if (!mpState.isHost) showMpToast('🗺️ Map dipilih: ' + mode.toUpperCase());
   });
-  socket.on('all_ready', () => showMpToast('✅ Semua siap!'));
-  socket.on('pick_map', () => showMpMapSelect(true));
-  socket.on('map_selected', ({ mode }) => { if (!mpState.isHost) { showMpToast('🗺️ Map: ' + mode.toUpperCase()); showMpMapSelect(false); } });
+
+  socket.on('all_ready', () => showMpToast('✅ Semua siap! Memulai...'));
+
+  socket.on('start_countdown', ({ count }) => {
+    const el = document.getElementById('mpStartCountdown');
+    el.style.display = 'block';
+    el.textContent = count > 0 ? count : 'GO!';
+    if (count === 0) setTimeout(() => { el.style.display = 'none'; }, 800);
+  });
+
   socket.on('game_start', ({ seed, mode, positions, players }) => {
-    mpState.myPosition = positions[mpState.myId];
+    mpState.myPosition = positions[mpState.myId] || 'front';
     const opp = players.find(p => p.id !== mpState.myId);
-    if (opp) { mpState.opponentId = opp.id; mpState.opponentName = opp.name; mpState.opponentSkin = opp.skin; mpState.opponentLives = opp.lives; mpState.opponentPosition = positions[opp.id]; }
-    mpState.isMultiplayerGame = true; mpState.myAlive = true;
-    startGame(mode); setupMpHud();
+    if (opp) {
+      mpState.opponentId = opp.id;
+      mpState.opponentName = opp.name;
+      mpState.opponentSkinId = opp.skinId;
+      mpState.opponentSkinColor = opp.skinColor || '#a855f7';
+      mpState.opponentSkinGradient = opp.skinGradient || null;
+      mpState.opponentLives = opp.lives || 1;
+      mpState.opponentPosition = positions[opp.id] || 'back';
+      opponentGhost.skinColor = opp.skinColor || '#a855f7';
+      opponentGhost.skinGradient = opp.skinGradient || null;
+      opponentGhost.skinId = opp.skinId || '';
+      opponentGhost.name = opp.name;
+    }
+    mpState.isMultiplayerGame = true;
+    mpState.myAlive = true;
+    mpState.swapTimerDisplay = 12;
+    startGame(mode);
+    setupMpIngame();
   });
+
   socket.on('game_tick', ({ fc, events }) => {
     if (!mpState.isMultiplayerGame) return;
     for (const ev of events) {
       if (ev.type === 'obstacle') mpHandleObstacleSpawn(ev.rval);
       else if (ev.type === 'quicksand' && typeof quicksandPatches !== 'undefined') quicksandPatches.push(new Quicksand());
       else if (ev.type === 'coin' && typeof coins !== 'undefined') coins.push(new Coin(ev.airborne));
-      else if (ev.type === 'swap') handleSwapEvent(ev.positions);
+      else if (ev.type === 'swap') handleSwapEvent(ev.positions, ev.reason);
+      else if (ev.type === 'respawn' && ev.playerId === mpState.myId) {
+        mpState.myAlive = true;
+        document.getElementById('respawnOverlay').style.display = 'none';
+        if (mpState.respawnInterval) clearInterval(mpState.respawnInterval);
+      }
     }
   });
-  socket.on('opponent_score', ({ scoreRun }) => { mpState.opponentScore = scoreRun; updateOppHud(); });
+
+  socket.on('swap_countdown', ({ seconds }) => {
+    mpState.swapTimerDisplay = seconds;
+    updateSwapBadge();
+  });
+
+  socket.on('swap_countdown_reset', ({ seconds }) => {
+    mpState.swapTimerDisplay = seconds;
+    updateSwapBadge();
+  });
+
+  // Opponent position/state sync
+  socket.on('opponent_state', ({ y, isJumping, isDucking, x }) => {
+    opponentGhost.isJumping = isJumping;
+    opponentGhost.isDucking = isDucking;
+    opponentGhost.y = y;
+    if (x !== undefined) opponentGhost.targetX = x;
+  });
+
+  // Opponent ability
+  socket.on('opponent_ability', ({ abilityType, name }) => {
+    showMpToast('⚡ ' + name + ' menggunakan ' + (abilityType || 'ability') + '!');
+  });
+
+  // Obstacle sync
+  socket.on('sync_obstacle_destroy', ({ obstacleIndex, reason }) => {
+    if (typeof obstacles !== 'undefined' && obstacles[obstacleIndex]) {
+      obstacles.splice(obstacleIndex, 1);
+    }
+  });
+
+  // Coin collect sync
+  socket.on('sync_coin_collect', ({ index, totalCoins }) => {
+    if (typeof coins !== 'undefined' && coins[index]) {
+      coins.splice(index, 1);
+    }
+    sessionCoins = totalCoins;
+    document.getElementById('coinCount').textContent = totalCoins;
+  });
+
+  // Score sync
+  socket.on('opponent_score', ({ scoreRun, scoreJump }) => {
+    mpState.opponentScoreRun = scoreRun;
+    mpState.opponentScoreJump = scoreJump;
+    updateOppLivesUI();
+  });
+
+  // Death events
   socket.on('opponent_died', ({ respawnIn }) => {
     mpState.opponentLives = 0;
-    document.getElementById('oppStatus').textContent = '💀 Respawn ' + respawnIn + 's';
-    updateOppHud(); showMpToast('💀 ' + mpState.opponentName + ' mati!');
+    updateOppLivesUI();
+    showMpToast('💀 ' + mpState.opponentName + ' mati! Respawn ' + respawnIn + 's...');
   });
+
   socket.on('player_respawn', ({ playerId }) => {
     if (playerId !== mpState.myId) {
       mpState.opponentLives = 1;
-      document.getElementById('oppStatus').textContent = '✅ Hidup';
-      updateOppHud(); showMpToast('✅ ' + mpState.opponentName + ' respawn!');
-    } else {
-      mpState.myAlive = true;
-      document.getElementById('respawnOverlay').style.display = 'none';
-      if (mpState.respawnInterval) clearInterval(mpState.respawnInterval);
-      if (typeof player !== 'undefined') { player.isDucking = false; }
+      updateOppLivesUI();
+      showMpToast('✅ ' + mpState.opponentName + ' respawn!');
     }
   });
-  socket.on('you_died', ({ respawnIn }) => { mpState.myAlive = false; startRespawnCountdown(respawnIn); });
-  socket.on('game_over_all', () => { if (typeof endGame === 'function') endGame(); });
-  socket.on('opponent_disconnected', ({ name }) => { showMpToast('⚠️ ' + name + ' disconnect!'); document.getElementById('oppStatus').textContent = '⚠️ DC'; });
-  socket.on('host_changed', ({ newHost }) => { if (newHost === mpState.myId) { mpState.isHost = true; showMpToast('👑 Kamu jadi host!'); } });
+
+  socket.on('you_died', ({ respawnIn }) => {
+    mpState.myAlive = false;
+    startRespawnCountdown(respawnIn);
+  });
+
+  socket.on('game_over_all', () => {
+    if (typeof endGame === 'function') endGame();
+  });
+
+  socket.on('opponent_disconnected', ({ name }) => {
+    showMpToast('⚠️ ' + name + ' disconnect! Kamu lanjut sendiri...');
+    mpState.opponentId = null;
+  });
+
+  socket.on('host_changed', ({ newHost }) => {
+    if (newHost === mpState.myId) { mpState.isHost = true; showMpToast('👑 Kamu jadi host!'); updateLobbyForHost(); }
+  });
 }
 
+// =====================
+// OBSTACLE SPAWN FROM SERVER
+// =====================
 function mpHandleObstacleSpawn(rval) {
   if (!gameRunning || !mpState.isMultiplayerGame) return;
+  if ((currentMode === 'day' && typeof heatwaveActive !== 'undefined' && heatwaveActive) ||
+      (currentMode === 'night' && typeof meteorShowerActive !== 'undefined' && meteorShowerActive)) return;
   let types = [];
   if (currentMode === 'egypt') types = ['cactus','bird'];
   else if (currentMode === 'day') types = ['sunflower','tree','bee'];
@@ -14779,27 +14761,153 @@ function mpHandleObstacleSpawn(rval) {
   else if (currentMode === 'ocean') types = ['crab','palm','seagull'];
   else if (currentMode === 'sakura') types = ['torii','lantern','bamboo'];
   const type = types[Math.floor(rval * types.length)];
-  if (typeof Obstacle !== 'undefined' && typeof obstacles !== 'undefined') obstacles.push(new Obstacle(type));
+  if (typeof Obstacle !== 'undefined') obstacles.push(new Obstacle(type));
 }
 
-function handleSwapEvent(positions) {
+// =====================
+// SWAP HANDLING
+// =====================
+function handleSwapEvent(positions, reason) {
+  const oldPos = mpState.myPosition;
   mpState.myPosition = positions[mpState.myId] || mpState.myPosition;
   mpState.opponentPosition = positions[mpState.opponentId] || mpState.opponentPosition;
-  updatePositionBadge(); updateOppHud();
-  const swapEl = document.getElementById('swapCountdown');
-  swapEl.style.display = 'block';
-  document.getElementById('swapCountdownText').textContent = mpState.myPosition === 'front' ? '⚔️ KAMU DEPAN!' : '🛡️ KAMU BELAKANG!';
-  setTimeout(() => { swapEl.style.display = 'none'; }, 1800);
+  mpState.swapTimerDisplay = 12;
+  updateSwapBadge();
+  updateOppLivesUI();
+
+  // Flash overlay
+  const overlay = document.getElementById('swapFlashOverlay');
+  overlay.textContent = mpState.myPosition === 'front' ? '⚔️ KAMU DEPAN!' : '🛡️ KAMU BELAKANG!';
+  overlay.style.display = 'flex';
+  setTimeout(() => { overlay.style.display = 'none'; }, 1200);
+
+  // Update opponent ghost X position based on positions
+  updateGhostPositions();
 }
 
-function updatePositionBadge() {
-  const badge = document.getElementById('myPositionBadge');
-  badge.className = '';
-  if (mpState.myPosition === 'front') { badge.classList.add('front'); badge.textContent = '⚔️ DEPAN'; }
-  else { badge.classList.add('back'); badge.textContent = '🛡️ BELAKANG'; }
+function updateGhostPositions() {
+  // Front player is at x=100, back player is at x=160
+  // (opponent is rendered at different X based on position)
+  if (mpState.opponentPosition === 'front') {
+    opponentGhost.displayX = 100; // Front position
+  } else {
+    opponentGhost.displayX = 170; // Behind my player
+  }
+}
+
+// =====================
+// SWAP BADGE (under FPS)
+// =====================
+function updateSwapBadge() {
+  const badge = document.getElementById('mpSwapBadge');
+  if (!mpState.isMultiplayerGame) { badge.style.display = 'none'; return; }
+  
+  const posIcon = mpState.myPosition === 'front' ? '⚔️DEPAN' : '🛡️BLKG';
+  badge.textContent = posIcon + ' | SWAP: ' + mpState.swapTimerDisplay + 's';
   badge.style.display = 'block';
+
+  // Position badge under fpsDisplay
+  const fpsEl = document.getElementById('fpsDisplay');
+  if (fpsEl) {
+    const fpsRect = fpsEl.getBoundingClientRect();
+    badge.style.top = (fpsRect.bottom + 4) + 'px';
+    badge.style.left = fpsEl.style.left || '10px';
+  } else {
+    badge.style.top = '60px';
+    badge.style.left = '10px';
+  }
 }
 
+// =====================
+// OPPONENT GHOST RENDERING
+// =====================
+function drawOpponentGhost() {
+  if (!mpState.isMultiplayerGame || !mpState.opponentId || typeof ctx === 'undefined') return;
+
+  const ghost = opponentGhost;
+  const groundY_val = typeof groundY !== 'undefined' ? groundY : 300;
+  
+  // Smooth X positioning
+  const targetX = ghost.displayX || (mpState.opponentPosition === 'front' ? 100 : 170);
+  ghost.x = ghost.x + (targetX - ghost.x) * 0.1;
+  
+  // Y from server state
+  const size = ghost.isDucking ? 25 : ghost.height;
+  const yPos = ghost.isDucking ? (ghost.y + 15) : ghost.y;
+  const renderY = ghost.y || (groundY_val - 40);
+
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+
+  // Draw block body
+  if (ghost.skinGradient) {
+    try {
+      const grd = ctx.createLinearGradient(ghost.x, renderY, ghost.x + ghost.width, renderY + size);
+      const parts = ghost.skinGradient.match(/#[0-9a-fA-F]{3,6}/g) || [ghost.skinColor, ghost.skinColor];
+      parts.forEach((c, i) => grd.addColorStop(i / (parts.length - 1), c));
+      ctx.fillStyle = grd;
+    } catch(e) { ctx.fillStyle = ghost.skinColor; }
+  } else {
+    ctx.fillStyle = ghost.skinColor || '#a855f7';
+  }
+  
+  const bSize = ghost.isDucking ? 25 : 40;
+  const bY = ghost.isDucking ? renderY + 15 : renderY;
+  ctx.fillRect(ghost.x + 9, bY + 9, 32, bSize);
+
+  // Purple outline to distinguish from self
+  ctx.strokeStyle = '#a855f7';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(ghost.x + 8, bY + 8, 34, bSize + 2);
+
+  // Name above head
+  if (mpSettings.oppName && ghost.name) {
+    ctx.globalAlpha = 0.95;
+    ctx.font = '6px "Press Start 2P", monospace';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    const nameX = ghost.x + 28;
+    const nameY = bY + 4;
+    // Background pill
+    const textW = ctx.measureText(ghost.name).width;
+    ctx.fillStyle = 'rgba(168,85,247,0.8)';
+    ctx.fillRect(nameX - textW/2 - 3, nameY - 8, textW + 6, 10);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(ghost.name.substring(0, 8), nameX, nameY);
+  }
+
+  // Dead indicator
+  if (mpState.opponentLives <= 0) {
+    ctx.globalAlpha = 0.4;
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('💀', ghost.x + 28, bY + 20);
+  }
+
+  ctx.restore();
+  ctx.textAlign = 'left';
+}
+
+// =====================
+// OPP LIVES UI (right of my lives)
+// =====================
+function updateOppLivesUI() {
+  const el = document.getElementById('teammLivesDisplay');
+  const countEl = document.getElementById('teammLivesCount');
+  if (!el || !countEl) return;
+  
+  if (mpState.isMultiplayerGame && mpSettings.oppLives) {
+    el.style.display = 'inline';
+    countEl.textContent = mpState.opponentLives;
+    el.style.color = mpState.opponentLives <= 0 ? '#666' : '#a855f7';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// =====================
+// RESPAWN
+// =====================
 function startRespawnCountdown(seconds) {
   const overlay = document.getElementById('respawnOverlay');
   overlay.style.display = 'block';
@@ -14808,170 +14916,181 @@ function startRespawnCountdown(seconds) {
   if (mpState.respawnInterval) clearInterval(mpState.respawnInterval);
   mpState.respawnInterval = setInterval(() => {
     remaining--;
-    document.getElementById('respawnCountdown').textContent = remaining;
-    if (remaining <= 0) { clearInterval(mpState.respawnInterval); }
+    document.getElementById('respawnCountdown').textContent = Math.max(0, remaining);
+    if (remaining <= 0) clearInterval(mpState.respawnInterval);
   }, 1000);
 }
 
-function setupMpHud() {
-  const hud = document.getElementById('opponentHud');
-  hud.classList.add('visible');
-  document.getElementById('oppName').textContent = mpState.opponentName || '???';
-  document.getElementById('oppLives').textContent = '❤️ ' + mpState.opponentLives;
-  document.getElementById('oppScore').textContent = 'RUN: 0';
-  document.getElementById('oppPosition').textContent = mpState.opponentPosition === 'front' ? '⚔️ DEPAN' : '🛡️ BELAKANG';
-  document.getElementById('oppStatus').textContent = '✅ Hidup';
-  updatePositionBadge();
-  document.getElementById('myPositionBadge').style.display = 'block';
-  document.getElementById('mpSettingsBtn').style.display = 'flex';
+// =====================
+// SETUP IN-GAME MP
+// =====================
+function setupMpIngame() {
+  // Show teammate lives
+  const livesDisplay = document.getElementById('livesDisplay');
+  if (livesDisplay) livesDisplay.style.display = 'flex';
+  document.getElementById('teammLivesDisplay').style.display = 'inline';
+  document.getElementById('teammLivesCount').textContent = mpState.opponentLives;
+
+  // Init ghost position
+  opponentGhost.y = typeof groundY !== 'undefined' ? groundY - 40 : 200;
+  updateGhostPositions();
+  updateSwapBadge();
 }
 
-function updateOppHud() {
-  const s = mpSettings;
-  document.getElementById('oppName').style.display = s.oppName ? '' : 'none';
-  document.getElementById('oppLives').style.display = s.oppLives ? '' : 'none';
-  document.getElementById('oppScore').style.display = s.oppScore ? '' : 'none';
-  document.getElementById('oppPosition').style.display = s.oppPosition ? '' : 'none';
-  document.getElementById('oppLives').textContent = '❤️ ' + mpState.opponentLives;
-  document.getElementById('oppScore').textContent = 'RUN: ' + mpState.opponentScore;
-  document.getElementById('oppPosition').textContent = mpState.opponentPosition === 'front' ? '⚔️ DEPAN' : '🛡️ BELAKANG';
-}
-
-function hideMpHud() {
-  document.getElementById('opponentHud').classList.remove('visible');
-  document.getElementById('myPositionBadge').style.display = 'none';
-  document.getElementById('mpSettingsBtn').style.display = 'none';
-  document.getElementById('mpSettingsPanel').classList.remove('open');
+function teardownMpIngame() {
   document.getElementById('respawnOverlay').style.display = 'none';
-  document.getElementById('swapCountdown').style.display = 'none';
+  document.getElementById('swapFlashOverlay').style.display = 'none';
+  document.getElementById('mpSwapBadge').style.display = 'none';
+  const el = document.getElementById('teammLivesDisplay');
+  if (el) el.style.display = 'none';
 }
 
-function toggleMpSettingsPanel() { document.getElementById('mpSettingsPanel').classList.toggle('open'); }
+// =====================
+// TOGGLE SETTINGS (in lobby chips)
+// =====================
 function toggleMpSetting(key) {
   mpSettings[key] = !mpSettings[key];
-  const capKey = key.charAt(0).toUpperCase() + key.slice(1);
-  const el = document.getElementById('toggleOpp' + capKey);
-  if (el) el.classList.toggle('on', mpSettings[key]);
-  updateOppHud();
+  const chipMap = { oppName:'chipOppName', oppLives:'chipOppLives', oppScore:'chipOppScore', oppPosition:'chipOppPos' };
+  const chip = document.getElementById(chipMap[key]);
+  if (chip) chip.classList.toggle('on', mpSettings[key]);
+  updateOppLivesUI();
 }
 
-let mpScoreSyncTimer = 0;
-function mpSyncScore() {
+// =====================
+// SCORE SYNC
+// =====================
+let mpSyncCounter = 0;
+function mpDoScoreSync() {
   if (!mpState.isMultiplayerGame || !socket) return;
-  mpScoreSyncTimer++;
-  if (mpScoreSyncTimer % 60 === 0) socket.emit('score_update', { scoreRun, scoreJump });
+  mpSyncCounter++;
+  if (mpSyncCounter % 60 === 0) {
+    socket.emit('score_update', { scoreRun, scoreJump });
+  }
+  // State sync for ghost rendering (every 2 frames)
+  if (mpSyncCounter % 2 === 0 && typeof player !== 'undefined') {
+    socket.emit('player_state', {
+      y: player.y, x: player.x,
+      isJumping: player.isJumping,
+      isDucking: player.isDucking
+    });
+  }
 }
 
+// =====================
+// SCREENS
+// =====================
 function showMpSetup() {
   connectSocket();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('mpSetup').classList.add('active');
-  const savedName = localStorage.getItem('mpPlayerName') || '';
-  if (savedName) document.getElementById('mpNameInput').value = savedName;
+  const saved = localStorage.getItem('mpPlayerName') || '';
+  if (saved) document.getElementById('mpNameInput').value = saved;
 }
 
 function showMpLobby() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('mpLobby').classList.add('active');
-  document.getElementById('mpRoomCodeDisplay').textContent = mpState.roomCode;
-  const skinEmoji = getMySkinEmoji();
-  document.getElementById('mpLobbyP1Skin').textContent = skinEmoji;
+  document.getElementById('mpRoomCodeDisplay').textContent = mpState.roomCode || '----';
+
+  getMySkinData();
+  document.getElementById('mpLobbyP1Skin').textContent = getSkinEmoji(mpState.mySkinId);
   document.getElementById('mpLobbyP1Name').textContent = mpState.myName;
   document.getElementById('mpLobbyP1Sub').textContent = mpState.isHost ? '👑 Host' : 'Kamu';
-  document.getElementById('mpLobbyP1Badge').textContent = '';
   document.getElementById('mpLobbyP2Card').classList.add('waiting');
-  document.getElementById('mpLobbyP2Name').textContent = 'MENUNGGU PLAYER...';
+  document.getElementById('mpLobbyP2Name').textContent = 'MENUNGGU...';
   document.getElementById('mpLobbyP2Skin').textContent = '👤';
+
+  // Show/hide map select based on host
+  updateLobbyForHost();
+  
+  if (mpState.selectedMode) {
+    document.getElementById('mpSelectedMapLabel').textContent = 'Map: ' + mpState.selectedMode.toUpperCase() + ' ✅';
+  }
 }
 
-function showMpMapSelect(isChooser) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('mpMapSelect').classList.add('active');
-  const cards = document.querySelectorAll('.mp-map-card');
-  if (isChooser) {
-    document.getElementById('mpMapHint').textContent = '👑 Pilih map untuk bermain!';
-    cards.forEach(c => c.style.pointerEvents = 'auto');
-    document.getElementById('mpMapWait').style.display = 'none';
+function updateLobbyForHost() {
+  const mapBtns = document.getElementById('mpMapBtns');
+  const mapLabel = document.getElementById('mpMapLabel');
+  if (mpState.isHost) {
+    mapBtns.style.pointerEvents = 'auto'; mapBtns.style.opacity = '1';
+    mapLabel.textContent = '👑 Pilih Map:';
   } else {
-    document.getElementById('mpMapHint').textContent = 'Host sedang memilih map...';
-    cards.forEach(c => c.style.pointerEvents = 'none');
-    document.getElementById('mpMapWait').style.display = 'block';
+    mapBtns.style.pointerEvents = 'none'; mapBtns.style.opacity = '0.5';
+    mapLabel.textContent = '🗺️ Map (dipilih host):';
   }
 }
 
 function updateLobbyPlayers(players) {
   const me = players.find(p => p.id === mpState.myId);
   const opp = players.find(p => p.id !== mpState.myId);
+
   if (me) {
-    document.getElementById('mpLobbyP1Skin').textContent = getSkinEmoji(me.skin);
+    document.getElementById('mpLobbyP1Skin').textContent = getSkinEmoji(me.skinId);
     document.getElementById('mpLobbyP1Name').textContent = me.name;
     document.getElementById('mpLobbyP1Badge').innerHTML = me.ready
       ? '<span class="lobby-ready-badge">✅ READY</span>'
-      : '<span class="lobby-waiting-badge">MENUNGGU...</span>';
+      : '<span class="lobby-waiting-badge">...</span>';
   }
+
   if (opp) {
-    mpState.opponentId = opp.id; mpState.opponentName = opp.name; mpState.opponentSkin = opp.skin;
+    mpState.opponentId = opp.id; mpState.opponentName = opp.name;
+    mpState.opponentSkinId = opp.skinId; mpState.opponentSkinColor = opp.skinColor;
     document.getElementById('mpLobbyP2Card').classList.remove('waiting');
-    document.getElementById('mpLobbyP2Skin').textContent = getSkinEmoji(opp.skin);
+    document.getElementById('mpLobbyP2Skin').textContent = getSkinEmoji(opp.skinId);
     document.getElementById('mpLobbyP2Name').textContent = opp.name;
     document.getElementById('mpLobbyP2Sub').textContent = '';
     document.getElementById('mpLobbyP2Badge').innerHTML = opp.ready
       ? '<span class="lobby-ready-badge">✅ READY</span>'
-      : '<span class="lobby-waiting-badge">MENUNGGU...</span>';
-    document.getElementById('mpLobbyStatus').textContent = me && me.ready && opp.ready ? '🚀 Menuju pilih map...' : 'Klik READY saat siap!';
+      : '<span class="lobby-waiting-badge">...</span>';
+    const bothReady = me && me.ready && opp.ready;
+    document.getElementById('mpLobbyStatus').textContent = bothReady ? '🚀 Memulai...' : 'Klik READY saat siap!';
   } else {
-    document.getElementById('mpLobbyStatus').textContent = 'Tunggu temanmu join dulu...';
+    document.getElementById('mpLobbyStatus').textContent = 'Tunggu teman join...';
   }
 }
 
-function getSkinEmoji(skinId) {
-  const map = { default:'🟩',egypt:'🏺',night:'🦇',day:'☀️',snow:'⛄',ocean:'🐠',sakura:'🌸',
-    pharaoh:'👑',mummy:'🏚️',anubis:'🐺',cleopatra:'💎',ninja:'🥷',astronaut:'🚀',
-    robot:'🤖',wizard:'🧙',knight:'⚔️',dragon:'🐉',cat:'🐱',fox:'🦊',panda:'🐼',bunny:'🐰' };
-  return map[skinId] || '🟩';
-}
-
-function getMySkinEmoji() {
-  const skinId = (typeof playerData !== 'undefined' && playerData.equippedSkins)
-    ? (playerData.equippedSkins[currentMode] || playerData.equippedSkins.default || 'default') : 'default';
-  mpState.mySkin = skinId;
-  return getSkinEmoji(skinId);
-}
-
+// =====================
+// ACTIONS
+// =====================
 function mpCreateRoom() {
   const name = document.getElementById('mpNameInput').value.trim().toUpperCase();
-  if (!name || name.length < 2) { showMpToast('❌ Nama minimal 2 karakter!'); return; }
-  mpState.myName = name; getMySkinEmoji();
+  if (!name || name.length < 2) { showMpToast('❌ Nama min 2 karakter!'); return; }
+  mpState.myName = name;
   localStorage.setItem('mpPlayerName', name);
+  getMySkinData();
   if (!socket || !socket.connected) { showMpToast('⏳ Connecting...'); setTimeout(mpCreateRoom, 1200); return; }
-  socket.emit('create_room', { name, skin: mpState.mySkin });
+  socket.emit('create_room', { name, skinId: mpState.mySkinId, skinColor: mpState.mySkinColor, skinGradient: mpState.mySkinGradient, lives: mpState.myLives || 1 });
 }
 
 function mpJoinRoom() {
   const name = document.getElementById('mpNameInput').value.trim().toUpperCase();
   const code = document.getElementById('mpCodeInput').value.trim().toUpperCase();
-  if (!name || name.length < 2) { showMpToast('❌ Nama minimal 2 karakter!'); return; }
-  if (!code || code.length < 4) { showMpToast('❌ Masukkan kode room 4 karakter!'); return; }
-  mpState.myName = name; getMySkinEmoji();
+  if (!name || name.length < 2) { showMpToast('❌ Nama min 2 karakter!'); return; }
+  if (!code || code.length < 4) { showMpToast('❌ Kode room 4 karakter!'); return; }
+  mpState.myName = name;
   localStorage.setItem('mpPlayerName', name);
+  getMySkinData();
   if (!socket || !socket.connected) { showMpToast('⏳ Connecting...'); setTimeout(mpJoinRoom, 1200); return; }
-  socket.emit('join_room', { code, name, skin: mpState.mySkin });
+  socket.emit('join_room', { code, name, skinId: mpState.mySkinId, skinColor: mpState.mySkinColor, skinGradient: mpState.mySkinGradient, lives: mpState.myLives || 1 });
 }
 
 function mpLeaveRoom() {
-  mpState.inRoom = false; mpState.roomCode = null; mpState.isHost = false; mpState.ready = false;
-  if (socket) socket.disconnect(); socket = null; showMenu();
+  mpState.inRoom = false; mpState.roomCode = null; mpState.isHost = false;
+  mpState.ready = false; mpState.selectedMode = null;
+  if (socket) { socket.disconnect(); socket = null; }
+  showMenu();
 }
 
 function mpToggleReady() {
-  if (!mpState.opponentId) { showMpToast('⏳ Tunggu teman join dulu!'); return; }
+  if (!mpState.opponentId) { showMpToast('⏳ Tunggu teman join!'); return; }
+  if (!mpState.selectedMode) { showMpToast('❌ Pilih map dulu!'); return; }
   mpState.ready = !mpState.ready;
   const btn = document.getElementById('mpReadyBtn');
   if (mpState.ready) {
     btn.textContent = '❌ BATAL READY';
     btn.style.background = '#ff6b6b'; btn.style.boxShadow = '4px 4px 0 #cc5555';
-    const lives = (typeof getCurrentSkin === 'function') ? (getCurrentSkin().lives || 1) : 1;
-    socket.emit('player_ready', { lives });
+    getMySkinData();
+    socket.emit('player_ready', { lives: mpState.myLives || 1, skinId: mpState.mySkinId, skinColor: mpState.mySkinColor, skinGradient: mpState.mySkinGradient });
   } else {
     btn.textContent = '✅ READY';
     btn.style.background = '#a855f7'; btn.style.boxShadow = '4px 4px 0 #4c1d95';
@@ -14981,37 +15100,54 @@ function mpToggleReady() {
 
 function mpSelectMap(mode) {
   if (!mpState.isHost) return;
+  mpState.selectedMode = mode;
   socket.emit('select_map', { mode });
+  document.getElementById('mpSelectedMapLabel').textContent = 'Map: ' + mode.toUpperCase() + ' ✅';
+  // Highlight selected
+  document.querySelectorAll('.mp-map-card-sm').forEach(c => c.style.outline = 'none');
+  event.currentTarget.style.outline = '3px solid #00ff88';
 }
 
+// =====================
+// TOAST
+// =====================
 let mpToastTimeout;
 function showMpToast(msg) {
   const el = document.getElementById('mpToast');
   el.textContent = msg; el.style.display = 'block';
   clearTimeout(mpToastTimeout);
-  mpToastTimeout = setTimeout(() => { el.style.display = 'none'; }, 2500);
+  mpToastTimeout = setTimeout(() => { el.style.display = 'none'; }, 2800);
 }
 
-// Patch game functions after load
+// =====================
+// PATCHES (after window load)
+// =====================
 window.addEventListener('load', () => {
-  // Block local spawning during multiplayer (server controls it)
+  // Block local spawning in MP mode
   if (typeof spawnObstacle !== 'undefined') {
-    const orig = spawnObstacle;
+    const orig = window.spawnObstacle;
     window.spawnObstacle = function() { if (mpState.isMultiplayerGame) return; orig(); };
   }
   if (typeof spawnCoin !== 'undefined') {
-    const orig = spawnCoin;
+    const orig = window.spawnCoin;
     window.spawnCoin = function() { if (mpState.isMultiplayerGame) return; orig(); };
   }
-  // Patch endGame
+
+  // Patch endGame to handle MP
   if (typeof endGame !== 'undefined') {
-    const orig = endGame;
+    const orig = window.endGame;
     window.endGame = function() {
+      if (mpState.isMultiplayerGame) {
+        // Don't show gameover screen if only I died (let respawn happen)
+        if (!mpState.myAlive && mpState.opponentId) return;
+        teardownMpIngame();
+        mpState.isMultiplayerGame = false;
+      }
       orig.apply(this, arguments);
-      if (mpState.isMultiplayerGame) { hideMpHud(); mpState.isMultiplayerGame = false; }
     };
   }
-  // Watch for player death via livesCount
+
+  // Watch player lives for death detection
   const livesEl = document.getElementById('livesCount');
   if (livesEl) {
     new MutationObserver(() => {
@@ -15022,24 +15158,58 @@ window.addEventListener('load', () => {
       }
     }).observe(livesEl, { childList: true, characterData: true, subtree: true });
   }
-  // Score sync: hook into requestAnimationFrame loop
+
+  // Patch coin collection to sync
+  // We intercept via the coin collision in gameLoop by patching sessionCoins increment
   const origRAF = window.requestAnimationFrame;
-  let rafSyncCounter = 0;
+  let rafCounter = 0;
   window.requestAnimationFrame = function(cb) {
     return origRAF.call(window, function(ts) {
       cb(ts);
-      if (mpState.isMultiplayerGame && gameRunning) {
-        rafSyncCounter++;
-        if (rafSyncCounter % 60 === 0 && socket) {
-          socket.emit('score_update', { scoreRun, scoreJump });
+      if (mpState.isMultiplayerGame && typeof gameRunning !== 'undefined' && gameRunning) {
+        mpDoScoreSync();
+        updateSwapBadge();
+        updateOppLivesUI();
+
+        // Draw opponent ghost AFTER player draw (inject into render)
+        drawOpponentGhost();
+
+        // Detect front player hit by obstacle
+        rafCounter++;
+        if (rafCounter % 6 === 0 && mpState.myPosition === 'front' && socket) {
+          // Check if player just got hit (lives decreased)
+          // This is handled by livesEl MutationObserver above
         }
       }
     });
   };
+
+  // Sync coin collection: patch the coin collected part
+  // Watch coinCount element for changes
+  const coinEl = document.getElementById('coinCount');
+  let lastCoinCount = 0;
+  if (coinEl) {
+    new MutationObserver(() => {
+      const newVal = parseInt(coinEl.textContent) || 0;
+      if (mpState.isMultiplayerGame && newVal > lastCoinCount && socket) {
+        // A coin was collected - find which one and sync
+        socket.emit('coin_collected', { index: 0 }); // server handles shared count
+      }
+      lastCoinCount = newVal;
+    }).observe(coinEl, { childList: true, characterData: true, subtree: true });
+  }
 });
 
-console.log('🎮 bl0ck run multiplayer ready!');
-</script>
+// Position swap badge right after fpsDisplay is positioned
+document.addEventListener('DOMContentLoaded', () => {
+  const fpsEl = document.getElementById('fpsDisplay');
+  if (fpsEl) {
+    const badge = document.getElementById('mpSwapBadge');
+    // Position will be set dynamically in updateSwapBadge()
+  }
+});
 
+console.log('🎮 bl0ck run multiplayer v2 loaded!');
+</script>
 </body>
 </html>
