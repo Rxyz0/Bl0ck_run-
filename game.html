@@ -6768,6 +6768,11 @@ function createAndUpdateLoveTrail() {
 
     const skin = getCurrentSkin();
     if (!skin.ability) return;
+
+    // Emit ability to opponent in MP so they can see the visual effect
+    if (typeof mpState !== 'undefined' && mpState.isMultiplayerGame && typeof socket !== 'undefined' && socket) {
+      socket.emit('use_ability', { abilityType: skin.abilityType, abilityId: skin.id });
+    }
     
     if (skin.abilityType === 'solar_blaster') {
         solarBlasterActive = true;
@@ -6922,6 +6927,11 @@ function useAbility2() {
     
     playSound('ability');
     vibrate(100);
+
+    // Emit ability to opponent in MP
+    if (typeof mpState !== 'undefined' && mpState.isMultiplayerGame && typeof socket !== 'undefined' && socket) {
+      socket.emit('use_ability', { abilityType: 'heart_shot', abilityId: skin.id });
+    }
     
     // Tembak heart pertama LANGSUNG saat diklik
     heartShots.push({
@@ -13373,6 +13383,13 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
     
     // Skip collision check jika solar blaster aktif dan obstacle sudah dihancurkan
     if (!solarBlasterActive || frameCount % 2 !== 0) {
+    // In MP: skip collision if respawning (playerLives=999 guard), OR if I'm the back player
+    const mpSkipCollision = mpState.isMultiplayerGame && (
+      window._mpRespawnInProgress === true ||
+      mpState.myPosition === 'back'  // back player is safe from obstacles
+    );
+
+    if (!mpSkipCollision) {
     // Special collision for seagull (harus duck)
     let collided = false;
     if (obs.type === 'seagull') {
@@ -13389,6 +13406,8 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
         if (shieldActive && shieldHits > 0) {
             shieldHits--;
             obstacles.splice(i, 1);
+            // Sync obstacle destroyed to server in MP
+            if (mpState.isMultiplayerGame && socket) socket.emit('obstacle_destroyed', { obstacleIndex: i });
 
            playSound('hit');
         vibrate(50);
@@ -13407,9 +13426,11 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
             if (shieldHits <= 0) {
                 shieldActive = false;
             }
-        } else if (playerLives > 1) {
+        } else if (playerLives > 1 && !(mpState.isMultiplayerGame && playerLives >= 999)) {
             playerLives--;
             obstacles.splice(i, 1);
+            // Sync obstacle destroyed to server in MP
+            if (mpState.isMultiplayerGame && socket) socket.emit('obstacle_destroyed', { obstacleIndex: i });
 
             playSound('hit');
         vibrate([50, 50, 50]); // Triple vibration
@@ -13427,7 +13448,7 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
                     color: '#FFD700'
                 });
             }
-        } else {
+        } else if (!(mpState.isMultiplayerGame && playerLives >= 999)) {
               playSound('hit');
         vibrate([100, 50, 100]); // Death vibration pattern
 
@@ -13435,6 +13456,7 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
             return;
         }
     }
+    } // end mpSkipCollision guard
 }
                 
                 if (!obs.passed && obs.x + obs.width < player.x) {
@@ -14682,8 +14704,13 @@ function connectSocket() {
         window._mpRespawnInProgress = false;
         document.getElementById('respawnOverlay').style.display = 'none';
         if (mpState.respawnInterval) { clearInterval(mpState.respawnInterval); mpState.respawnInterval = null; }
-        // Restore player state
-        if (typeof playerLives !== 'undefined') { playerLives = 1; }
+        // Restore player state - give back 1 life (or skin's lives)
+        if (typeof playerLives !== 'undefined') {
+          const skin = typeof getCurrentSkin === 'function' ? getCurrentSkin() : null;
+          playerLives = (skin && skin.lives) ? skin.lives : 1;
+          maxLives = playerLives;
+          updateAbilityButton();
+        }
         if (typeof player !== 'undefined') {
           const gY = typeof groundY !== 'undefined' ? groundY : 300;
           player.y = gY - 40; player.velocityY = 0; player.isJumping = false; player.isDucking = false;
@@ -14737,8 +14764,13 @@ function connectSocket() {
     if (typeof coins !== 'undefined' && coins[index]) {
       coins.splice(index, 1);
     }
+    // Use flag to prevent MutationObserver from re-emitting
+    if (typeof window._mpSetServerUpdatingCoins === 'function') window._mpSetServerUpdatingCoins(true);
     sessionCoins = totalCoins;
     document.getElementById('coinCount').textContent = totalCoins;
+    requestAnimationFrame(() => {
+      if (typeof window._mpSetServerUpdatingCoins === 'function') window._mpSetServerUpdatingCoins(false);
+    });
   });
 
   // Score sync
@@ -14818,26 +14850,41 @@ function handleSwapEvent(positions, reason) {
   updateSwapBadge();
   updateOppLivesUI();
 
+  // Move ghost to new position
+  updateGhostPositions();
+
+  // Move MY player to new position too (both players actually move)
+  updateMyPlayerPosition();
+
   // Flash overlay
   const overlay = document.getElementById('swapFlashOverlay');
   overlay.textContent = mpState.myPosition === 'front' ? '⚔️ KAMU DEPAN!' : '🛡️ KAMU BELAKANG!';
   overlay.style.display = 'flex';
   setTimeout(() => { overlay.style.display = 'none'; }, 1200);
-
-  // Update opponent ghost X position based on positions
-  updateGhostPositions();
 }
 
 function updateGhostPositions() {
-  // Match exact player X positions: player is at x=100 when front
-  // When opponent is front: x=100, when back: x=160 (behind player)
+  // FRONT position: x=100 (same as main player's default x, facing obstacles)
+  // BACK position: x=180 (further back, safer)
   if (mpState.opponentPosition === 'front') {
-    opponentGhost.displayX = 100; // Same as player.x front position
+    opponentGhost.displayX = 100;
   } else {
-    opponentGhost.displayX = 160; // Slightly behind
+    opponentGhost.displayX = 180; // Behind the front player
   }
-  // Force immediate jump for swap visibility
+  // Move opponent ghost immediately (snap halfway for visibility)
   opponentGhost.x = opponentGhost.x + (opponentGhost.displayX - opponentGhost.x) * 0.5;
+}
+
+// Move my own player X based on my position
+function updateMyPlayerPosition() {
+  if (typeof player === 'undefined') return;
+  const targetX = mpState.myPosition === 'front' ? 100 : 180;
+  // Animate player to new X over ~20 frames
+  if (Math.abs(player.x - targetX) > 1) {
+    player.x = player.x + (targetX - player.x) * 0.12;
+  } else {
+    player.x = targetX;
+  }
 }
 
 // =====================
@@ -14873,9 +14920,9 @@ function drawOpponentGhost() {
   const ghost = opponentGhost;
   const groundY_val = typeof groundY !== 'undefined' ? groundY : 300;
   
-  // Smooth X positioning - faster lerp for swap visibility
-  const targetX = ghost.displayX || (mpState.opponentPosition === 'front' ? 100 : 160);
-  ghost.x = ghost.x + (targetX - ghost.x) * 0.18;
+  // Smooth X positioning - use displayX set by updateGhostPositions()
+  const targetX = ghost.displayX !== undefined ? ghost.displayX : (mpState.opponentPosition === 'front' ? 100 : 180);
+  ghost.x = ghost.x + (targetX - ghost.x) * 0.12; // smooth lerp
   
   // Y: snap to ground when not jumping
   const baseY = ghost.isJumping ? (ghost.y || groundY_val - 40) : (groundY_val - 40);
@@ -14997,6 +15044,10 @@ function drawOpponentAbilityEffect() {
   const eff = mpOppAbilityEffect;
   if (eff.duration <= 0) { mpOppAbilityEffect = null; return; }
 
+  // Track ghost position live so the effect follows the opponent
+  const liveX = opponentGhost.x || eff.x;
+  const liveY = opponentGhost.y || eff.y;
+
   const progress = eff.duration / eff.maxDuration;
   const alpha = progress;
   const radius = (1 - progress) * 80 + 10;
@@ -15018,15 +15069,15 @@ function drawOpponentAbilityEffect() {
   ctx.strokeStyle = color;
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.arc(eff.x + 20, eff.y + 20, radius, 0, Math.PI * 2);
+  ctx.arc(liveX + 20, liveY + 20, radius, 0, Math.PI * 2);
   ctx.stroke();
 
   // Pixel burst particles
   for (let i = 0; i < 8; i++) {
     const ang = (i / 8) * Math.PI * 2 + fc * 0.1;
     const dist = radius * 0.7;
-    const px = eff.x + 20 + Math.cos(ang) * dist;
-    const py = eff.y + 20 + Math.sin(ang) * dist;
+    const px = liveX + 20 + Math.cos(ang) * dist;
+    const py = liveY + 20 + Math.sin(ang) * dist;
     ctx.fillStyle = color;
     ctx.fillRect(px - 3, py - 3, 6, 6);
   }
@@ -15035,7 +15086,7 @@ function drawOpponentAbilityEffect() {
   if (eff.duration > eff.maxDuration * 0.7) {
     ctx.globalAlpha = alpha * 1.2;
     ctx.fillStyle = color;
-    ctx.fillRect(eff.x + 8, eff.y + 8, 24, 24);
+    ctx.fillRect(liveX + 8, liveY + 8, 24, 24);
   }
 
   ctx.restore();
@@ -15089,6 +15140,11 @@ function setupMpIngame() {
   opponentGhost.y = typeof groundY !== 'undefined' ? groundY - 40 : 200;
   updateGhostPositions();
   updateSwapBadge();
+
+  // Set initial player X based on starting position
+  if (typeof player !== 'undefined') {
+    player.x = mpState.myPosition === 'front' ? 100 : 180;
+  }
 }
 
 function teardownMpIngame() {
@@ -15310,12 +15366,18 @@ window.addEventListener('load', () => {
     const orig = window.endGame;
     window.endGame = function() {
       if (mpState.isMultiplayerGame) {
-        // In multiplayer, endGame is called by game engine when obstacle hits
-        // But we intercept it: if my opponent is still alive, just emit player_died
-        // and show respawn overlay. Only end game for real if game_over_all from server.
         if (!mpState._gameOverAll) {
-          // Don't show game over screen - let respawn handle it
-          // Keep game running so canvas doesn't stop
+          // Player died in MP - emit to server if not already done
+          if (mpState.myAlive) {
+            mpState.myAlive = false;
+            if (socket) socket.emit('player_died');
+            startRespawnCountdown(25);
+          }
+          // Keep game loop running but set lives high so obstacles don't retrigger
+          if (typeof playerLives !== 'undefined') {
+            playerLives = 999; // Prevent re-trigger during respawn
+          }
+          window._mpRespawnInProgress = true;
           gameRunning = true;
           return;
         }
@@ -15328,60 +15390,53 @@ window.addEventListener('load', () => {
     };
   }
 
-  // Watch player lives for death detection
-  const livesEl = document.getElementById('livesCount');
-  if (livesEl) {
-    new MutationObserver(() => {
-      const val = parseInt(livesEl.textContent) || 0;
-      if (mpState.isMultiplayerGame && val <= 0 && mpState.myAlive) {
-        mpState.myAlive = false;
-        if (socket) socket.emit('player_died');
-        // Show respawn overlay immediately in case you_died event has latency
-        startRespawnCountdown(25);
-      }
-    }).observe(livesEl, { childList: true, characterData: true, subtree: true });
-  }
+  // NOTE: Death detection is handled inside the endGame patch above.
+  // We do NOT use a MutationObserver on livesCount because that causes
+  // double-emit and race conditions with the playerLives=999 respawn trick.
 
   // Patch coin collection to sync
   // We intercept via the coin collision in gameLoop by patching sessionCoins increment
+  // NOTE: We do NOT patch requestAnimationFrame anymore to avoid per-frame overhead/lag
+  // Instead, MP per-frame tasks run inside the existing gameLoop via a lightweight hook
+  window._mpPerFrameHook = function() {
+    if (!mpState.isMultiplayerGame || typeof gameRunning === 'undefined' || !gameRunning) return;
+    mpDoScoreSync();
+    updateSwapBadge();
+    updateOppLivesUI();
+    updateMyPlayerPosition(); // Smooth player X animation after swap
+    drawOpponentGhost();
+    drawOpponentAbilityEffect();
+  };
+
+  // Patch gameLoop to call MP hook at end
   const origRAF = window.requestAnimationFrame;
-  let rafCounter = 0;
   window.requestAnimationFrame = function(cb) {
     return origRAF.call(window, function(ts) {
       cb(ts);
-      if (mpState.isMultiplayerGame && typeof gameRunning !== 'undefined' && gameRunning) {
-        mpDoScoreSync();
-        updateSwapBadge();
-        updateOppLivesUI();
-
-        // Draw opponent ghost AFTER player draw (inject into render)
-        drawOpponentGhost();
-        drawOpponentAbilityEffect();
-
-        // Detect front player hit by obstacle
-        rafCounter++;
-        if (rafCounter % 6 === 0 && mpState.myPosition === 'front' && socket) {
-          // Check if player just got hit (lives decreased)
-          // This is handled by livesEl MutationObserver above
-        }
+      if (typeof window._mpPerFrameHook === 'function') {
+        window._mpPerFrameHook();
       }
     });
   };
 
-  // Sync coin collection: patch the coin collected part
-  // Watch coinCount element for changes
+  // Sync coin collection: watch coinCount for LOCAL player collecting
+  // Use a flag to prevent re-emit when SERVER updates our coinCount
   const coinEl = document.getElementById('coinCount');
   let lastCoinCount = 0;
+  let _mpServerUpdatingCoins = false; // flag: server is updating, don't re-emit
   if (coinEl) {
     new MutationObserver(() => {
       const newVal = parseInt(coinEl.textContent) || 0;
-      if (mpState.isMultiplayerGame && newVal > lastCoinCount && socket) {
-        // A coin was collected - find which one and sync
-        socket.emit('coin_collected', { index: 0 }); // server handles shared count
+      if (mpState.isMultiplayerGame && newVal > lastCoinCount && socket && !_mpServerUpdatingCoins) {
+        // Local player collected a coin - sync to server
+        socket.emit('coin_collected', { index: 0 });
       }
       lastCoinCount = newVal;
     }).observe(coinEl, { childList: true, characterData: true, subtree: true });
   }
+
+  // Expose flag so sync_coin_collect handler can suppress re-emit
+  window._mpSetServerUpdatingCoins = function(v) { _mpServerUpdatingCoins = v; };
 });
 
 // Position swap badge right after fpsDisplay is positioned
