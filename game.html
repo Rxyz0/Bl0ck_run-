@@ -13089,8 +13089,11 @@ if (waveActive) {
         ctx.fillRect(lx + swing - 8, lanternTop, 34, 40);
     });
     
-    // Game particles
-    particles.forEach((p, i) => {
+    // Game particles — cap di 80 saat MP, 200 saat solo
+    const maxParticles = (typeof mpState !== 'undefined' && mpState.isPlaying) ? 80 : 200;
+    if (particles.length > maxParticles) particles.splice(0, particles.length - maxParticles);
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
         if (p.life !== undefined) {
             ctx.fillStyle = p.color;
             const px = Math.floor(p.x / 4) * 4;
@@ -13101,7 +13104,7 @@ if (waveActive) {
             p.life--;
             if (p.life <= 0) particles.splice(i, 1);
         }
-    });
+    }
 }
           
             ctx.fillStyle = currentMode === 'snow' ? '#F0F8FF' : currentMode === 'sakura' ? '#CD853F' : '#8B4513';
@@ -13201,6 +13204,11 @@ function updateAllCoinDisplays() {
             // Sync score ke server setiap 60 frame (1 detik) saat MP
             if (frameCount % 60 === 0 && typeof mpState !== 'undefined' && mpState.isPlaying && typeof socket !== 'undefined' && socket) {
                 socket.emit('score_update', { scoreRun, scoreJump });
+            }
+
+            // Sync posisi ke server setiap 3 frame saat MP
+            if (frameCount % 3 === 0 && typeof mpState !== 'undefined' && mpState.isPlaying) {
+                _mpEmitPlayerState();
             }
             
             if (abilityCooldown > 0) {
@@ -13343,7 +13351,10 @@ if (currentMode === 'ocean') {
         }
     }
 }
-updateDustParticles();
+const _isMPActive = typeof mpState !== 'undefined' && mpState.isPlaying;
+
+// Dust particles — skip di MP
+if (!_isMPActive) updateDustParticles();
 
 updateSolarBlaster();
 updateLunarShield();
@@ -13353,10 +13364,14 @@ updateIceBlast();
 updateTidalWave();
 updateIceSpikes();
 updateHeartShot();
-if (typeof mpState !== "undefined" && mpState.isPlaying) updateOppAbility();
-updateSnowflakes();
-updatePlayerSnowTrail();
-createAndUpdateLoveTrail();
+if (_isMPActive) updateOppAbility();
+
+// Snow/trail effects — skip di MP untuk hemat FPS
+if (!_isMPActive) {
+    updateSnowflakes();
+    updatePlayerSnowTrail();
+    createAndUpdateLoveTrail();
+}
 
 // === SURFING EFFECTS (Ocean mode - BIG WAVE only) ===
 if (currentMode === 'ocean' && surfing && waveActive && currentWaveType === 'big') {
@@ -13398,7 +13413,10 @@ if (meteorShowerActive && currentMode === 'night') {
             playerDodgeX = canvas.width - player.width;
         }
     }
-    player.x = playerDodgeX;
+    // Jangan override player.x di MP (posisi fixed)
+    if (!(typeof mpState !== 'undefined' && mpState.isPlaying)) {
+        player.x = playerDodgeX;
+    }
 }
 
 player.update();
@@ -14162,6 +14180,13 @@ if (currentMode === 'night' && gameMode === 'minigame') {
             // Set gameMode jadi 'normal' untuk mode yang tidak punya mini game
             if (mode === 'egypt' || mode === 'snow') {
                 gameMode = 'normal';
+            }
+
+            // === PERFORMANCE: Force low quality saat MP untuk hindari FPS drop ===
+            if (typeof mpState !== 'undefined' && mpState.isPlaying) {
+                graphicsQuality = 'low';
+                particleMultiplier = 0.2;
+                effectsEnabled = false;
             }
             
             score = 0;
@@ -16151,27 +16176,15 @@ const _mpOrigAddEventListener = document.addEventListener.bind(document);
     });
 })();
 
-// Emit player state to server every ~3 frames for ghost
-(function() {
-    let _mpStateFrame = 0;
-    const _origRaf = window.requestAnimationFrame;
-    window.requestAnimationFrame = function(cb) {
-        return _origRaf(function(ts) {
-            cb(ts);
-            if (mpState.isPlaying && socket && typeof player !== 'undefined' && gameRunning) {
-                _mpStateFrame++;
-                if (_mpStateFrame % 3 === 0) {
-                    socket.emit('player_state', {
-                        y: player.y, x: player.x,
-                        isJumping: player.isJumping,
-                        isDucking: player.isDucking
-                    });
-                    // mpDrawOpponent dipanggil dari gameLoop langsung, tidak perlu double call di sini
-                }
-            }
-        });
-    };
-})();
+// Player state sync ke server - dipanggil dari gameLoop, bukan rAF patch
+function _mpEmitPlayerState() {
+    if (!mpState.isPlaying || !socket) return;
+    socket.emit('player_state', {
+        y: player.y, x: player.x,
+        isJumping: player.isJumping,
+        isDucking: player.isDucking
+    });
+}
     </script>
 
 <!-- =====================
