@@ -5086,6 +5086,11 @@ updateMissionNotification();
 
         function togglePause() {
             if (!gameRunning) return;
+            // In multiplayer, pause is disabled - game must keep running for sync
+            if (typeof mpState !== 'undefined' && mpState.isMultiplayerGame) {
+                showMpToast('⚠️ Pause tidak bisa saat multiplayer!');
+                return;
+            }
             
             gamePaused = !gamePaused;
             
@@ -5111,6 +5116,15 @@ updateMissionNotification();
             document.getElementById('pauseScreen').classList.remove('active');
             showMenu();
         }
+
+        // Auto-pause when tab is hidden (solo only)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && gameRunning && !gamePaused) {
+                if (typeof mpState === 'undefined' || !mpState.isMultiplayerGame) {
+                    togglePause();
+                }
+            }
+        });
 
         function showGameTypeSelect() {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -11039,7 +11053,8 @@ class Meteor {
         currentY += bandHeight;
     });
     
-    // Dithering antar warna untuk transisi pixel yang smooth
+    // Dithering antar warna untuk transisi pixel yang smooth (skip in MP for performance)
+    if (!mpState.isMultiplayerGame) {
     currentY = 0;
     for (let i = 0; i < skyBands.length - 1; i++) {
         currentY += canvas.height * skyBands[i].height;
@@ -11052,6 +11067,7 @@ class Meteor {
                 }
             }
         }
+    }
     }
     
     // === PIXEL SUN - Sunset Style ===
@@ -11302,7 +11318,8 @@ class Meteor {
         currentY += bandHeight;
     });
     
-    // Dithering antar warna untuk transisi pixel
+    // Dithering antar warna untuk transisi pixel (skip in MP)
+    if (!mpState.isMultiplayerGame) {
     currentY = 0;
     for (let i = 0; i < skyBands.length - 1; i++) {
         currentY += canvas.height * skyBands[i].height;
@@ -11315,6 +11332,7 @@ class Meteor {
                 }
             }
         }
+    }
     }
     
     // === PIXEL SUN - Bright Midday ===
@@ -11626,7 +11644,8 @@ class Meteor {
         currentY += bandHeight;
     });
     
-    // Dithering antar warna
+    // Dithering antar warna (skip in MP)
+    if (!mpState.isMultiplayerGame) {
     currentY = 0;
     for (let i = 0; i < skyBands.length - 1; i++) {
         currentY += canvas.height * skyBands[i].height;
@@ -11639,6 +11658,7 @@ class Meteor {
                 }
             }
         }
+    }
     }
     
     // === PIXEL STARS - Multiple Types ===
@@ -11969,7 +11989,8 @@ class Meteor {
         ctx.fillRect(0, skyY, canvas.width, h);
         skyY += h;
     });
-    // Dithering transitions
+    // Dithering transitions (skip in MP)
+    if (!mpState.isMultiplayerGame) {
     skyY = 0;
     for (let i = 0; i < skyBands.length - 1; i++) {
         skyY += canvas.height * skyBands[i].height;
@@ -11979,6 +12000,7 @@ class Meteor {
                 if ((x/4 + dy/4) % 2 === 0) ctx.fillRect(x, skyY + dy, 4, 4);
             }
         }
+    }
     }
 
     // === WINTER SUN (pale, static position) ===
@@ -12206,7 +12228,8 @@ class Meteor {
         ctx.fillRect(0, skyY, canvas.width, h);
         skyY += h;
     });
-    // Dithering
+    // Dithering (skip in MP)
+    if (!mpState.isMultiplayerGame) {
     skyY = 0;
     for (let i = 0; i < skyBands.length - 1; i++) {
         skyY += canvas.height * skyBands[i].height;
@@ -12216,6 +12239,7 @@ class Meteor {
                 if ((x/4 + dy/4) % 2 === 0) ctx.fillRect(x, skyY + dy, 4, 4);
             }
         }
+    }
     }
 
     // === SUN - Bright tropical ===
@@ -12683,7 +12707,8 @@ if (waveActive) {
         skyY += h;
     });
     
-    // Dithering transitions
+    // Dithering transitions (skip in MP)
+    if (!mpState.isMultiplayerGame) {
     skyY = 0;
     for (let i = 0; i < skyBands.length - 1; i++) {
         skyY += canvas.height * skyBands[i].height;
@@ -12695,6 +12720,7 @@ if (waveActive) {
                 }
             }
         }
+    }
     }
     
     // === PINK SUN (setting/rising - khas Jepang) ===
@@ -13017,8 +13043,10 @@ if (waveActive) {
         ctx.fillRect(lx + swing - 8, lanternTop, 34, 40);
     });
     
-    // Game particles
-    particles.forEach((p, i) => {
+    // Game particles - cap at 150 to prevent lag
+    if (particles.length > 150) particles.splice(0, particles.length - 150);
+    for (let _pi = particles.length - 1; _pi >= 0; _pi--) {
+        const p = particles[_pi];
         if (p.life !== undefined) {
             ctx.fillStyle = p.color;
             const px = Math.floor(p.x / 4) * 4;
@@ -13027,9 +13055,9 @@ if (waveActive) {
             p.x += p.vx;
             p.y += p.vy;
             p.life--;
-            if (p.life <= 0) particles.splice(i, 1);
+            if (p.life <= 0) particles.splice(_pi, 1);
         }
-    });
+    }
 }
           
             ctx.fillStyle = currentMode === 'snow' ? '#F0F8FF' : currentMode === 'sakura' ? '#CD853F' : '#8B4513';
@@ -13381,24 +13409,24 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
     obs.update();
     obs.draw();
     
-    // Skip collision check jika solar blaster aktif dan obstacle sudah dihancurkan
-    if (!solarBlasterActive || frameCount % 2 !== 0) {
-    // In MP: skip collision if respawning (playerLives=999 guard), OR if I'm the back player
-    const mpSkipCollision = mpState.isMultiplayerGame && (
+    // In MP: skip collision if respawning OR if I'm the back player (back is safe)
+    const mpSkipCollision = typeof mpState !== 'undefined' && mpState.isMultiplayerGame && (
       window._mpRespawnInProgress === true ||
-      mpState.myPosition === 'back'  // back player is safe from obstacles
+      mpState.myPosition === 'back'
     );
 
-    if (!mpSkipCollision) {
+    // Skip player collision only when solar blaster is actively destroying this obstacle
+    // (solarBlasterActive handles its own obstacle removal in updateSolarBlaster)
+    const solarSkip = solarBlasterActive;
+
+    if (!mpSkipCollision && !solarSkip) {
     // Special collision for seagull (harus duck)
     let collided = false;
     if (obs.type === 'seagull') {
-        // Seagull hanya bisa dihindari dengan duck
         if (!player.isDucking && obs.collidesWith(player)) {
             collided = true;
         }
     } else {
-        // Obstacle lain normal collision
         collided = obs.collidesWith(player);
     }
     
@@ -13406,58 +13434,33 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
         if (shieldActive && shieldHits > 0) {
             shieldHits--;
             obstacles.splice(i, 1);
-            // Sync obstacle destroyed to server in MP
-            if (mpState.isMultiplayerGame && socket) socket.emit('obstacle_destroyed', { obstacleIndex: i });
-
+            if (typeof mpState !== 'undefined' && mpState.isMultiplayerGame && socket) socket.emit('obstacle_destroyed', { obstacleIndex: i });
            playSound('hit');
-        vibrate(50);
-            
+           vibrate(50);
             for (let j = 0; j < 20; j++) {
-                particles.push({
-                    x: obs.x + obs.width/2,
-                    y: obs.y + obs.height/2,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 0.5) * 8,
-                    life: 30,
-                    color: '#8B5CF6'
-                });
+                particles.push({ x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8, life: 30, color: '#8B5CF6' });
             }
-            
-            if (shieldHits <= 0) {
-                shieldActive = false;
-            }
-        } else if (playerLives > 1 && !(mpState.isMultiplayerGame && playerLives >= 999)) {
+            if (shieldHits <= 0) shieldActive = false;
+        } else if (playerLives > 1 && !(typeof mpState !== 'undefined' && mpState.isMultiplayerGame && playerLives >= 999)) {
             playerLives--;
             obstacles.splice(i, 1);
-            // Sync obstacle destroyed to server in MP
-            if (mpState.isMultiplayerGame && socket) socket.emit('obstacle_destroyed', { obstacleIndex: i });
-
+            if (typeof mpState !== 'undefined' && mpState.isMultiplayerGame && socket) socket.emit('obstacle_destroyed', { obstacleIndex: i });
             playSound('hit');
-        vibrate([50, 50, 50]); // Triple vibration
-            
-            // Update ability button karena lives berubah
+            vibrate([50, 50, 50]);
             updateAbilityButton();
-            
             for (let j = 0; j < 30; j++) {
-                particles.push({
-                    x: player.x + player.width/2,
-                    y: player.y + player.height/2,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 0.5) * 8,
-                    life: 40,
-                    color: '#FFD700'
-                });
+                particles.push({ x: player.x + player.width/2, y: player.y + player.height/2,
+                    vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8, life: 40, color: '#FFD700' });
             }
-        } else if (!(mpState.isMultiplayerGame && playerLives >= 999)) {
-              playSound('hit');
-        vibrate([100, 50, 100]); // Death vibration pattern
-
+        } else if (!(typeof mpState !== 'undefined' && mpState.isMultiplayerGame && playerLives >= 999)) {
+            playSound('hit');
+            vibrate([100, 50, 100]);
             endGame();
             return;
         }
     }
-    } // end mpSkipCollision guard
-}
+    } // end collision guard
                 
                 if (!obs.passed && obs.x + obs.width < player.x) {
                     obs.passed = true;
@@ -14690,6 +14693,8 @@ function connectSocket() {
     mpState.swapTimerDisplay = 12;
     startGame(mode);
     setupMpIngame();
+    // Hide pause button in MP - can't pause multiplayer
+    document.getElementById('pauseBtn').style.display = 'none';
   });
 
   socket.on('game_tick', ({ fc, events }) => {
@@ -14745,11 +14750,25 @@ function connectSocket() {
     if (x !== undefined) opponentGhost.targetX = x;
   });
 
-  // Opponent ability
+  // Opponent ability - show full visual effect + destroy obstacles on our screen too
   socket.on('opponent_ability', ({ abilityType, abilityId, name }) => {
-    showMpToast('⚡ ' + name + ' menggunakan ' + (abilityType || 'ability') + '!');
-    // Show visual burst effect at opponent ghost position
-    mpShowOpponentAbilityEffect(abilityType, abilityId);
+    const displayName = name || mpState.opponentName || 'Teman';
+    showMpToast('⚡ ' + displayName + ' pakai ' + (abilityType || 'ability') + '!');
+    
+    // Show big visual burst at ghost position (longer duration)
+    const gX = opponentGhost.x || 160;
+    const gY = opponentGhost.y || (typeof groundY !== 'undefined' ? groundY - 40 : 260);
+    mpOppAbilityEffect = {
+      x: gX, y: gY,
+      type: abilityType || abilityId || 'generic',
+      duration: 120, // 2 seconds
+      maxDuration: 120
+    };
+
+    // Destroy obstacles on THIS screen matching the ability (with delay for visual sync)
+    setTimeout(() => {
+      mpApplyOpponentAbilityEffect(abilityType);
+    }, 100);
   });
 
   // Obstacle sync
@@ -15039,6 +15058,101 @@ function mpShowOpponentAbilityEffect(abilityType, abilityId) {
   };
 }
 
+// Apply opponent's ability effect on THIS screen (destroy obstacles, spawn particles, etc.)
+function mpApplyOpponentAbilityEffect(abilityType) {
+  if (typeof obstacles === 'undefined' || typeof particles === 'undefined') return;
+  if (!mpState.isMultiplayerGame) return;
+
+  const destroyAll = (color) => {
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+      const obs = obstacles[i];
+      const cx = obs.x + obs.width/2, cy = obs.y + obs.height/2;
+      for (let j = 0; j < 12; j++) {
+        particles.push({ x: cx, y: cy,
+          vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+          life: 30, color });
+      }
+      obstacles.splice(i, 1);
+    }
+  };
+
+  if (abilityType === 'solar_blaster') {
+    // Show beam effect for ~2 seconds (120 frames)
+    window._mpOppSolarActive = 120;
+    destroyAll('#FFA500');
+  } else if (abilityType === 'eclipse_blast') {
+    window._mpOppEclipseActive = 120;
+    destroyAll('#8B5CF6');
+  } else if (abilityType === 'sand_tornado') {
+    window._mpOppTornadoActive = 120;
+    destroyAll('#C19A6B');
+  } else if (abilityType === 'ice_blast' || abilityType === 'ice_spike') {
+    destroyAll('#87CEEB');
+  } else if (abilityType === 'tidal_wave') {
+    destroyAll('#00CED1');
+  } else if (abilityType === 'lunar_shield') {
+    // Give shield to this player too (co-op benefit!)
+    if (typeof shieldActive !== 'undefined') {
+      shieldActive = true;
+      shieldHits = 2;
+      showMpToast('🛡️ Teman kasih shield!');
+    }
+  }
+  // valentine_dual - no obstacle destruction needed
+}
+
+// Draw opponent ability overlays (solar beam, eclipse flash, tornado swirl)
+function drawMpOppActiveAbilities() {
+  if (!mpState.isMultiplayerGame) return;
+  const fc = typeof frameCount !== 'undefined' ? frameCount : 0;
+
+  // Opponent Solar Blaster beam overlay
+  if (window._mpOppSolarActive > 0) {
+    window._mpOppSolarActive--;
+    const alpha = Math.min(1, window._mpOppSolarActive / 30);
+    const gY = opponentGhost.y || (typeof groundY !== 'undefined' ? groundY - 40 : 260);
+    const beamY = gY + 20;
+    ctx.save();
+    ctx.globalAlpha = alpha * 0.7;
+    ctx.fillStyle = `rgba(255, 200, 0, 0.4)`;
+    ctx.fillRect(opponentGhost.x + 40, beamY - 15, (typeof canvas !== 'undefined' ? canvas.width : 400), 30);
+    ctx.fillStyle = '#FFD700';
+    for (let x = opponentGhost.x + 40; x < (typeof canvas !== 'undefined' ? canvas.width : 400); x += 4) {
+      ctx.fillRect(x, beamY - 3, 4, 6);
+    }
+    ctx.restore();
+  }
+
+  // Opponent Eclipse flash
+  if (window._mpOppEclipseActive > 0) {
+    window._mpOppEclipseActive--;
+    if (window._mpOppEclipseActive % 40 < 20) {
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = '#8B5CF6';
+      ctx.fillRect(0, 0, typeof canvas !== 'undefined' ? canvas.width : 400, typeof canvas !== 'undefined' ? canvas.height : 300);
+      ctx.restore();
+    }
+  }
+
+  // Opponent Tornado swirl indicator
+  if (window._mpOppTornadoActive > 0) {
+    window._mpOppTornadoActive--;
+    const gX = opponentGhost.x + 60;
+    const gY2 = typeof groundY !== 'undefined' ? groundY - 80 : 220;
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = '#C19A6B';
+    ctx.lineWidth = 3;
+    for (let r = 10; r < 50; r += 15) {
+      ctx.beginPath();
+      ctx.arc(gX, gY2, r + Math.sin(fc * 0.2) * 5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
 function drawOpponentAbilityEffect() {
   if (!mpOppAbilityEffect || !mpState.isMultiplayerGame) return;
   const eff = mpOppAbilityEffect;
@@ -15145,6 +15259,22 @@ function setupMpIngame() {
   if (typeof player !== 'undefined') {
     player.x = mpState.myPosition === 'front' ? 100 : 180;
   }
+
+  // === MP PERFORMANCE MODE: disable expensive GPU effects ===
+  // Suppress shadowBlur to prevent GPU stall on mobile
+  if (!window._origCtxShadowBlur) {
+    window._origCtxShadowBlur = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'shadowBlur');
+    Object.defineProperty(CanvasRenderingContext2D.prototype, 'shadowBlur', {
+      get() { return 0; },
+      set(v) { /* noop in MP */ },
+      configurable: true
+    });
+  }
+  // Reduce particleMultiplier to 0.2 in MP
+  if (typeof particleMultiplier !== 'undefined') {
+    window._mpSavedParticleMultiplier = particleMultiplier;
+    particleMultiplier = 0.2;
+  }
 }
 
 function teardownMpIngame() {
@@ -15153,6 +15283,17 @@ function teardownMpIngame() {
   document.getElementById('mpSwapBadge').style.display = 'none';
   const el = document.getElementById('teammLivesDisplay');
   if (el) el.style.display = 'none';
+
+  // Restore shadowBlur
+  if (window._origCtxShadowBlur) {
+    Object.defineProperty(CanvasRenderingContext2D.prototype, 'shadowBlur', window._origCtxShadowBlur);
+    window._origCtxShadowBlur = null;
+  }
+  // Restore particleMultiplier
+  if (typeof window._mpSavedParticleMultiplier !== 'undefined') {
+    particleMultiplier = window._mpSavedParticleMultiplier;
+    window._mpSavedParticleMultiplier = undefined;
+  }
 }
 
 // =====================
@@ -15403,9 +15544,10 @@ window.addEventListener('load', () => {
     mpDoScoreSync();
     updateSwapBadge();
     updateOppLivesUI();
-    updateMyPlayerPosition(); // Smooth player X animation after swap
+    updateMyPlayerPosition();
     drawOpponentGhost();
     drawOpponentAbilityEffect();
+    drawMpOppActiveAbilities(); // Draw sustained ability visuals (solar beam, eclipse, tornado)
   };
 
   // Patch gameLoop to call MP hook at end
