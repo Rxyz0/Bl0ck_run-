@@ -6835,6 +6835,11 @@ function createAndUpdateLoveTrail() {
 
     const skin = getCurrentSkin();
     if (!skin.ability) return;
+
+    // Notify opponent in multiplayer
+    if (typeof mpState !== 'undefined' && mpState.isPlaying && typeof socket !== 'undefined' && socket) {
+        socket.emit('use_ability', { abilityType: skin.abilityType || 'default' });
+    }
     
     if (skin.abilityType === 'solar_blaster') {
         solarBlasterActive = true;
@@ -8629,6 +8634,1014 @@ function drawHeartShot() {
     });
 }
 
+function drawCharacter(px, py, pw, ph, pDucking, skin, fc) {
+    const size = pDucking ? 25 : ph;
+    const yPos = pDucking ? py + 15 : py;
+    // Surfboard (jika surfing DAN wave active)
+    if (surfing && waveActive) {
+    // Surfboard body (cyan terang)
+    ctx.fillStyle = '#00CED1';
+    ctx.fillRect(px - 10, yPos + ph - 3, pw + 20, 6);
+    
+    // Surfboard outline
+    ctx.strokeStyle = '#008B8B';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px - 10, yPos + ph - 3, pw + 20, 6);
+    
+    // Surfboard nose (ujung depan lebih lancip)
+    ctx.fillStyle = '#40E0D0';
+    ctx.fillRect(px + pw + 10, yPos + ph - 2, 6, 4);
+    
+    // Center stripe (garis tengah)
+    ctx.fillStyle = '#FFA500';
+    ctx.fillRect(px, yPos + ph - 1, pw, 2);
+    
+    // Fin (sirip bawah)
+    ctx.fillStyle = '#20B2AA';
+    ctx.fillRect(px + pw/2 - 3, yPos + ph + 3, 6, 5);
+    
+    // Water splash particles
+    if (fc % 4 === 0) {
+    particles.push({
+    x: px - 8,
+    y: yPos + ph,
+    vx: -3 - Math.random() * 2,
+    vy: -Math.random() * 3,
+    life: 20,
+    color: '#87CEEB'
+    });
+    }
+    }
+    
+    if (skin.cape && !pDucking) {
+    if (skin.id && skin.id.startsWith('night_')) {
+    // Sayap untuk night epic
+    const wingTime = fc * 0.15;
+    const wingFlap = Math.sin(wingTime) * 3;
+    
+    // Sayap kiri
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath();
+    ctx.moveTo(px, yPos + 10);
+    ctx.lineTo(px - 20, yPos + 5 + wingFlap);
+    ctx.lineTo(px - 18, yPos + 20 + wingFlap);
+    ctx.lineTo(px, yPos + 25);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.strokeStyle = '#8B5CF6';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Detail sayap kiri
+    ctx.fillStyle = '#4C1D95';
+    ctx.beginPath();
+    ctx.moveTo(px, yPos + 15);
+    ctx.lineTo(px - 15, yPos + 12 + wingFlap);
+    ctx.lineTo(px - 13, yPos + 22 + wingFlap);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Sayap kanan (mirror)
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath();
+    ctx.moveTo(px + pw, yPos + 10);
+    ctx.lineTo(px + pw + 20, yPos + 5 + wingFlap);
+    ctx.lineTo(px + pw + 18, yPos + 20 + wingFlap);
+    ctx.lineTo(px + pw, yPos + 25);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.strokeStyle = '#8B5CF6';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Detail sayap kanan
+    ctx.fillStyle = '#4C1D95';
+    ctx.beginPath();
+    ctx.moveTo(px + pw, yPos + 15);
+    ctx.lineTo(px + pw + 15, yPos + 12 + wingFlap);
+    ctx.lineTo(px + pw + 13, yPos + 22 + wingFlap);
+    ctx.closePath();
+    ctx.fill();
+    } else if (skin.id === 'egypt_epic') {
+    // Pharaoh Cape untuk Epic (pixel style)
+    const capeFlow = Math.sin(fc * 0.1) * 2;
+    
+    // Base jubah (coklat gelap - trapezoid pixel)
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(px - 4,  yPos + 4,  4, 6);
+    ctx.fillRect(px - 8,  yPos + 10, 8, 6);
+    ctx.fillRect(px - 12, yPos + 16, 12, 6);
+    ctx.fillRect(px - 16, yPos + 22, 16, 6);
+    ctx.fillRect(px - 18, yPos + 28 + capeFlow, 16, 6);
+    ctx.fillRect(px - 16, yPos + 34 + capeFlow, 14, 4);
+    
+    // Trim emas (border pixel)
+    ctx.fillStyle = '#DAA520';
+    ctx.fillRect(px - 20, yPos + 28 + capeFlow, 2, 6);
+    ctx.fillRect(px - 18, yPos + 38 + capeFlow, 14, 2);
+    
+    // Pattern hieroglyph (pixel lines)
+    ctx.fillStyle = '#8B6914';
+    ctx.fillRect(px - 14, yPos + 12, 8, 2);
+    ctx.fillRect(px - 14, yPos + 20, 8, 2);
+    ctx.fillRect(px - 14, yPos + 28, 8, 2);
+    
+    } else if (skin.id === 'egypt_legendary') {
+    // === ROYAL PHARAOH MANTLE (Legendary) ===
+    const flow = Math.sin(fc * 0.06);      // -1→1 smooth wave
+    const shimmer = (Math.sin(fc * 0.08) + 1) / 2;  // 0→1 shimmer
+    
+    // — BASE MANTLE (coklat saddle - sesuai skin) —
+    ctx.fillStyle = '#8B4513';  // coklat skin
+    ctx.fillRect(px - 4,  yPos + 2,  6, 4);
+    ctx.fillRect(px - 8,  yPos + 6 + flow * 0.5,  10, 4);
+    ctx.fillRect(px - 10, yPos + 10 + flow,       12, 4);
+    ctx.fillRect(px - 12, yPos + 14 + flow * 1.5, 14, 4);
+    ctx.fillRect(px - 14, yPos + 18 + flow * 2,   16, 4);
+    ctx.fillRect(px - 16, yPos + 22 + flow * 2.5, 18, 4);
+    ctx.fillRect(px - 18, yPos + 26 + flow * 3,   20, 4);
+    ctx.fillRect(px - 18, yPos + 30 + flow * 3,   18, 4);
+    ctx.fillRect(px - 16, yPos + 34 + flow * 3,   16, 4);
+    
+    // Shadow layer (darker)
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(px - 20, yPos + 28 + flow * 3, 2, 10);
+    
+    // — INNER ACCENT (turquoise strips - sesuai gradient) —
+    ctx.fillStyle = '#40E0D0';  // turquoise
+    ctx.fillRect(px - 6,  yPos + 8 + flow * 0.8,  6, 2);
+    ctx.fillRect(px - 8,  yPos + 12 + flow * 1.2, 8, 2);
+    ctx.fillRect(px - 10, yPos + 16 + flow * 1.8, 10, 2);
+    ctx.fillRect(px - 12, yPos + 20 + flow * 2.2, 12, 2);
+    ctx.fillRect(px - 14, yPos + 24 + flow * 2.8, 14, 2);
+    
+    // — GOLDEN TRIM (border emas) —
+    ctx.fillStyle = `rgba(255, 215, 0, ${0.8 + shimmer * 0.2})`;
+    // Border kiri
+    for (let i = 0; i < 6; i++) {
+    ctx.fillRect(px - 20, yPos + 26 + i * 2 + flow * (2.5 + i * 0.2), 2, 2);
+    }
+    // Border bawah
+    for (let x = 0; x < 16; x += 2) {
+    const waveY = Math.sin((x * 0.3) + fc * 0.1) * 1;
+    ctx.fillRect(px - 18 + x, yPos + 38 + flow * 3 + waveY, 2, 2);
+    }
+    
+    // — ANKH SYMBOL (turquoise sacred) —
+    ctx.fillStyle = '#40E0D0';
+    ctx.fillRect(px - 9, yPos + 12 + flow * 1.5, 2, 8);  // vertical
+    ctx.fillRect(px - 13, yPos + 14 + flow * 1.5, 10, 2); // horizontal
+    ctx.fillRect(px - 11, yPos + 8 + flow * 1.5,  6, 2);  // loop
+    ctx.fillRect(px - 13, yPos + 10 + flow * 1.5, 2, 2);
+    ctx.fillRect(px - 7,  yPos + 10 + flow * 1.5, 2, 2);
+    
+    // — EYE OF HORUS (emas) —
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(px - 12, yPos + 24 + flow * 2.8, 8, 2);
+    ctx.fillRect(px - 10, yPos + 22 + flow * 2.8, 4, 2);
+    ctx.fillRect(px - 10, yPos + 26 + flow * 2.8, 2, 2);
+    // Pupil (coklat)
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(px - 9, yPos + 24 + flow * 2.8, 2, 2);
+    
+    // — SCARAB BEETLES (turquoise) —
+    ctx.fillStyle = `rgba(64, 224, 208, ${0.8 + shimmer * 0.2})`;
+    // Beetle atas
+    ctx.fillRect(px - 8, yPos + 6 + flow * 0.8,  4, 2);
+    ctx.fillRect(px - 7, yPos + 4 + flow * 0.8,  2, 2);
+    ctx.fillRect(px - 10, yPos + 8 + flow * 0.8, 2, 2);
+    ctx.fillRect(px - 4,  yPos + 8 + flow * 0.8, 2, 2);
+    
+    // — SHOULDER CLASP (emas) —
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(px - 2, yPos,     6, 3);
+    ctx.fillRect(px - 4, yPos + 3, 8, 2);
+    ctx.fillStyle = '#40E0D0';  // turquoise accent
+    ctx.fillRect(px,     yPos + 1, 2, 2);
+    
+    } else {
+    // Default jubah sederhana
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(px - 15, yPos - 5, 15, size + 10);
+    ctx.strokeStyle = '#654321';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px - 15, yPos - 5, 15, size + 10);
+    }
+    }
+    
+    // === SNOW WINTER ACCESSORIES ===
+    if (skin.iceCape && !pDucking) {
+    
+    // ========================================
+    // EPIC - "Blizzard Knight" - WINTER JACKET
+    // ========================================
+    if (skin.id === 'snow_epic') {
+    
+    // JAKET BIRU (Winter Jacket)
+    
+    // 1. Body Jacket (badan jaket)
+    ctx.fillStyle = '#4682B4'; // Steel Blue
+    ctx.fillRect(px - 4, yPos, pw + 8, size);
+    
+    // 2. Hoodie (kerudung/topi)
+    ctx.fillStyle = '#5A9BD5'; // Lighter blue
+    // Hood back
+    ctx.fillRect(px - 2, yPos - 8, pw + 4, 10);
+    // Hood sides
+    ctx.fillRect(px - 4, yPos - 6, 4, 12);
+    ctx.fillRect(px + pw, yPos - 6, 4, 12);
+    
+    // Hood outline
+    ctx.strokeStyle = '#2F4F7F';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px - 2, yPos - 8, pw + 4, 10);
+    
+    // 3. Zipper (resleting tengah)
+    ctx.fillStyle = '#C0C0C0'; // Silver
+    ctx.fillRect(px + pw/2 - 2, yPos + 2, 4, size - 4);
+    
+    // Zipper teeth (gigi resleting)
+    ctx.fillStyle = '#A0A0A0';
+    for (let i = 0; i < size - 8; i += 6) {
+    ctx.fillRect(px + pw/2 - 3, yPos + 4 + i, 2, 3);
+    ctx.fillRect(px + pw/2 + 1, yPos + 4 + i, 2, 3);
+    }
+    
+    // Zipper pull (penarik resleting)
+    ctx.fillStyle = '#FFD700'; // Gold
+    ctx.fillRect(px + pw/2 - 3, yPos + 4, 6, 6);
+    
+    // 4. Pockets (kantong kiri-kanan)
+    ctx.fillStyle = '#3A6FA5'; // Darker blue
+    // Left pocket
+    ctx.fillRect(px + 2, yPos + size - 16, 12, 10);
+    ctx.strokeStyle = '#2F4F7F';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px + 2, yPos + size - 16, 12, 10);
+    
+    // Right pocket
+    ctx.fillRect(px + pw - 14, yPos + size - 16, 12, 10);
+    ctx.strokeRect(px + pw - 14, yPos + size - 16, 12, 10);
+    
+    // 5. Sleeves (lengan)
+    ctx.fillStyle = '#4682B4';
+    // Left sleeve
+    ctx.fillRect(px - 8, yPos + 8, 6, 16);
+    // Right sleeve
+    ctx.fillRect(px + pw + 2, yPos + 8, 6, 16);
+    
+    // Sleeve cuffs (ujung lengan)
+    ctx.fillStyle = '#2F4F7F';
+    ctx.fillRect(px - 8, yPos + 22, 6, 4);
+    ctx.fillRect(px + pw + 2, yPos + 22, 6, 4);
+    
+    // 6. Snow details on jacket (aksen salju)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    // Snow on shoulders
+    ctx.fillRect(px - 2, yPos + 2, 8, 3);
+    ctx.fillRect(px + pw - 6, yPos + 2, 8, 3);
+    // Snow on hood
+    ctx.fillRect(px + 4, yPos - 6, 12, 2);
+    ctx.fillRect(px + 20, yPos - 6, 12, 2);
+    
+    // 7. Jacket outline (border jaket)
+    ctx.strokeStyle = '#2F4F7F';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px - 4, yPos, pw + 8, size);
+    }
+    
+    
+    // ==========================================
+    // LEGENDARY - "Frozen Emperor" - TRAIL EFFECT
+    // ==========================================
+    else if (skin.id === 'snow_legendary') {
+    
+    // Keep existing ice cape (tetap pakai jubah es yang lama)
+    const capeShimmer = Math.sin(fc * 0.08) * 0.3 + 0.7;
+    const capeFlow = Math.sin(fc * 0.1) * 3;
+    
+    }
+    }
+    
+    if (skin.gradient) {
+    const colors = skin.gradient.match(/#[0-9A-F]{6}/gi);
+    if (colors && colors.length >= 2) {
+    const grad = ctx.createLinearGradient(px, yPos, px + pw, yPos + size);
+    if (colors.length === 2) {
+    grad.addColorStop(0, colors[0]);
+    grad.addColorStop(1, colors[1]);
+    } else {
+    // Support multi color stops (untuk night legendary 5 warna, snow 4 warna, dll)
+    colors.forEach((color, i) => {
+    grad.addColorStop(i / (colors.length - 1), color);
+    });
+    }
+    ctx.fillStyle = grad;
+    } else {
+    ctx.fillStyle = skin.color;
+    }
+    } else {
+    ctx.fillStyle = skin.color;
+    }
+    
+    // === VALENTINE HEART SHAPE - SMOOTH GRADIENT ===
+    if (skin.valentineHeart && !pDucking) {
+    const centerX = px + pw / 2;
+    const centerY = yPos + size / 2;
+    const heartSize = pw * 0.9;
+    
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    
+    // Create gradient for heart
+    const heartGrad = ctx.createLinearGradient(0, -heartSize/2, 0, heartSize/2);
+    
+    // Parse skin color for gradient
+    if (skin.gradient) {
+    const colors = skin.gradient.match(/#[0-9A-F]{6}/gi);
+    if (colors && colors.length >= 2) {
+    heartGrad.addColorStop(0, colors[0]);
+    heartGrad.addColorStop(1, colors[1]);
+    } else {
+    heartGrad.addColorStop(0, skin.color);
+    heartGrad.addColorStop(1, skin.color);
+    }
+    } else {
+    // Default pink gradient
+    heartGrad.addColorStop(0, skin.color);
+    const darkerColor = skin.color.replace(/[0-9A-F]/g, (c) => {
+    const val = parseInt(c, 16);
+    return Math.max(0, val - 3).toString(16);
+    });
+    heartGrad.addColorStop(1, darkerColor);
+    }
+    
+    // Draw smooth heart shape
+    ctx.beginPath();
+    ctx.fillStyle = heartGrad;
+    
+    const scale = heartSize / 40;
+    
+    // Heart path
+    ctx.moveTo(0, -15 * scale);
+    
+    // Left top curve
+    ctx.bezierCurveTo(-12 * scale, -22 * scale, -20 * scale, -18 * scale, -20 * scale, -8 * scale);
+    ctx.bezierCurveTo(-20 * scale, 0, -12 * scale, 8 * scale, 0, 18 * scale);
+    
+    // Right top curve
+    ctx.bezierCurveTo(12 * scale, 8 * scale, 20 * scale, 0, 20 * scale, -8 * scale);
+    ctx.bezierCurveTo(20 * scale, -18 * scale, 12 * scale, -22 * scale, 0, -15 * scale);
+    
+    ctx.closePath();
+    
+    // Fill heart
+    ctx.fill();
+    
+    // Add shine/highlight effect
+    const shineGrad = ctx.createRadialGradient(-5 * scale, -8 * scale, 0, -5 * scale, -8 * scale, 15 * scale);
+    shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+    shineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = shineGrad;
+    ctx.fill();
+    
+    // Heart outline
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    ctx.restore();
+    } else {
+    // Normal square block
+    ctx.fillRect(px, yPos, pw, size);
+    }
+    
+    // Efek glow
+    if (skin.glow && !pDucking) {
+    if (skin.id && skin.id.startsWith('night_')) {
+    // Glow ungu untuk night skins
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = 'rgba(139, 92, 246, 0.9)';
+    ctx.fillRect(px, yPos, pw, size);
+    ctx.shadowBlur = 0;
+    } else if (skin.id && skin.id.startsWith('snow_')) {
+    // Glow biru es untuk snow skins
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = 'rgba(135, 206, 235, 0.8)';
+    ctx.fillRect(px, yPos, pw, size);
+    ctx.shadowBlur = 0;
+    } else {
+    // Glow kuning untuk day skins
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+    ctx.fillRect(px, yPos, pw, size);
+    ctx.shadowBlur = 0;
+    }
+    }
+    
+    // Redraw untuk non-valentine skins
+    if (!skin.valentineHeart) {
+    ctx.fillRect(px, yPos, pw, size);
+    }
+    
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 3;
+    if (!skin.valentineHeart) {
+        ctx.strokeRect(px, yPos, pw, size);
+    }
+    
+    if (skin.crown && !pDucking) {
+        // === PHARAOH HEADDRESS (detail hieroglyph) ===
+        const crownShimmer = (Math.sin(fc * 0.1) + 1) / 2;
+        
+        // — BASE CROWN (coklat-emas gradient) —
+        // Bottom band
+        ctx.fillStyle = '#8B4513';  // coklat
+        ctx.fillRect(px + 5, yPos - 15, 30, 4);
+        ctx.fillStyle = '#FFD700';  // emas
+        ctx.fillRect(px + 5, yPos - 19, 30, 4);
+        
+        // — THREE PEAKS (simetris) —
+        // Peak kiri
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(px + 8,  yPos - 22, 6, 3);
+        ctx.fillRect(px + 9,  yPos - 25, 4, 3);
+        ctx.fillRect(px + 10, yPos - 27, 2, 2);
+        // Peak tengah (highest)
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(px + 17, yPos - 25, 6, 6);
+        ctx.fillRect(px + 18, yPos - 29, 4, 4);
+        ctx.fillRect(px + 19, yPos - 31, 2, 2);
+        // Peak kanan
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(px + 26, yPos - 22, 6, 3);
+        ctx.fillRect(px + 27, yPos - 25, 4, 3);
+        ctx.fillRect(px + 28, yPos - 27, 2, 2);
+        
+        // — TURQUOISE ACCENTS (sacred stripes) —
+        ctx.fillStyle = '#40E0D0';
+        ctx.fillRect(px + 7,  yPos - 16, 2, 2);
+        ctx.fillRect(px + 19, yPos - 18, 2, 2);
+        ctx.fillRect(px + 31, yPos - 16, 2, 2);
+        
+        // — COBRA URAEUS (center peak - khas pharaoh!) —
+        ctx.fillStyle = '#40E0D0';
+        ctx.fillRect(px + 19, yPos - 32, 2, 3);  // head
+        ctx.fillRect(px + 18, yPos - 30, 1, 2);  // hood left
+        ctx.fillRect(px + 21, yPos - 30, 1, 2);  // hood right
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(px + 19, yPos - 32, 1, 1);  // eye
+        
+        // — SCARAB SYMBOL (on band) —
+        ctx.fillStyle = `rgba(64, 224, 208, ${0.7 + crownShimmer * 0.3})`;
+        ctx.fillRect(px + 19, yPos - 17, 2, 2);
+        ctx.fillRect(px + 17, yPos - 16, 1, 1);
+        ctx.fillRect(px + 22, yPos - 16, 1, 1);
+        
+        // — GOLDEN DETAILS (shimmer dots) —
+        if (fc % 16 < 8) {
+            ctx.fillStyle = `rgba(255, 215, 0, ${crownShimmer})`;
+            ctx.fillRect(px + 10, yPos - 24, 1, 1);
+            ctx.fillRect(px + 29, yPos - 24, 1, 1);
+        }
+        
+        // — OUTLINE —
+        ctx.strokeStyle = '#8B4513';  // coklat outline
+        ctx.lineWidth = 1;
+        ctx.strokeRect(px + 5, yPos - 19, 30, 8);
+        ctx.strokeRect(px + 8,  yPos - 22, 6, 3);
+        ctx.strokeRect(px + 17, yPos - 25, 6, 6);
+        ctx.strokeRect(px + 26, yPos - 22, 6, 3);
+    }
+    
+    
+    // === MAHKOTA MATAHARI ANIMATED - Day Legendary ===
+    if (skin.sunCrownAnimated && !pDucking) {
+    const pulse  = (Math.sin(fc * 0.07) + 1) / 2;
+    const flap   = Math.sin(fc * 0.12) * 3;
+    const glow   = Math.sin(fc * 0.08) * 0.3 + 0.7;
+    const bx     = px;
+    const cx     = bx + 20;
+    
+    // GOLDEN AURA (pixel circle, bukan smooth)
+    const auraX = cx;
+    const auraY = yPos + ph/2;
+    
+    // Outer aura (pixel circle - radius 34)
+    ctx.fillStyle = `rgba(255,180,0,${pulse * 0.08})`;
+    for (let x = -34; x <= 34; x += 4) {
+    for (let y = -34; y <= 34; y += 4) {
+    const dist = Math.sqrt(x*x + y*y);
+    if (dist >= 28 && dist < 34) {
+    ctx.fillRect(auraX + x, auraY + y, 4, 4);
+    }
+    }
+    }
+    
+    // Inner aura (pixel circle - radius 28)
+    ctx.fillStyle = `rgba(255,220,0,${pulse * 0.12})`;
+    for (let x = -28; x <= 28; x += 4) {
+    for (let y = -28; y <= 28; y += 4) {
+    const dist = Math.sqrt(x*x + y*y);
+    if (dist < 28) {
+    ctx.fillRect(auraX + x, auraY + y, 4, 4);
+    }
+    }
+    }
+    
+    // SOLAR WINGS KIRI
+    const lwx = bx - 2;
+    const lwy = yPos + 6;
+    ctx.fillStyle = `rgba(255,240,200,${0.6 + pulse * 0.3})`;
+    ctx.fillRect(lwx - 18, lwy - 6 + flap, 10, 4);
+    ctx.fillRect(lwx - 20, lwy - 2 + flap, 8,  4);
+    ctx.fillRect(lwx - 18, lwy + 2 + flap, 6,  4);
+    ctx.fillRect(lwx - 14, lwy + 6 + flap, 4,  3);
+    ctx.fillStyle = `rgba(255,215,0,${0.7 + pulse * 0.2})`;
+    ctx.fillRect(lwx - 14, lwy - 4 + flap, 8,  4);
+    ctx.fillRect(lwx - 12, lwy + 0 + flap, 6,  4);
+    ctx.fillRect(lwx - 10, lwy + 4 + flap, 5,  4);
+    ctx.fillRect(lwx - 6,  lwy + 8 + flap, 3,  3);
+    ctx.fillStyle = `rgba(255,160,50,${0.8 + pulse * 0.15})`;
+    ctx.fillRect(lwx - 8,  lwy - 2 + flap, 6,  3);
+    ctx.fillRect(lwx - 6,  lwy + 1 + flap, 4,  3);
+    ctx.fillRect(lwx - 4,  lwy + 4 + flap, 3,  4);
+    ctx.fillStyle = `rgba(255,255,220,${glow * 0.8})`;
+    ctx.fillRect(lwx - 18, lwy - 6 + flap, 2,  2);
+    ctx.fillRect(lwx - 20, lwy - 2 + flap, 2,  2);
+    ctx.fillRect(lwx - 16, lwy + 2 + flap, 2,  2);
+    ctx.fillStyle = `rgba(255,200,80,${0.7 + pulse * 0.2})`;
+    ctx.fillRect(lwx - 2, lwy, 4, 6);
+    ctx.fillRect(lwx,     lwy, 2, 8);
+    
+    // SOLAR WINGS KANAN
+    const rwx = bx + pw - 2;
+    const rwy = yPos + 6;
+    ctx.fillStyle = `rgba(255,240,200,${0.6 + pulse * 0.3})`;
+    ctx.fillRect(rwx + 8,  rwy - 6 + flap, 10, 4);
+    ctx.fillRect(rwx + 12, rwy - 2 + flap, 8,  4);
+    ctx.fillRect(rwx + 12, rwy + 2 + flap, 6,  4);
+    ctx.fillRect(rwx + 10, rwy + 6 + flap, 4,  3);
+    ctx.fillStyle = `rgba(255,215,0,${0.7 + pulse * 0.2})`;
+    ctx.fillRect(rwx + 6,  rwy - 4 + flap, 8,  4);
+    ctx.fillRect(rwx + 6,  rwy + 0 + flap, 6,  4);
+    ctx.fillRect(rwx + 5,  rwy + 4 + flap, 5,  4);
+    ctx.fillRect(rwx + 3,  rwy + 8 + flap, 3,  3);
+    ctx.fillStyle = `rgba(255,160,50,${0.8 + pulse * 0.15})`;
+    ctx.fillRect(rwx + 2,  rwy - 2 + flap, 6,  3);
+    ctx.fillRect(rwx + 2,  rwy + 1 + flap, 4,  3);
+    ctx.fillRect(rwx + 1,  rwy + 4 + flap, 3,  4);
+    ctx.fillStyle = `rgba(255,255,220,${glow * 0.8})`;
+    ctx.fillRect(rwx + 16, rwy - 6 + flap, 2,  2);
+    ctx.fillRect(rwx + 18, rwy - 2 + flap, 2,  2);
+    ctx.fillRect(rwx + 14, rwy + 2 + flap, 2,  2);
+    ctx.fillStyle = `rgba(255,200,80,${0.7 + pulse * 0.2})`;
+    ctx.fillRect(rwx - 2, rwy, 4, 6);
+    ctx.fillRect(rwx - 2, rwy, 2, 8);
+    
+    // SUNBURST JEWEL di dada
+    const jx = cx;
+    const jy = yPos + ph/2 + 2;
+    const jPulse = 0.6 + Math.sin(fc * 0.16) * 0.4;
+    ctx.fillStyle = `rgba(255,180,0,${jPulse})`;
+    ctx.fillRect(jx - 2, jy - 2, 4, 4);
+    ctx.fillStyle = `rgba(255,240,150,${jPulse})`;
+    ctx.fillRect(jx - 1, jy - 1, 2, 2);
+    ctx.fillStyle = `rgba(255,215,0,${jPulse * 0.6})`;
+    ctx.fillRect(jx - 1, jy - 5, 2, 3);
+    ctx.fillRect(jx - 1, jy + 2, 2, 3);
+    ctx.fillRect(jx - 5, jy - 1, 3, 2);
+    ctx.fillRect(jx + 2, jy - 1, 3, 2);
+    
+    // LIGHT HALOS
+    const orbs = [
+    { angle: fc * 0.08,      radius: 16, size: 2 },
+    { angle: fc * 0.08 + 2,  radius: 18, size: 2 },
+    { angle: fc * 0.08 + 4,  radius: 14, size: 2 }
+    ];
+    orbs.forEach(orb => {
+    const ox = cx + Math.cos(orb.angle) * orb.radius;
+    const oy = jy + Math.sin(orb.angle) * orb.radius * 0.5;
+    ctx.fillStyle = `rgba(255,240,180,${glow * 0.7})`;
+    ctx.fillRect(Math.floor(ox) - 1, Math.floor(oy) - 1, orb.size, orb.size);
+    ctx.fillStyle = `rgba(255,255,200,${glow * 0.4})`;
+    ctx.fillRect(Math.floor(ox) - 2, Math.floor(oy) - 2, orb.size + 2, orb.size + 2);
+    });
+    
+    // LIGHT PARTICLES naik dari sayap
+    if (fc % 8 === 0) {
+    particles.push({ x: lwx - 10, y: lwy + flap, vx: -(0.2 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 0.5), life: 35, color: '#FFD700' });
+    particles.push({ x: rwx + 10, y: rwy + flap, vx: (0.2 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 0.5), life: 35, color: '#FFD700' });
+    }
+    
+    if (pulse > 0.7) {
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = `rgba(255,200,0,${pulse * 0.4})`;
+    ctx.fillStyle = `rgba(255,240,200,0.08)`;
+    ctx.fillRect(bx - 24, yPos - 4, pw + 48, ph + 16);
+    ctx.shadowBlur = 0;
+    }
+    
+    } else if (skin.sunCrown && !pDucking) {
+    // Static sun crown
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(px + 5, yPos - 15, 30, 8);
+    for (let i = 0; i < 4; i++) {
+    ctx.fillRect(px + 7 + i * 8, yPos - 22, 5, 8);
+    }
+    ctx.fillStyle = '#FFA500';
+    for (let i = 0; i < 8; i++) {
+    const angle = (i * 45) * Math.PI / 180;
+    const x1 = px + 20 + Math.cos(angle) * 18;
+    const y1 = yPos - 11 + Math.sin(angle) * 18;
+    const x2 = px + 20 + Math.cos(angle) * 25;
+    const y2 = yPos - 11 + Math.sin(angle) * 25;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    }
+    ctx.strokeStyle = '#B8860B';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px + 5, yPos - 15, 30, 8);
+    }
+    
+    // === ECLIPSE HORNS - Night Legendary ===
+    if (skin.moonCrownAnimated && !pDucking) {
+    const pulse = Math.sin(fc * 0.09) * 0.3 + 0.7;
+    const drift = Math.sin(fc * 0.05) * 2;
+    const bx    = px;
+    const cx    = bx + 20;
+    const cy    = yPos - 8;
+    
+    // VOID AURA (pixel circle, bukan smooth)
+    const auraX = cx;
+    const auraY = cy;
+    
+    // Outer void aura (pixel circle - radius 26)
+    ctx.fillStyle = `rgba(76,29,149,${pulse * 0.15})`;
+    for (let x = -26; x <= 26; x += 4) {
+    for (let y = -26; y <= 26; y += 4) {
+    const dist = Math.sqrt(x*x + y*y);
+    if (dist >= 22 && dist < 26) {
+    ctx.fillRect(auraX + x, auraY + y, 4, 4);
+    }
+    }
+    }
+    
+    // Inner void aura (pixel circle - radius 22)
+    ctx.fillStyle = `rgba(15,23,42,${pulse * 0.25})`;
+    for (let x = -22; x <= 22; x += 4) {
+    for (let y = -22; y <= 22; y += 4) {
+    const dist = Math.sqrt(x*x + y*y);
+    if (dist < 22) {
+    ctx.fillRect(auraX + x, auraY + y, 4, 4);
+    }
+    }
+    }
+    
+    // HORN KIRI
+    const lx = bx - 6;
+    const ly = yPos - 12;
+    ctx.fillStyle = '#0F172A';
+    ctx.fillRect(lx,     ly,      8, 4);
+    ctx.fillRect(lx - 2, ly + 4,  6, 4);
+    ctx.fillRect(lx - 4, ly + 8,  6, 6);
+    ctx.fillRect(lx - 4, ly + 14, 6, 4);
+    ctx.fillRect(lx - 2, ly + 18, 4, 4);
+    ctx.fillRect(lx,     ly + 22, 2, 2);
+    ctx.fillStyle = '#4C1D95';
+    ctx.fillRect(lx + 2, ly + 4,  4, 4);
+    ctx.fillRect(lx,     ly + 8,  4, 6);
+    ctx.fillRect(lx,     ly + 14, 4, 4);
+    ctx.fillRect(lx,     ly + 18, 2, 4);
+    ctx.fillStyle = `rgba(192,132,252,${pulse})`;
+    ctx.fillRect(lx - 4, ly + 8,  2, 6);
+    ctx.fillRect(lx - 4, ly + 14, 2, 4);
+    ctx.fillRect(lx - 2, ly + 18, 1, 3);
+    if (fc % 16 < 8) {
+    ctx.fillStyle = `rgba(216,180,254,${pulse * 0.7})`;
+    ctx.fillRect(lx - 3, ly + 10, 1, 2);
+    ctx.fillRect(lx - 3, ly + 15, 1, 2);
+    }
+    
+    // HORN KANAN
+    const rx = bx + pw - 2;
+    const ry = yPos - 12;
+    ctx.fillStyle = '#0F172A';
+    ctx.fillRect(rx,     ry,      8, 4);
+    ctx.fillRect(rx + 4, ry + 4,  6, 4);
+    ctx.fillRect(rx + 6, ry + 8,  6, 6);
+    ctx.fillRect(rx + 6, ry + 14, 6, 4);
+    ctx.fillRect(rx + 6, ry + 18, 4, 4);
+    ctx.fillRect(rx + 6, ry + 22, 2, 2);
+    ctx.fillStyle = '#4C1D95';
+    ctx.fillRect(rx + 2, ry + 4,  4, 4);
+    ctx.fillRect(rx + 4, ry + 8,  4, 6);
+    ctx.fillRect(rx + 4, ry + 14, 4, 4);
+    ctx.fillRect(rx + 6, ry + 18, 2, 4);
+    ctx.fillStyle = `rgba(192,132,252,${pulse})`;
+    ctx.fillRect(rx + 10, ry + 8,  2, 6);
+    ctx.fillRect(rx + 10, ry + 14, 2, 4);
+    ctx.fillRect(rx + 9,  ry + 18, 1, 3);
+    if (fc % 16 < 8) {
+    ctx.fillStyle = `rgba(216,180,254,${pulse * 0.7})`;
+    ctx.fillRect(rx + 10, ry + 10, 1, 2);
+    ctx.fillRect(rx + 10, ry + 15, 1, 2);
+    }
+    
+    // ECLIPSE JEWEL di dahi
+    const jx = cx;
+    const jy = yPos - 8;
+    ctx.fillStyle = '#0F172A';
+    ctx.fillRect(jx - 2, jy - 2, 4, 4);
+    const ePulse = 0.5 + Math.sin(fc * 0.18) * 0.5;
+    ctx.fillStyle = `rgba(139,92,246,${ePulse})`;
+    ctx.fillRect(jx - 3, jy - 3, 6, 1);
+    ctx.fillRect(jx - 3, jy + 2, 6, 1);
+    ctx.fillRect(jx - 3, jy - 2, 1, 4);
+    ctx.fillRect(jx + 2, jy - 2, 1, 4);
+    ctx.fillStyle = `rgba(192,132,252,${ePulse * 0.8})`;
+    ctx.fillRect(jx - 1, jy - 1, 2, 2);
+    
+    // STAR ORBIT
+    const oAngle = fc * 0.08;
+    const oRad   = 8;
+    const oX     = jx + Math.cos(oAngle) * oRad;
+    const oY     = jy + Math.sin(oAngle) * oRad * 0.6 + drift * 0.3;
+    ctx.fillStyle = `rgba(216,180,254,${pulse})`;
+    ctx.fillRect(Math.floor(oX) - 1, Math.floor(oY) - 1, 2, 2);
+    ctx.fillRect(Math.floor(oX),     Math.floor(oY) - 2, 1, 1);
+    ctx.fillRect(Math.floor(oX),     Math.floor(oY) + 1, 1, 1);
+    const t1X = jx + Math.cos(oAngle - 0.5) * oRad;
+    const t1Y = jy + Math.sin(oAngle - 0.5) * oRad * 0.6 + drift * 0.3;
+    ctx.fillStyle = 'rgba(167,139,250,0.3)';
+    ctx.fillRect(Math.floor(t1X), Math.floor(t1Y), 1, 1);
+    
+    // VOID PARTICLES
+    if (fc % 14 === 0) {
+    particles.push({ x: lx - 2, y: ly + 12, vx: -(0.3 + Math.random() * 0.4), vy: 0.5 + Math.random() * 0.3, life: 35, color: '#8B5CF6' });
+    particles.push({ x: rx + 8, y: ry + 12, vx: (0.3 + Math.random() * 0.4), vy: 0.5 + Math.random() * 0.3, life: 35, color: '#8B5CF6' });
+    }
+    
+    if (pulse > 0.85) {
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = 'rgba(76,29,149,0.6)';
+    ctx.fillStyle = 'rgba(15,23,42,0.1)';
+    ctx.fillRect(bx - 8, yPos - 26, pw + 16, 30);
+    ctx.shadowBlur = 0;
+    }
+    
+    } else if (skin.moonCrown && !pDucking) {
+    const pulse = Math.sin(fc * 0.1) * 0.3 + 0.7;
+    const bx = px;
+    ctx.fillStyle = '#1E1B4B';
+    ctx.fillRect(bx - 4, yPos - 8,  6, 12);
+    ctx.fillRect(bx + pw - 2, yPos - 8, 6, 12);
+    ctx.fillStyle = '#4C1D95';
+    ctx.fillRect(bx - 2, yPos - 6, 2, 8);
+    ctx.fillRect(bx + pw, yPos - 6, 2, 8);
+    ctx.fillStyle = `rgba(139,92,246,${pulse})`;
+    ctx.fillRect(bx + 18, yPos - 8, 4, 4);
+    ctx.fillStyle = '#0F172A';
+    ctx.fillRect(bx + 19, yPos - 7, 2, 2);
+    }
+    
+    // === TIDAL CROWN (Ocean Legendary - mahkota berbentuk ombak pixel!) ===
+    if (skin.tidalCrown && !pDucking) {
+    const t = fc;
+    const cx = px;
+    const cy = yPos;
+    
+    // Base mahkota
+    ctx.fillStyle = '#03045E';
+    ctx.fillRect(cx + 7, cy - 10, 26, 6);
+    ctx.fillStyle = '#0077B6';
+    ctx.fillRect(cx + 9, cy - 10, 22, 3);
+    
+    // Puncak kiri
+    ctx.fillStyle = '#0077B6';
+    ctx.fillRect(cx + 9,  cy - 16, 6, 6);
+    ctx.fillRect(cx + 7,  cy - 14, 4, 4);
+    // Puncak tengah (curl kanan khas ombak)
+    ctx.fillStyle = '#00B4D8';
+    ctx.fillRect(cx + 16, cy - 22, 8, 12);
+    ctx.fillRect(cx + 14, cy - 20, 4, 10);
+    ctx.fillRect(cx + 24, cy - 18, 4, 8);
+    ctx.fillRect(cx + 26, cy - 16, 4, 6);
+    // Puncak kanan
+    ctx.fillStyle = '#0077B6';
+    ctx.fillRect(cx + 26, cy - 16, 6, 6);
+    ctx.fillRect(cx + 28, cy - 18, 4, 4);
+    
+    // Foam putih
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(cx + 9,  cy - 18, 6, 2);
+    ctx.fillRect(cx + 16, cy - 24, 8, 2);
+    ctx.fillRect(cx + 24, cy - 20, 6, 2);
+    
+    // 3 mutiara di base
+    ['#90E0EF', '#48CAE4', '#90E0EF'].forEach((col, i) => {
+    ctx.fillStyle = col;
+    ctx.fillRect(cx + 11 + i * 8, cy - 8, 4, 4);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(cx + 12 + i * 8, cy - 8, 1, 1);
+    });
+    
+    // Shimmer animasi
+    const sh = Math.sin(t * 0.12) > 0 ? 0 : 2;
+    ctx.fillStyle = 'rgba(144,224,239,0.7)';
+    ctx.fillRect(cx + 17, cy - 23 + sh, 4, 2);
+    ctx.fillRect(cx + 22, cy - 21 + sh, 4, 2);
+    }
+    
+    // === WAVE MANTLE (Ocean Legendary - jubah ombak!) ===
+    if (skin.waveMantle && !pDucking) {
+    const t = fc;
+    const mx = px;
+    const myBase = yPos + 8;
+    
+    // Mantle kiri
+    ctx.fillStyle = '#0077B6';
+    ctx.fillRect(mx - 10, myBase,      8, 4);
+    ctx.fillRect(mx - 14, myBase + 4,  10, 4);
+    ctx.fillRect(mx - 16, myBase + 8,  10, 4);
+    ctx.fillRect(mx - 14, myBase + 12, 8, 4);
+    ctx.fillRect(mx - 10, myBase + 16, 6, 4);
+    // Mantle kanan
+    ctx.fillRect(mx + pw + 2,  myBase,      8, 4);
+    ctx.fillRect(mx + pw + 4,  myBase + 4,  10, 4);
+    ctx.fillRect(mx + pw + 6,  myBase + 8,  10, 4);
+    ctx.fillRect(mx + pw + 4,  myBase + 12, 8, 4);
+    ctx.fillRect(mx + pw + 2,  myBase + 16, 6, 4);
+    
+    // Highlight
+    ctx.fillStyle = '#48CAE4';
+    ctx.fillRect(mx - 10, myBase,     6, 2);
+    ctx.fillRect(mx - 14, myBase + 4, 8, 2);
+    ctx.fillRect(mx + pw + 2, myBase,     6, 2);
+    ctx.fillRect(mx + pw + 4, myBase + 4, 8, 2);
+    
+    // Foam ujung (animasi)
+    const fOff = Math.sin(t * 0.1) > 0 ? 0 : 2;
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fillRect(mx - 16 + fOff, myBase + 8,  4, 2);
+    ctx.fillRect(mx - 14 + fOff, myBase + 12, 4, 2);
+    ctx.fillRect(mx + pw + 12 - fOff, myBase + 8,  4, 2);
+    ctx.fillRect(mx + pw + 10 - fOff, myBase + 12, 4, 2);
+    
+    // Water drops
+    if (t % 14 === 0) {
+    particles.push({ x: mx - 12, y: myBase + 20, vx: -0.4, vy: 1.2, life: 16, color: '#90E0EF' });
+    particles.push({ x: mx + pw + 10, y: myBase + 20, vx: 0.4, vy: 1.2, life: 16, color: '#90E0EF' });
+    }
+    }
+    
+    if (skin.snowflakeCrown && !pDucking) {
+    const crownGlow = Math.sin(fc * 0.1) * 0.3 + 0.7;
+    const sparkle = Math.sin(fc * 0.15);
+    
+    // Base crown (ice blue gradient)
+    const crownGrad = ctx.createLinearGradient(
+    px + 8, yPos - 12,
+    px + 32, yPos - 12
+    );
+    crownGrad.addColorStop(0, '#B0E0E6');
+    crownGrad.addColorStop(0.5, '#E0F7FF');
+    crownGrad.addColorStop(1, '#B0E0E6');
+    ctx.fillStyle = crownGrad;
+    ctx.fillRect(px + 8, yPos - 12, 24, 6);
+    
+    // Crown peaks (3 peaks)
+    ctx.fillStyle = '#E0F7FF';
+    ctx.fillRect(px + 10, yPos - 20, 4, 8);
+    ctx.fillRect(px + 18, yPos - 26, 4, 14);
+    ctx.fillRect(px + 26, yPos - 20, 4, 8);
+    
+    // Peak highlights
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(px + 11, yPos - 19, 2, 2);
+    ctx.fillRect(px + 19, yPos - 25, 2, 2);
+    ctx.fillRect(px + 27, yPos - 19, 2, 2);
+    
+    // Peak outlines
+    ctx.strokeStyle = '#87CEEB';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px + 8, yPos - 12, 24, 6);
+    ctx.strokeRect(px + 10, yPos - 20, 4, 8);
+    ctx.strokeRect(px + 18, yPos - 26, 4, 14);
+    ctx.strokeRect(px + 26, yPos - 20, 4, 8);
+    
+    // Central snowflake jewel
+    const snowflakeX = px + 20;
+    const snowflakeY = yPos - 19;
+    
+    // Snowflake glow (pixel circle, bukan smooth)
+    ctx.fillStyle = `rgba(135, 206, 235, ${crownGlow * 0.5})`;
+    for (let x = -8; x <= 8; x += 2) {
+    for (let y = -8; y <= 8; y += 2) {
+    const dist = Math.sqrt(x*x + y*y);
+    if (dist < 8) {
+    ctx.fillRect(snowflakeX + x, snowflakeY + y, 2, 2);
+    }
+    }
+    }
+    
+    // Snowflake core (6-pointed star)
+    ctx.fillStyle = `rgba(255, 255, 255, ${crownGlow})`;
+    ctx.fillRect(snowflakeX - 1, snowflakeY - 1, 3, 3);
+    
+    // 6 points rotating
+    const points = 6;
+    const rotation = fc * 0.5;
+    for (let i = 0; i < points; i++) {
+    const angle = ((i * 360 / points) + rotation) * Math.PI / 180;
+    const length = 6;
+    
+    for (let len = 2; len <= length; len += 2) {
+    const x = Math.floor(snowflakeX + Math.cos(angle) * len);
+    const y = Math.floor(snowflakeY + Math.sin(angle) * len);
+    ctx.fillRect(x, y, 2, 2);
+    }
+    
+    const tipX = Math.floor(snowflakeX + Math.cos(angle) * length);
+    const tipY = Math.floor(snowflakeY + Math.sin(angle) * length);
+    
+    const branchAngle1 = angle - Math.PI / 4;
+    const branchAngle2 = angle + Math.PI / 4;
+    
+    ctx.fillRect(Math.floor(tipX + Math.cos(branchAngle1) * 2), Math.floor(tipY + Math.sin(branchAngle1) * 2), 2, 2);
+    ctx.fillRect(Math.floor(tipX + Math.cos(branchAngle2) * 2), Math.floor(tipY + Math.sin(branchAngle2) * 2), 2, 2);
+    }
+    
+    // Sparkles
+    if (sparkle > 0.5) {
+    ctx.fillStyle = `rgba(255, 255, 255, ${sparkle})`;
+    const sparkles = [
+    { x: snowflakeX - 10, y: snowflakeY - 3 },
+    { x: snowflakeX + 10, y: snowflakeY + 2 },
+    { x: snowflakeX - 4, y: snowflakeY - 8 },
+    { x: snowflakeX + 5, y: snowflakeY + 7 }
+    ];
+    
+    sparkles.forEach(spark => {
+    ctx.fillRect(spark.x, spark.y, 2, 2);
+    ctx.fillRect(spark.x - 2, spark.y, 2, 2);
+    ctx.fillRect(spark.x + 2, spark.y, 2, 2);
+    });
+    }
+    
+        // Ice crystal decorations
+        ctx.fillStyle = `rgba(255, 255, 255, ${crownGlow * 0.6})`;
+        ctx.fillRect(px + 12, yPos - 10, 2, 2);
+        ctx.fillRect(px + 20, yPos - 9, 2, 2);
+        ctx.fillRect(px + 28, yPos - 10, 2, 2);
+    }
+    if (skin.valentineEyes) {
+        // White outer eyes
+        ctx.fillStyle = '#FFF';
+        if (!pDucking) {
+            ctx.fillRect(px + 8, yPos + 14, 8, 8);
+            ctx.fillRect(px + 24, yPos + 14, 8, 8);
+            // Black inner eyes (smaller)
+            ctx.fillStyle = '#000';
+            ctx.fillRect(px + 11, yPos + 16, 3, 4);
+            ctx.fillRect(px + 27, yPos + 16, 3, 4);
+        } else {
+            ctx.fillRect(px + 10, yPos + 10, 6, 4);
+            ctx.fillRect(px + 24, yPos + 10, 6, 4);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(px + 11, yPos + 11, 3, 2);
+            ctx.fillRect(px + 25, yPos + 11, 3, 2);
+        }
+    } else if (skin.whiteEyes) {
+        ctx.fillStyle = '#FFF';
+        if (!pDucking) {
+            ctx.fillRect(px + 8, yPos + 10, 8, 8);
+            ctx.fillRect(px + 24, yPos + 10, 8, 8);
+        } else {
+            ctx.fillRect(px + 10, yPos + 7, 6, 3);
+            ctx.fillRect(px + 24, yPos + 7, 6, 3);
+        }
+    } else {
+        ctx.fillStyle = '#000';
+        if (!pDucking) {
+            ctx.fillRect(px + 8, yPos + 10, 8, 8);
+            ctx.fillRect(px + 24, yPos + 10, 8, 8);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(px + 11, yPos + 12, 3, 4);
+            ctx.fillRect(px + 27, yPos + 12, 3, 4);
+        } else {
+            ctx.fillRect(px + 10, yPos + 7, 6, 3);
+            ctx.fillRect(px + 24, yPos + 7, 6, 3);
+        }
+    }
+    }
+}
+
         const player = {
             x: 100,
             y: groundY - 40,
@@ -8703,1011 +9716,7 @@ function drawHeartShot() {
             },
             
             draw() {
-                const size = this.isDucking ? 25 : this.height;
-                const yPos = this.isDucking ? this.y + 15 : this.y;
-                const skin = getCurrentSkin();
-// Surfboard (jika surfing DAN wave active)
-if (surfing && waveActive) {
-    // Surfboard body (cyan terang)
-    ctx.fillStyle = '#00CED1';
-    ctx.fillRect(this.x - 10, yPos + this.height - 3, this.width + 20, 6);
-    
-    // Surfboard outline
-    ctx.strokeStyle = '#008B8B';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(this.x - 10, yPos + this.height - 3, this.width + 20, 6);
-    
-    // Surfboard nose (ujung depan lebih lancip)
-    ctx.fillStyle = '#40E0D0';
-    ctx.fillRect(this.x + this.width + 10, yPos + this.height - 2, 6, 4);
-    
-    // Center stripe (garis tengah)
-    ctx.fillStyle = '#FFA500';
-    ctx.fillRect(this.x, yPos + this.height - 1, this.width, 2);
-    
-    // Fin (sirip bawah)
-    ctx.fillStyle = '#20B2AA';
-    ctx.fillRect(this.x + this.width/2 - 3, yPos + this.height + 3, 6, 5);
-    
-    // Water splash particles
-    if (frameCount % 4 === 0) {
-        particles.push({
-            x: this.x - 8,
-            y: yPos + this.height,
-            vx: -3 - Math.random() * 2,
-            vy: -Math.random() * 3,
-            life: 20,
-            color: '#87CEEB'
-        });
-    }
-}
-                
-                if (skin.cape && !this.isDucking) {
-    if (skin.id && skin.id.startsWith('night_')) {
-        // Sayap untuk night epic
-        const wingTime = frameCount * 0.15;
-        const wingFlap = Math.sin(wingTime) * 3;
-        
-        // Sayap kiri
-        ctx.fillStyle = '#1a1a2e';
-        ctx.beginPath();
-        ctx.moveTo(this.x, yPos + 10);
-        ctx.lineTo(this.x - 20, yPos + 5 + wingFlap);
-        ctx.lineTo(this.x - 18, yPos + 20 + wingFlap);
-        ctx.lineTo(this.x, yPos + 25);
-        ctx.closePath();
-        ctx.fill();
-        
-        ctx.strokeStyle = '#8B5CF6';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        // Detail sayap kiri
-        ctx.fillStyle = '#4C1D95';
-        ctx.beginPath();
-        ctx.moveTo(this.x, yPos + 15);
-        ctx.lineTo(this.x - 15, yPos + 12 + wingFlap);
-        ctx.lineTo(this.x - 13, yPos + 22 + wingFlap);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Sayap kanan (mirror)
-        ctx.fillStyle = '#1a1a2e';
-        ctx.beginPath();
-        ctx.moveTo(this.x + this.width, yPos + 10);
-        ctx.lineTo(this.x + this.width + 20, yPos + 5 + wingFlap);
-        ctx.lineTo(this.x + this.width + 18, yPos + 20 + wingFlap);
-        ctx.lineTo(this.x + this.width, yPos + 25);
-        ctx.closePath();
-        ctx.fill();
-        
-        ctx.strokeStyle = '#8B5CF6';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        // Detail sayap kanan
-        ctx.fillStyle = '#4C1D95';
-        ctx.beginPath();
-        ctx.moveTo(this.x + this.width, yPos + 15);
-        ctx.lineTo(this.x + this.width + 15, yPos + 12 + wingFlap);
-        ctx.lineTo(this.x + this.width + 13, yPos + 22 + wingFlap);
-        ctx.closePath();
-        ctx.fill();
-    } else if (skin.id === 'egypt_epic') {
-        // Pharaoh Cape untuk Epic (pixel style)
-        const capeFlow = Math.sin(frameCount * 0.1) * 2;
-        
-        // Base jubah (coklat gelap - trapezoid pixel)
-        ctx.fillStyle = '#654321';
-        ctx.fillRect(this.x - 4,  yPos + 4,  4, 6);
-        ctx.fillRect(this.x - 8,  yPos + 10, 8, 6);
-        ctx.fillRect(this.x - 12, yPos + 16, 12, 6);
-        ctx.fillRect(this.x - 16, yPos + 22, 16, 6);
-        ctx.fillRect(this.x - 18, yPos + 28 + capeFlow, 16, 6);
-        ctx.fillRect(this.x - 16, yPos + 34 + capeFlow, 14, 4);
-        
-        // Trim emas (border pixel)
-        ctx.fillStyle = '#DAA520';
-        ctx.fillRect(this.x - 20, yPos + 28 + capeFlow, 2, 6);
-        ctx.fillRect(this.x - 18, yPos + 38 + capeFlow, 14, 2);
-        
-        // Pattern hieroglyph (pixel lines)
-        ctx.fillStyle = '#8B6914';
-        ctx.fillRect(this.x - 14, yPos + 12, 8, 2);
-        ctx.fillRect(this.x - 14, yPos + 20, 8, 2);
-        ctx.fillRect(this.x - 14, yPos + 28, 8, 2);
-                
-    } else if (skin.id === 'egypt_legendary') {
-        // === ROYAL PHARAOH MANTLE (Legendary) ===
-        const flow = Math.sin(frameCount * 0.06);      // -1→1 smooth wave
-        const shimmer = (Math.sin(frameCount * 0.08) + 1) / 2;  // 0→1 shimmer
-        
-        // — BASE MANTLE (coklat saddle - sesuai skin) —
-        ctx.fillStyle = '#8B4513';  // coklat skin
-        ctx.fillRect(this.x - 4,  yPos + 2,  6, 4);
-        ctx.fillRect(this.x - 8,  yPos + 6 + flow * 0.5,  10, 4);
-        ctx.fillRect(this.x - 10, yPos + 10 + flow,       12, 4);
-        ctx.fillRect(this.x - 12, yPos + 14 + flow * 1.5, 14, 4);
-        ctx.fillRect(this.x - 14, yPos + 18 + flow * 2,   16, 4);
-        ctx.fillRect(this.x - 16, yPos + 22 + flow * 2.5, 18, 4);
-        ctx.fillRect(this.x - 18, yPos + 26 + flow * 3,   20, 4);
-        ctx.fillRect(this.x - 18, yPos + 30 + flow * 3,   18, 4);
-        ctx.fillRect(this.x - 16, yPos + 34 + flow * 3,   16, 4);
-        
-        // Shadow layer (darker)
-        ctx.fillStyle = '#654321';
-        ctx.fillRect(this.x - 20, yPos + 28 + flow * 3, 2, 10);
-        
-        // — INNER ACCENT (turquoise strips - sesuai gradient) —
-        ctx.fillStyle = '#40E0D0';  // turquoise
-        ctx.fillRect(this.x - 6,  yPos + 8 + flow * 0.8,  6, 2);
-        ctx.fillRect(this.x - 8,  yPos + 12 + flow * 1.2, 8, 2);
-        ctx.fillRect(this.x - 10, yPos + 16 + flow * 1.8, 10, 2);
-        ctx.fillRect(this.x - 12, yPos + 20 + flow * 2.2, 12, 2);
-        ctx.fillRect(this.x - 14, yPos + 24 + flow * 2.8, 14, 2);
-        
-        // — GOLDEN TRIM (border emas) —
-        ctx.fillStyle = `rgba(255, 215, 0, ${0.8 + shimmer * 0.2})`;
-        // Border kiri
-        for (let i = 0; i < 6; i++) {
-            ctx.fillRect(this.x - 20, yPos + 26 + i * 2 + flow * (2.5 + i * 0.2), 2, 2);
-        }
-        // Border bawah
-        for (let x = 0; x < 16; x += 2) {
-            const waveY = Math.sin((x * 0.3) + frameCount * 0.1) * 1;
-            ctx.fillRect(this.x - 18 + x, yPos + 38 + flow * 3 + waveY, 2, 2);
-        }
-        
-        // — ANKH SYMBOL (turquoise sacred) —
-        ctx.fillStyle = '#40E0D0';
-        ctx.fillRect(this.x - 9, yPos + 12 + flow * 1.5, 2, 8);  // vertical
-        ctx.fillRect(this.x - 13, yPos + 14 + flow * 1.5, 10, 2); // horizontal
-        ctx.fillRect(this.x - 11, yPos + 8 + flow * 1.5,  6, 2);  // loop
-        ctx.fillRect(this.x - 13, yPos + 10 + flow * 1.5, 2, 2);
-        ctx.fillRect(this.x - 7,  yPos + 10 + flow * 1.5, 2, 2);
-        
-        // — EYE OF HORUS (emas) —
-        ctx.fillStyle = '#FFD700';
-        ctx.fillRect(this.x - 12, yPos + 24 + flow * 2.8, 8, 2);
-        ctx.fillRect(this.x - 10, yPos + 22 + flow * 2.8, 4, 2);
-        ctx.fillRect(this.x - 10, yPos + 26 + flow * 2.8, 2, 2);
-        // Pupil (coklat)
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(this.x - 9, yPos + 24 + flow * 2.8, 2, 2);
-        
-        // — SCARAB BEETLES (turquoise) —
-        ctx.fillStyle = `rgba(64, 224, 208, ${0.8 + shimmer * 0.2})`;
-        // Beetle atas
-        ctx.fillRect(this.x - 8, yPos + 6 + flow * 0.8,  4, 2);
-        ctx.fillRect(this.x - 7, yPos + 4 + flow * 0.8,  2, 2);
-        ctx.fillRect(this.x - 10, yPos + 8 + flow * 0.8, 2, 2);
-        ctx.fillRect(this.x - 4,  yPos + 8 + flow * 0.8, 2, 2);
-        
-        // — SHOULDER CLASP (emas) —
-        ctx.fillStyle = '#FFD700';
-        ctx.fillRect(this.x - 2, yPos,     6, 3);
-        ctx.fillRect(this.x - 4, yPos + 3, 8, 2);
-        ctx.fillStyle = '#40E0D0';  // turquoise accent
-        ctx.fillRect(this.x,     yPos + 1, 2, 2);
-        
-    } else {
-        // Default jubah sederhana
-        ctx.fillStyle = '#8B4513';
-        ctx.fillRect(this.x - 15, yPos - 5, 15, size + 10);
-        ctx.strokeStyle = '#654321';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.x - 15, yPos - 5, 15, size + 10);
-}
-}
-
-// === SNOW WINTER ACCESSORIES ===
-if (skin.iceCape && !this.isDucking) {
-    
-    // ========================================
-    // EPIC - "Blizzard Knight" - WINTER JACKET
-    // ========================================
-    if (skin.id === 'snow_epic') {
-        
-        // JAKET BIRU (Winter Jacket)
-        
-        // 1. Body Jacket (badan jaket)
-        ctx.fillStyle = '#4682B4'; // Steel Blue
-        ctx.fillRect(this.x - 4, yPos, this.width + 8, size);
-        
-        // 2. Hoodie (kerudung/topi)
-        ctx.fillStyle = '#5A9BD5'; // Lighter blue
-        // Hood back
-        ctx.fillRect(this.x - 2, yPos - 8, this.width + 4, 10);
-        // Hood sides
-        ctx.fillRect(this.x - 4, yPos - 6, 4, 12);
-        ctx.fillRect(this.x + this.width, yPos - 6, 4, 12);
-        
-        // Hood outline
-        ctx.strokeStyle = '#2F4F7F';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.x - 2, yPos - 8, this.width + 4, 10);
-        
-        // 3. Zipper (resleting tengah)
-        ctx.fillStyle = '#C0C0C0'; // Silver
-        ctx.fillRect(this.x + this.width/2 - 2, yPos + 2, 4, size - 4);
-        
-        // Zipper teeth (gigi resleting)
-        ctx.fillStyle = '#A0A0A0';
-        for (let i = 0; i < size - 8; i += 6) {
-            ctx.fillRect(this.x + this.width/2 - 3, yPos + 4 + i, 2, 3);
-            ctx.fillRect(this.x + this.width/2 + 1, yPos + 4 + i, 2, 3);
-        }
-        
-        // Zipper pull (penarik resleting)
-        ctx.fillStyle = '#FFD700'; // Gold
-        ctx.fillRect(this.x + this.width/2 - 3, yPos + 4, 6, 6);
-        
-        // 4. Pockets (kantong kiri-kanan)
-        ctx.fillStyle = '#3A6FA5'; // Darker blue
-        // Left pocket
-        ctx.fillRect(this.x + 2, yPos + size - 16, 12, 10);
-        ctx.strokeStyle = '#2F4F7F';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(this.x + 2, yPos + size - 16, 12, 10);
-        
-        // Right pocket
-        ctx.fillRect(this.x + this.width - 14, yPos + size - 16, 12, 10);
-        ctx.strokeRect(this.x + this.width - 14, yPos + size - 16, 12, 10);
-        
-        // 5. Sleeves (lengan)
-        ctx.fillStyle = '#4682B4';
-        // Left sleeve
-        ctx.fillRect(this.x - 8, yPos + 8, 6, 16);
-        // Right sleeve
-        ctx.fillRect(this.x + this.width + 2, yPos + 8, 6, 16);
-        
-        // Sleeve cuffs (ujung lengan)
-        ctx.fillStyle = '#2F4F7F';
-        ctx.fillRect(this.x - 8, yPos + 22, 6, 4);
-        ctx.fillRect(this.x + this.width + 2, yPos + 22, 6, 4);
-        
-        // 6. Snow details on jacket (aksen salju)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        // Snow on shoulders
-        ctx.fillRect(this.x - 2, yPos + 2, 8, 3);
-        ctx.fillRect(this.x + this.width - 6, yPos + 2, 8, 3);
-        // Snow on hood
-        ctx.fillRect(this.x + 4, yPos - 6, 12, 2);
-        ctx.fillRect(this.x + 20, yPos - 6, 12, 2);
-        
-        // 7. Jacket outline (border jaket)
-        ctx.strokeStyle = '#2F4F7F';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.x - 4, yPos, this.width + 8, size);
-    }
-    
-    
-    // ==========================================
-    // LEGENDARY - "Frozen Emperor" - TRAIL EFFECT
-    // ==========================================
-    else if (skin.id === 'snow_legendary') {
-        
-        // Keep existing ice cape (tetap pakai jubah es yang lama)
-        const capeShimmer = Math.sin(frameCount * 0.08) * 0.3 + 0.7;
-        const capeFlow = Math.sin(frameCount * 0.1) * 3;
-
-    }
-}
-                
-                if (skin.gradient) {
-    const colors = skin.gradient.match(/#[0-9A-F]{6}/gi);
-    if (colors && colors.length >= 2) {
-        const grad = ctx.createLinearGradient(this.x, yPos, this.x + this.width, yPos + size);
-        if (colors.length === 2) {
-            grad.addColorStop(0, colors[0]);
-            grad.addColorStop(1, colors[1]);
-        } else {
-            // Support multi color stops (untuk night legendary 5 warna, snow 4 warna, dll)
-            colors.forEach((color, i) => {
-                grad.addColorStop(i / (colors.length - 1), color);
-            });
-        }
-        ctx.fillStyle = grad;
-    } else {
-        ctx.fillStyle = skin.color;
-    }
-} else {
-    ctx.fillStyle = skin.color;
-}
-
-// === VALENTINE HEART SHAPE - SMOOTH GRADIENT ===
-if (skin.valentineHeart && !this.isDucking) {
-    const centerX = this.x + this.width / 2;
-    const centerY = yPos + size / 2;
-    const heartSize = this.width * 0.9;
-    
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    
-    // Create gradient for heart
-    const heartGrad = ctx.createLinearGradient(0, -heartSize/2, 0, heartSize/2);
-    
-    // Parse skin color for gradient
-    if (skin.gradient) {
-        const colors = skin.gradient.match(/#[0-9A-F]{6}/gi);
-        if (colors && colors.length >= 2) {
-            heartGrad.addColorStop(0, colors[0]);
-            heartGrad.addColorStop(1, colors[1]);
-        } else {
-            heartGrad.addColorStop(0, skin.color);
-            heartGrad.addColorStop(1, skin.color);
-        }
-    } else {
-        // Default pink gradient
-        heartGrad.addColorStop(0, skin.color);
-        const darkerColor = skin.color.replace(/[0-9A-F]/g, (c) => {
-            const val = parseInt(c, 16);
-            return Math.max(0, val - 3).toString(16);
-        });
-        heartGrad.addColorStop(1, darkerColor);
-    }
-    
-    // Draw smooth heart shape
-    ctx.beginPath();
-    ctx.fillStyle = heartGrad;
-    
-    const scale = heartSize / 40;
-    
-    // Heart path
-    ctx.moveTo(0, -15 * scale);
-    
-    // Left top curve
-    ctx.bezierCurveTo(-12 * scale, -22 * scale, -20 * scale, -18 * scale, -20 * scale, -8 * scale);
-    ctx.bezierCurveTo(-20 * scale, 0, -12 * scale, 8 * scale, 0, 18 * scale);
-    
-    // Right top curve
-    ctx.bezierCurveTo(12 * scale, 8 * scale, 20 * scale, 0, 20 * scale, -8 * scale);
-    ctx.bezierCurveTo(20 * scale, -18 * scale, 12 * scale, -22 * scale, 0, -15 * scale);
-    
-    ctx.closePath();
-    
-    // Fill heart
-    ctx.fill();
-    
-    // Add shine/highlight effect
-    const shineGrad = ctx.createRadialGradient(-5 * scale, -8 * scale, 0, -5 * scale, -8 * scale, 15 * scale);
-    shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-    shineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    ctx.fillStyle = shineGrad;
-    ctx.fill();
-    
-    // Heart outline
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-    
-    ctx.restore();
-} else {
-    // Normal square block
-    ctx.fillRect(this.x, yPos, this.width, size);
-}
-
-// Efek glow
-if (skin.glow && !this.isDucking) {
-    if (skin.id && skin.id.startsWith('night_')) {
-        // Glow ungu untuk night skins
-        ctx.shadowBlur = 25;
-        ctx.shadowColor = 'rgba(139, 92, 246, 0.9)';
-        ctx.fillRect(this.x, yPos, this.width, size);
-        ctx.shadowBlur = 0;
-    } else if (skin.id && skin.id.startsWith('snow_')) {
-        // Glow biru es untuk snow skins
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = 'rgba(135, 206, 235, 0.8)';
-        ctx.fillRect(this.x, yPos, this.width, size);
-        ctx.shadowBlur = 0;
-    } else {
-        // Glow kuning untuk day skins
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
-        ctx.fillRect(this.x, yPos, this.width, size);
-        ctx.shadowBlur = 0;
-    }
-}
-                
-// Redraw untuk non-valentine skins
-if (!skin.valentineHeart) {
-    ctx.fillRect(this.x, yPos, this.width, size);
-}
-                
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 3;
-                if (!skin.valentineHeart) {
-                    ctx.strokeRect(this.x, yPos, this.width, size);
-                }
-                
-                if (skin.crown && !this.isDucking) {
-                    // === PHARAOH HEADDRESS (detail hieroglyph) ===
-                    const crownShimmer = (Math.sin(frameCount * 0.1) + 1) / 2;
-                    
-                    // — BASE CROWN (coklat-emas gradient) —
-                    // Bottom band
-                    ctx.fillStyle = '#8B4513';  // coklat
-                    ctx.fillRect(this.x + 5, yPos - 15, 30, 4);
-                    ctx.fillStyle = '#FFD700';  // emas
-                    ctx.fillRect(this.x + 5, yPos - 19, 30, 4);
-                    
-                    // — THREE PEAKS (simetris) —
-                    // Peak kiri
-                    ctx.fillStyle = '#FFD700';
-                    ctx.fillRect(this.x + 8,  yPos - 22, 6, 3);
-                    ctx.fillRect(this.x + 9,  yPos - 25, 4, 3);
-                    ctx.fillRect(this.x + 10, yPos - 27, 2, 2);
-                    // Peak tengah (highest)
-                    ctx.fillStyle = '#FFD700';
-                    ctx.fillRect(this.x + 17, yPos - 25, 6, 6);
-                    ctx.fillRect(this.x + 18, yPos - 29, 4, 4);
-                    ctx.fillRect(this.x + 19, yPos - 31, 2, 2);
-                    // Peak kanan
-                    ctx.fillStyle = '#FFD700';
-                    ctx.fillRect(this.x + 26, yPos - 22, 6, 3);
-                    ctx.fillRect(this.x + 27, yPos - 25, 4, 3);
-                    ctx.fillRect(this.x + 28, yPos - 27, 2, 2);
-                    
-                    // — TURQUOISE ACCENTS (sacred stripes) —
-                    ctx.fillStyle = '#40E0D0';
-                    ctx.fillRect(this.x + 7,  yPos - 16, 2, 2);
-                    ctx.fillRect(this.x + 19, yPos - 18, 2, 2);
-                    ctx.fillRect(this.x + 31, yPos - 16, 2, 2);
-                    
-                    // — COBRA URAEUS (center peak - khas pharaoh!) —
-                    ctx.fillStyle = '#40E0D0';
-                    ctx.fillRect(this.x + 19, yPos - 32, 2, 3);  // head
-                    ctx.fillRect(this.x + 18, yPos - 30, 1, 2);  // hood left
-                    ctx.fillRect(this.x + 21, yPos - 30, 1, 2);  // hood right
-                    ctx.fillStyle = '#FFD700';
-                    ctx.fillRect(this.x + 19, yPos - 32, 1, 1);  // eye
-                    
-                    // — SCARAB SYMBOL (on band) —
-                    ctx.fillStyle = `rgba(64, 224, 208, ${0.7 + crownShimmer * 0.3})`;
-                    ctx.fillRect(this.x + 19, yPos - 17, 2, 2);
-                    ctx.fillRect(this.x + 17, yPos - 16, 1, 1);
-                    ctx.fillRect(this.x + 22, yPos - 16, 1, 1);
-                    
-                    // — GOLDEN DETAILS (shimmer dots) —
-                    if (frameCount % 16 < 8) {
-                        ctx.fillStyle = `rgba(255, 215, 0, ${crownShimmer})`;
-                        ctx.fillRect(this.x + 10, yPos - 24, 1, 1);
-                        ctx.fillRect(this.x + 29, yPos - 24, 1, 1);
-                    }
-                    
-                    // — OUTLINE —
-                    ctx.strokeStyle = '#8B4513';  // coklat outline
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(this.x + 5, yPos - 19, 30, 8);
-                    ctx.strokeRect(this.x + 8,  yPos - 22, 6, 3);
-                    ctx.strokeRect(this.x + 17, yPos - 25, 6, 6);
-                    ctx.strokeRect(this.x + 26, yPos - 22, 6, 3);
-                }
-
-
-// === MAHKOTA MATAHARI ANIMATED - Day Legendary ===
-if (skin.sunCrownAnimated && !this.isDucking) {
-    const pulse  = (Math.sin(frameCount * 0.07) + 1) / 2;
-    const flap   = Math.sin(frameCount * 0.12) * 3;
-    const glow   = Math.sin(frameCount * 0.08) * 0.3 + 0.7;
-    const bx     = this.x;
-    const cx     = bx + 20;
-
-    // GOLDEN AURA (pixel circle, bukan smooth)
-    const auraX = cx;
-    const auraY = yPos + this.height/2;
-    
-    // Outer aura (pixel circle - radius 34)
-    ctx.fillStyle = `rgba(255,180,0,${pulse * 0.08})`;
-    for (let x = -34; x <= 34; x += 4) {
-        for (let y = -34; y <= 34; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist >= 28 && dist < 34) {
-                ctx.fillRect(auraX + x, auraY + y, 4, 4);
-            }
-        }
-    }
-    
-    // Inner aura (pixel circle - radius 28)
-    ctx.fillStyle = `rgba(255,220,0,${pulse * 0.12})`;
-    for (let x = -28; x <= 28; x += 4) {
-        for (let y = -28; y <= 28; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < 28) {
-                ctx.fillRect(auraX + x, auraY + y, 4, 4);
-            }
-        }
-    }
-
-    // SOLAR WINGS KIRI
-    const lwx = bx - 2;
-    const lwy = yPos + 6;
-    ctx.fillStyle = `rgba(255,240,200,${0.6 + pulse * 0.3})`;
-    ctx.fillRect(lwx - 18, lwy - 6 + flap, 10, 4);
-    ctx.fillRect(lwx - 20, lwy - 2 + flap, 8,  4);
-    ctx.fillRect(lwx - 18, lwy + 2 + flap, 6,  4);
-    ctx.fillRect(lwx - 14, lwy + 6 + flap, 4,  3);
-    ctx.fillStyle = `rgba(255,215,0,${0.7 + pulse * 0.2})`;
-    ctx.fillRect(lwx - 14, lwy - 4 + flap, 8,  4);
-    ctx.fillRect(lwx - 12, lwy + 0 + flap, 6,  4);
-    ctx.fillRect(lwx - 10, lwy + 4 + flap, 5,  4);
-    ctx.fillRect(lwx - 6,  lwy + 8 + flap, 3,  3);
-    ctx.fillStyle = `rgba(255,160,50,${0.8 + pulse * 0.15})`;
-    ctx.fillRect(lwx - 8,  lwy - 2 + flap, 6,  3);
-    ctx.fillRect(lwx - 6,  lwy + 1 + flap, 4,  3);
-    ctx.fillRect(lwx - 4,  lwy + 4 + flap, 3,  4);
-    ctx.fillStyle = `rgba(255,255,220,${glow * 0.8})`;
-    ctx.fillRect(lwx - 18, lwy - 6 + flap, 2,  2);
-    ctx.fillRect(lwx - 20, lwy - 2 + flap, 2,  2);
-    ctx.fillRect(lwx - 16, lwy + 2 + flap, 2,  2);
-    ctx.fillStyle = `rgba(255,200,80,${0.7 + pulse * 0.2})`;
-    ctx.fillRect(lwx - 2, lwy, 4, 6);
-    ctx.fillRect(lwx,     lwy, 2, 8);
-
-    // SOLAR WINGS KANAN
-    const rwx = bx + this.width - 2;
-    const rwy = yPos + 6;
-    ctx.fillStyle = `rgba(255,240,200,${0.6 + pulse * 0.3})`;
-    ctx.fillRect(rwx + 8,  rwy - 6 + flap, 10, 4);
-    ctx.fillRect(rwx + 12, rwy - 2 + flap, 8,  4);
-    ctx.fillRect(rwx + 12, rwy + 2 + flap, 6,  4);
-    ctx.fillRect(rwx + 10, rwy + 6 + flap, 4,  3);
-    ctx.fillStyle = `rgba(255,215,0,${0.7 + pulse * 0.2})`;
-    ctx.fillRect(rwx + 6,  rwy - 4 + flap, 8,  4);
-    ctx.fillRect(rwx + 6,  rwy + 0 + flap, 6,  4);
-    ctx.fillRect(rwx + 5,  rwy + 4 + flap, 5,  4);
-    ctx.fillRect(rwx + 3,  rwy + 8 + flap, 3,  3);
-    ctx.fillStyle = `rgba(255,160,50,${0.8 + pulse * 0.15})`;
-    ctx.fillRect(rwx + 2,  rwy - 2 + flap, 6,  3);
-    ctx.fillRect(rwx + 2,  rwy + 1 + flap, 4,  3);
-    ctx.fillRect(rwx + 1,  rwy + 4 + flap, 3,  4);
-    ctx.fillStyle = `rgba(255,255,220,${glow * 0.8})`;
-    ctx.fillRect(rwx + 16, rwy - 6 + flap, 2,  2);
-    ctx.fillRect(rwx + 18, rwy - 2 + flap, 2,  2);
-    ctx.fillRect(rwx + 14, rwy + 2 + flap, 2,  2);
-    ctx.fillStyle = `rgba(255,200,80,${0.7 + pulse * 0.2})`;
-    ctx.fillRect(rwx - 2, rwy, 4, 6);
-    ctx.fillRect(rwx - 2, rwy, 2, 8);
-
-    // SUNBURST JEWEL di dada
-    const jx = cx;
-    const jy = yPos + this.height/2 + 2;
-    const jPulse = 0.6 + Math.sin(frameCount * 0.16) * 0.4;
-    ctx.fillStyle = `rgba(255,180,0,${jPulse})`;
-    ctx.fillRect(jx - 2, jy - 2, 4, 4);
-    ctx.fillStyle = `rgba(255,240,150,${jPulse})`;
-    ctx.fillRect(jx - 1, jy - 1, 2, 2);
-    ctx.fillStyle = `rgba(255,215,0,${jPulse * 0.6})`;
-    ctx.fillRect(jx - 1, jy - 5, 2, 3);
-    ctx.fillRect(jx - 1, jy + 2, 2, 3);
-    ctx.fillRect(jx - 5, jy - 1, 3, 2);
-    ctx.fillRect(jx + 2, jy - 1, 3, 2);
-
-    // LIGHT HALOS
-    const orbs = [
-        { angle: frameCount * 0.08,      radius: 16, size: 2 },
-        { angle: frameCount * 0.08 + 2,  radius: 18, size: 2 },
-        { angle: frameCount * 0.08 + 4,  radius: 14, size: 2 }
-    ];
-    orbs.forEach(orb => {
-        const ox = cx + Math.cos(orb.angle) * orb.radius;
-        const oy = jy + Math.sin(orb.angle) * orb.radius * 0.5;
-        ctx.fillStyle = `rgba(255,240,180,${glow * 0.7})`;
-        ctx.fillRect(Math.floor(ox) - 1, Math.floor(oy) - 1, orb.size, orb.size);
-        ctx.fillStyle = `rgba(255,255,200,${glow * 0.4})`;
-        ctx.fillRect(Math.floor(ox) - 2, Math.floor(oy) - 2, orb.size + 2, orb.size + 2);
-    });
-
-    // LIGHT PARTICLES naik dari sayap
-    if (frameCount % 8 === 0) {
-        particles.push({ x: lwx - 10, y: lwy + flap, vx: -(0.2 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 0.5), life: 35, color: '#FFD700' });
-        particles.push({ x: rwx + 10, y: rwy + flap, vx: (0.2 + Math.random() * 0.3), vy: -(1.5 + Math.random() * 0.5), life: 35, color: '#FFD700' });
-    }
-
-    if (pulse > 0.7) {
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = `rgba(255,200,0,${pulse * 0.4})`;
-        ctx.fillStyle = `rgba(255,240,200,0.08)`;
-        ctx.fillRect(bx - 24, yPos - 4, this.width + 48, this.height + 16);
-        ctx.shadowBlur = 0;
-    }
-
-} else if (skin.sunCrown && !this.isDucking) {
-    // Static sun crown
-    ctx.fillStyle = '#FFD700';
-    ctx.fillRect(this.x + 5, yPos - 15, 30, 8);
-    for (let i = 0; i < 4; i++) {
-        ctx.fillRect(this.x + 7 + i * 8, yPos - 22, 5, 8);
-    }
-    ctx.fillStyle = '#FFA500';
-    for (let i = 0; i < 8; i++) {
-        const angle = (i * 45) * Math.PI / 180;
-        const x1 = this.x + 20 + Math.cos(angle) * 18;
-        const y1 = yPos - 11 + Math.sin(angle) * 18;
-        const x2 = this.x + 20 + Math.cos(angle) * 25;
-        const y2 = yPos - 11 + Math.sin(angle) * 25;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-    }
-    ctx.strokeStyle = '#B8860B';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(this.x + 5, yPos - 15, 30, 8);
-}
-
-// === ECLIPSE HORNS - Night Legendary ===
-if (skin.moonCrownAnimated && !this.isDucking) {
-    const pulse = Math.sin(frameCount * 0.09) * 0.3 + 0.7;
-    const drift = Math.sin(frameCount * 0.05) * 2;
-    const bx    = this.x;
-    const cx    = bx + 20;
-    const cy    = yPos - 8;
-
-    // VOID AURA (pixel circle, bukan smooth)
-    const auraX = cx;
-    const auraY = cy;
-    
-    // Outer void aura (pixel circle - radius 26)
-    ctx.fillStyle = `rgba(76,29,149,${pulse * 0.15})`;
-    for (let x = -26; x <= 26; x += 4) {
-        for (let y = -26; y <= 26; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist >= 22 && dist < 26) {
-                ctx.fillRect(auraX + x, auraY + y, 4, 4);
-            }
-        }
-    }
-    
-    // Inner void aura (pixel circle - radius 22)
-    ctx.fillStyle = `rgba(15,23,42,${pulse * 0.25})`;
-    for (let x = -22; x <= 22; x += 4) {
-        for (let y = -22; y <= 22; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < 22) {
-                ctx.fillRect(auraX + x, auraY + y, 4, 4);
-            }
-        }
-    }
-
-    // HORN KIRI
-    const lx = bx - 6;
-    const ly = yPos - 12;
-    ctx.fillStyle = '#0F172A';
-    ctx.fillRect(lx,     ly,      8, 4);
-    ctx.fillRect(lx - 2, ly + 4,  6, 4);
-    ctx.fillRect(lx - 4, ly + 8,  6, 6);
-    ctx.fillRect(lx - 4, ly + 14, 6, 4);
-    ctx.fillRect(lx - 2, ly + 18, 4, 4);
-    ctx.fillRect(lx,     ly + 22, 2, 2);
-    ctx.fillStyle = '#4C1D95';
-    ctx.fillRect(lx + 2, ly + 4,  4, 4);
-    ctx.fillRect(lx,     ly + 8,  4, 6);
-    ctx.fillRect(lx,     ly + 14, 4, 4);
-    ctx.fillRect(lx,     ly + 18, 2, 4);
-    ctx.fillStyle = `rgba(192,132,252,${pulse})`;
-    ctx.fillRect(lx - 4, ly + 8,  2, 6);
-    ctx.fillRect(lx - 4, ly + 14, 2, 4);
-    ctx.fillRect(lx - 2, ly + 18, 1, 3);
-    if (frameCount % 16 < 8) {
-        ctx.fillStyle = `rgba(216,180,254,${pulse * 0.7})`;
-        ctx.fillRect(lx - 3, ly + 10, 1, 2);
-        ctx.fillRect(lx - 3, ly + 15, 1, 2);
-    }
-
-    // HORN KANAN
-    const rx = bx + this.width - 2;
-    const ry = yPos - 12;
-    ctx.fillStyle = '#0F172A';
-    ctx.fillRect(rx,     ry,      8, 4);
-    ctx.fillRect(rx + 4, ry + 4,  6, 4);
-    ctx.fillRect(rx + 6, ry + 8,  6, 6);
-    ctx.fillRect(rx + 6, ry + 14, 6, 4);
-    ctx.fillRect(rx + 6, ry + 18, 4, 4);
-    ctx.fillRect(rx + 6, ry + 22, 2, 2);
-    ctx.fillStyle = '#4C1D95';
-    ctx.fillRect(rx + 2, ry + 4,  4, 4);
-    ctx.fillRect(rx + 4, ry + 8,  4, 6);
-    ctx.fillRect(rx + 4, ry + 14, 4, 4);
-    ctx.fillRect(rx + 6, ry + 18, 2, 4);
-    ctx.fillStyle = `rgba(192,132,252,${pulse})`;
-    ctx.fillRect(rx + 10, ry + 8,  2, 6);
-    ctx.fillRect(rx + 10, ry + 14, 2, 4);
-    ctx.fillRect(rx + 9,  ry + 18, 1, 3);
-    if (frameCount % 16 < 8) {
-        ctx.fillStyle = `rgba(216,180,254,${pulse * 0.7})`;
-        ctx.fillRect(rx + 10, ry + 10, 1, 2);
-        ctx.fillRect(rx + 10, ry + 15, 1, 2);
-    }
-
-    // ECLIPSE JEWEL di dahi
-    const jx = cx;
-    const jy = yPos - 8;
-    ctx.fillStyle = '#0F172A';
-    ctx.fillRect(jx - 2, jy - 2, 4, 4);
-    const ePulse = 0.5 + Math.sin(frameCount * 0.18) * 0.5;
-    ctx.fillStyle = `rgba(139,92,246,${ePulse})`;
-    ctx.fillRect(jx - 3, jy - 3, 6, 1);
-    ctx.fillRect(jx - 3, jy + 2, 6, 1);
-    ctx.fillRect(jx - 3, jy - 2, 1, 4);
-    ctx.fillRect(jx + 2, jy - 2, 1, 4);
-    ctx.fillStyle = `rgba(192,132,252,${ePulse * 0.8})`;
-    ctx.fillRect(jx - 1, jy - 1, 2, 2);
-
-    // STAR ORBIT
-    const oAngle = frameCount * 0.08;
-    const oRad   = 8;
-    const oX     = jx + Math.cos(oAngle) * oRad;
-    const oY     = jy + Math.sin(oAngle) * oRad * 0.6 + drift * 0.3;
-    ctx.fillStyle = `rgba(216,180,254,${pulse})`;
-    ctx.fillRect(Math.floor(oX) - 1, Math.floor(oY) - 1, 2, 2);
-    ctx.fillRect(Math.floor(oX),     Math.floor(oY) - 2, 1, 1);
-    ctx.fillRect(Math.floor(oX),     Math.floor(oY) + 1, 1, 1);
-    const t1X = jx + Math.cos(oAngle - 0.5) * oRad;
-    const t1Y = jy + Math.sin(oAngle - 0.5) * oRad * 0.6 + drift * 0.3;
-    ctx.fillStyle = 'rgba(167,139,250,0.3)';
-    ctx.fillRect(Math.floor(t1X), Math.floor(t1Y), 1, 1);
-
-    // VOID PARTICLES
-    if (frameCount % 14 === 0) {
-        particles.push({ x: lx - 2, y: ly + 12, vx: -(0.3 + Math.random() * 0.4), vy: 0.5 + Math.random() * 0.3, life: 35, color: '#8B5CF6' });
-        particles.push({ x: rx + 8, y: ry + 12, vx: (0.3 + Math.random() * 0.4), vy: 0.5 + Math.random() * 0.3, life: 35, color: '#8B5CF6' });
-    }
-
-    if (pulse > 0.85) {
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = 'rgba(76,29,149,0.6)';
-        ctx.fillStyle = 'rgba(15,23,42,0.1)';
-        ctx.fillRect(bx - 8, yPos - 26, this.width + 16, 30);
-        ctx.shadowBlur = 0;
-    }
-
-} else if (skin.moonCrown && !this.isDucking) {
-    const pulse = Math.sin(frameCount * 0.1) * 0.3 + 0.7;
-    const bx = this.x;
-    ctx.fillStyle = '#1E1B4B';
-    ctx.fillRect(bx - 4, yPos - 8,  6, 12);
-    ctx.fillRect(bx + this.width - 2, yPos - 8, 6, 12);
-    ctx.fillStyle = '#4C1D95';
-    ctx.fillRect(bx - 2, yPos - 6, 2, 8);
-    ctx.fillRect(bx + this.width, yPos - 6, 2, 8);
-    ctx.fillStyle = `rgba(139,92,246,${pulse})`;
-    ctx.fillRect(bx + 18, yPos - 8, 4, 4);
-    ctx.fillStyle = '#0F172A';
-    ctx.fillRect(bx + 19, yPos - 7, 2, 2);
-}
-
-// === TIDAL CROWN (Ocean Legendary - mahkota berbentuk ombak pixel!) ===
-if (skin.tidalCrown && !this.isDucking) {
-    const t = frameCount;
-    const cx = this.x;
-    const cy = yPos;
-
-    // Base mahkota
-    ctx.fillStyle = '#03045E';
-    ctx.fillRect(cx + 7, cy - 10, 26, 6);
-    ctx.fillStyle = '#0077B6';
-    ctx.fillRect(cx + 9, cy - 10, 22, 3);
-
-    // Puncak kiri
-    ctx.fillStyle = '#0077B6';
-    ctx.fillRect(cx + 9,  cy - 16, 6, 6);
-    ctx.fillRect(cx + 7,  cy - 14, 4, 4);
-    // Puncak tengah (curl kanan khas ombak)
-    ctx.fillStyle = '#00B4D8';
-    ctx.fillRect(cx + 16, cy - 22, 8, 12);
-    ctx.fillRect(cx + 14, cy - 20, 4, 10);
-    ctx.fillRect(cx + 24, cy - 18, 4, 8);
-    ctx.fillRect(cx + 26, cy - 16, 4, 6);
-    // Puncak kanan
-    ctx.fillStyle = '#0077B6';
-    ctx.fillRect(cx + 26, cy - 16, 6, 6);
-    ctx.fillRect(cx + 28, cy - 18, 4, 4);
-
-    // Foam putih
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(cx + 9,  cy - 18, 6, 2);
-    ctx.fillRect(cx + 16, cy - 24, 8, 2);
-    ctx.fillRect(cx + 24, cy - 20, 6, 2);
-
-    // 3 mutiara di base
-    ['#90E0EF', '#48CAE4', '#90E0EF'].forEach((col, i) => {
-        ctx.fillStyle = col;
-        ctx.fillRect(cx + 11 + i * 8, cy - 8, 4, 4);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(cx + 12 + i * 8, cy - 8, 1, 1);
-    });
-
-    // Shimmer animasi
-    const sh = Math.sin(t * 0.12) > 0 ? 0 : 2;
-    ctx.fillStyle = 'rgba(144,224,239,0.7)';
-    ctx.fillRect(cx + 17, cy - 23 + sh, 4, 2);
-    ctx.fillRect(cx + 22, cy - 21 + sh, 4, 2);
-}
-
-// === WAVE MANTLE (Ocean Legendary - jubah ombak!) ===
-if (skin.waveMantle && !this.isDucking) {
-    const t = frameCount;
-    const mx = this.x;
-    const myBase = yPos + 8;
-
-    // Mantle kiri
-    ctx.fillStyle = '#0077B6';
-    ctx.fillRect(mx - 10, myBase,      8, 4);
-    ctx.fillRect(mx - 14, myBase + 4,  10, 4);
-    ctx.fillRect(mx - 16, myBase + 8,  10, 4);
-    ctx.fillRect(mx - 14, myBase + 12, 8, 4);
-    ctx.fillRect(mx - 10, myBase + 16, 6, 4);
-    // Mantle kanan
-    ctx.fillRect(mx + this.width + 2,  myBase,      8, 4);
-    ctx.fillRect(mx + this.width + 4,  myBase + 4,  10, 4);
-    ctx.fillRect(mx + this.width + 6,  myBase + 8,  10, 4);
-    ctx.fillRect(mx + this.width + 4,  myBase + 12, 8, 4);
-    ctx.fillRect(mx + this.width + 2,  myBase + 16, 6, 4);
-
-    // Highlight
-    ctx.fillStyle = '#48CAE4';
-    ctx.fillRect(mx - 10, myBase,     6, 2);
-    ctx.fillRect(mx - 14, myBase + 4, 8, 2);
-    ctx.fillRect(mx + this.width + 2, myBase,     6, 2);
-    ctx.fillRect(mx + this.width + 4, myBase + 4, 8, 2);
-
-    // Foam ujung (animasi)
-    const fOff = Math.sin(t * 0.1) > 0 ? 0 : 2;
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.fillRect(mx - 16 + fOff, myBase + 8,  4, 2);
-    ctx.fillRect(mx - 14 + fOff, myBase + 12, 4, 2);
-    ctx.fillRect(mx + this.width + 12 - fOff, myBase + 8,  4, 2);
-    ctx.fillRect(mx + this.width + 10 - fOff, myBase + 12, 4, 2);
-
-    // Water drops
-    if (t % 14 === 0) {
-        particles.push({ x: mx - 12, y: myBase + 20, vx: -0.4, vy: 1.2, life: 16, color: '#90E0EF' });
-        particles.push({ x: mx + this.width + 10, y: myBase + 20, vx: 0.4, vy: 1.2, life: 16, color: '#90E0EF' });
-    }
-}
-
-if (skin.snowflakeCrown && !this.isDucking) {
-    const crownGlow = Math.sin(frameCount * 0.1) * 0.3 + 0.7;
-    const sparkle = Math.sin(frameCount * 0.15);
-    
-    // Base crown (ice blue gradient)
-    const crownGrad = ctx.createLinearGradient(
-        this.x + 8, yPos - 12,
-        this.x + 32, yPos - 12
-    );
-    crownGrad.addColorStop(0, '#B0E0E6');
-    crownGrad.addColorStop(0.5, '#E0F7FF');
-    crownGrad.addColorStop(1, '#B0E0E6');
-    ctx.fillStyle = crownGrad;
-    ctx.fillRect(this.x + 8, yPos - 12, 24, 6);
-    
-    // Crown peaks (3 peaks)
-    ctx.fillStyle = '#E0F7FF';
-    ctx.fillRect(this.x + 10, yPos - 20, 4, 8);
-    ctx.fillRect(this.x + 18, yPos - 26, 4, 14);
-    ctx.fillRect(this.x + 26, yPos - 20, 4, 8);
-    
-    // Peak highlights
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(this.x + 11, yPos - 19, 2, 2);
-    ctx.fillRect(this.x + 19, yPos - 25, 2, 2);
-    ctx.fillRect(this.x + 27, yPos - 19, 2, 2);
-    
-    // Peak outlines
-    ctx.strokeStyle = '#87CEEB';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(this.x + 8, yPos - 12, 24, 6);
-    ctx.strokeRect(this.x + 10, yPos - 20, 4, 8);
-    ctx.strokeRect(this.x + 18, yPos - 26, 4, 14);
-    ctx.strokeRect(this.x + 26, yPos - 20, 4, 8);
-    
-    // Central snowflake jewel
-    const snowflakeX = this.x + 20;
-    const snowflakeY = yPos - 19;
-    
-    // Snowflake glow (pixel circle, bukan smooth)
-    ctx.fillStyle = `rgba(135, 206, 235, ${crownGlow * 0.5})`;
-    for (let x = -8; x <= 8; x += 2) {
-        for (let y = -8; y <= 8; y += 2) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < 8) {
-                ctx.fillRect(snowflakeX + x, snowflakeY + y, 2, 2);
-            }
-        }
-    }
-    
-    // Snowflake core (6-pointed star)
-    ctx.fillStyle = `rgba(255, 255, 255, ${crownGlow})`;
-    ctx.fillRect(snowflakeX - 1, snowflakeY - 1, 3, 3);
-    
-    // 6 points rotating
-    const points = 6;
-    const rotation = frameCount * 0.5;
-    for (let i = 0; i < points; i++) {
-        const angle = ((i * 360 / points) + rotation) * Math.PI / 180;
-        const length = 6;
-        
-        for (let len = 2; len <= length; len += 2) {
-            const x = Math.floor(snowflakeX + Math.cos(angle) * len);
-            const y = Math.floor(snowflakeY + Math.sin(angle) * len);
-            ctx.fillRect(x, y, 2, 2);
-        }
-        
-        const tipX = Math.floor(snowflakeX + Math.cos(angle) * length);
-        const tipY = Math.floor(snowflakeY + Math.sin(angle) * length);
-        
-        const branchAngle1 = angle - Math.PI / 4;
-        const branchAngle2 = angle + Math.PI / 4;
-        
-        ctx.fillRect(Math.floor(tipX + Math.cos(branchAngle1) * 2), Math.floor(tipY + Math.sin(branchAngle1) * 2), 2, 2);
-        ctx.fillRect(Math.floor(tipX + Math.cos(branchAngle2) * 2), Math.floor(tipY + Math.sin(branchAngle2) * 2), 2, 2);
-    }
-    
-    // Sparkles
-    if (sparkle > 0.5) {
-        ctx.fillStyle = `rgba(255, 255, 255, ${sparkle})`;
-        const sparkles = [
-            { x: snowflakeX - 10, y: snowflakeY - 3 },
-            { x: snowflakeX + 10, y: snowflakeY + 2 },
-            { x: snowflakeX - 4, y: snowflakeY - 8 },
-            { x: snowflakeX + 5, y: snowflakeY + 7 }
-        ];
-        
-        sparkles.forEach(spark => {
-            ctx.fillRect(spark.x, spark.y, 2, 2);
-            ctx.fillRect(spark.x - 2, spark.y, 2, 2);
-            ctx.fillRect(spark.x + 2, spark.y, 2, 2);
-        });
-    }
-    
-                    // Ice crystal decorations
-                    ctx.fillStyle = `rgba(255, 255, 255, ${crownGlow * 0.6})`;
-                    ctx.fillRect(this.x + 12, yPos - 10, 2, 2);
-                    ctx.fillRect(this.x + 20, yPos - 9, 2, 2);
-                    ctx.fillRect(this.x + 28, yPos - 10, 2, 2);
-                }
-                if (skin.valentineEyes) {
-                    // White outer eyes
-                    ctx.fillStyle = '#FFF';
-                    if (!this.isDucking) {
-                        ctx.fillRect(this.x + 8, yPos + 14, 8, 8);
-                        ctx.fillRect(this.x + 24, yPos + 14, 8, 8);
-                        // Black inner eyes (smaller)
-                        ctx.fillStyle = '#000';
-                        ctx.fillRect(this.x + 11, yPos + 16, 3, 4);
-                        ctx.fillRect(this.x + 27, yPos + 16, 3, 4);
-                    } else {
-                        ctx.fillRect(this.x + 10, yPos + 10, 6, 4);
-                        ctx.fillRect(this.x + 24, yPos + 10, 6, 4);
-                        ctx.fillStyle = '#000';
-                        ctx.fillRect(this.x + 11, yPos + 11, 3, 2);
-                        ctx.fillRect(this.x + 25, yPos + 11, 3, 2);
-                    }
-                } else if (skin.whiteEyes) {
-                    ctx.fillStyle = '#FFF';
-                    if (!this.isDucking) {
-                        ctx.fillRect(this.x + 8, yPos + 10, 8, 8);
-                        ctx.fillRect(this.x + 24, yPos + 10, 8, 8);
-                    } else {
-                        ctx.fillRect(this.x + 10, yPos + 7, 6, 3);
-                        ctx.fillRect(this.x + 24, yPos + 7, 6, 3);
-                    }
-                } else {
-                    ctx.fillStyle = '#000';
-                    if (!this.isDucking) {
-                        ctx.fillRect(this.x + 8, yPos + 10, 8, 8);
-                        ctx.fillRect(this.x + 24, yPos + 10, 8, 8);
-                        ctx.fillStyle = '#fff';
-                        ctx.fillRect(this.x + 11, yPos + 12, 3, 4);
-                        ctx.fillRect(this.x + 27, yPos + 12, 3, 4);
-                    } else {
-                        ctx.fillRect(this.x + 10, yPos + 7, 6, 3);
-                        ctx.fillRect(this.x + 24, yPos + 7, 6, 3);
-                    }
-                }
+                drawCharacter(this.x, this.y, this.width, this.height, this.isDucking, getCurrentSkin(), frameCount);
             }
         };
 
@@ -13324,6 +13333,7 @@ updateIceBlast();
 updateTidalWave();
 updateIceSpikes();
 updateHeartShot();
+if (typeof mpState !== "undefined" && mpState.isPlaying) updateOppAbility();
 updateSnowflakes();
 updatePlayerSnowTrail();
 createAndUpdateLoveTrail();
@@ -13382,6 +13392,7 @@ drawIceBlast();
 drawTidalWave();
 drawIceSpikes();
 drawHeartShot();
+if (typeof mpState !== "undefined" && mpState.isPlaying) drawOppAbility();
             
             // Stop spawning obstacles during heatwave (Day mode) and meteor shower (Night mode)
             // Spawn rate controlled by graphics quality
@@ -15189,53 +15200,46 @@ function _mpHideRespawnOverlay() {
 }
 
 // Draw opponent ghost on canvas (called from gameLoop patch)
-function mpDrawOpponentGhost() {
+function mpDrawOpponent() {
     if (!mpState.isPlaying || !mpState.opponentId) return;
     if (!mpState.opponentAlive) return;
 
+    const oppSkin = mpState.opponentSkin;
+    if (!oppSkin) return;
+
     const gY = (mpState.oppY && mpState.oppY > 0) ? mpState.oppY : (groundY - 40);
     const gX = mpState.oppX || (canvas.width * 0.25);
-    const gH = mpState.oppDucking ? 25 : 40;
+    const isDucking = mpState.oppDucking;
     const gW = 40;
-    const yPos = mpState.oppDucking ? gY + 15 : gY;
+    const gH = 40;
 
+    // Draw karakter teman PERSIS sama kayak player asli
+    drawCharacter(gX, gY, gW, gH, isDucking, oppSkin, typeof frameCount !== 'undefined' ? frameCount : 0);
+
+    // Tag nama di atas kepala (pembeda dari player sendiri)
+    const nameY = isDucking ? (gY + 15) : gY;
+    const tagH = 16;
+    const tagPad = 6;
     ctx.save();
-    ctx.globalAlpha = 0.55;
+    ctx.font = `bold ${clamp(6, 1.5, 9)}px 'Press Start 2P', monospace`;
+    const nameText = mpState.opponentName || '?';
+    const textW = ctx.measureText(nameText).width;
+    const tagW = textW + tagPad * 2;
+    const tagX = gX + gW / 2 - tagW / 2;
+    const tagYTop = nameY - tagH - 6;
 
-    // Draw skin-colored ghost block
-    const sk = mpState.opponentSkin;
-    if (sk) {
-        if (sk.gradient) {
-            const colors = sk.gradient.match(/#[0-9A-Fa-f]{6}/gi);
-            if (colors && colors.length >= 2) {
-                const g = ctx.createLinearGradient(gX, yPos, gX + gW, yPos + gH);
-                colors.forEach((c, i) => g.addColorStop(i / (colors.length - 1), c));
-                ctx.fillStyle = g;
-            } else ctx.fillStyle = sk.color || '#a855f7';
-        } else if (sk.color2) {
-            const g = ctx.createLinearGradient(gX, yPos, gX + gW, yPos + gH);
-            g.addColorStop(0, sk.color); g.addColorStop(1, sk.color2);
-            ctx.fillStyle = g;
-        } else {
-            ctx.fillStyle = sk.color || '#a855f7';
-        }
-    } else {
-        ctx.fillStyle = '#a855f7';
-    }
+    // Background tag
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.fillRect(tagX, tagYTop, tagW, tagH);
+    ctx.strokeStyle = '#00ff88';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(tagX, tagYTop, tagW, tagH);
 
-    ctx.fillRect(gX, yPos, gW, gH);
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-    ctx.strokeRect(gX, yPos, gW, gH);
-
-    // Name label above ghost
-    ctx.globalAlpha = 0.85;
-    ctx.font = `bold ${clamp(7, 1.8, 10)}px 'Press Start 2P', monospace`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-    ctx.strokeText(mpState.opponentName || '?', gX + gW / 2, yPos - 3);
-    ctx.fillText(mpState.opponentName || '?', gX + gW / 2, yPos - 3);
-
+    // Nama
+    ctx.fillStyle = '#00ff88';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(nameText, gX + gW / 2, tagYTop + tagH / 2);
     ctx.restore();
 }
 
@@ -15245,38 +15249,758 @@ function clamp(min, mid, max) {
 }
 
 // Run opponent ability locally from ghost position
+
+// =====================================================
+// OPPONENT ABILITY SYSTEM
+// =====================================================
+
+// State untuk ability teman (mirror dari player ability state)
+// =====================================================
+// OPPONENT ABILITY SYSTEM — full mirror of player
+// =====================================================
+
+const oppAbility = {
+    type: null,
+    active: false,
+    duration: 0,
+    // solar blaster
+    beams: [],
+    // eclipse blast
+    lightningStrikes: [],
+    eclipseDuration: 0,
+    // shield (lunar/wave)
+    shieldActive: false,
+    shieldHits: 0,
+    // sand tornado
+    sandTornado: null,
+    sandTornadoDuration: 0,
+    // ice blast
+    iceBlastActive: false,
+    iceBlastDuration: 0,
+    iceBlastBalls: [],
+    // ice spikes
+    iceSpikes: [],
+    // tidal wave
+    tidalActive: false,
+    tidalX: -200,
+    tidalHeight: 180,
+    tidalPhase: 'riding',
+    tidalDuration: 0,
+    // heart shot
+    heartShots: [],
+};
+
+// Generate zigzag lightning path (same algorithm as player, stored once per strike)
+function _genLightningPath(startX, canvasHeight) {
+    const segments = [];
+    const segH = 12;
+    const count = Math.floor(canvasHeight / segH);
+    let cx = startX;
+    for (let i = 0; i < count; i++) {
+        const nz = (Math.floor(Math.random() * 5) - 2) * 8;
+        segments.push({ x: cx, y: i * segH, nz });
+        cx += nz;
+    }
+    return segments;
+}
+
+// Called when opponent_ability event received
 function _mpRunOpponentAbility(abilityType) {
     const type = (abilityType || '').toLowerCase();
     const gX = mpState.oppX || (canvas.width * 0.25);
     const gY = (mpState.oppY && mpState.oppY > 0) ? mpState.oppY : (groundY - 40);
 
-    // Visual flash
-    const flash = document.createElement('div');
-    flash.style.cssText = `position:fixed;inset:0;z-index:998;pointer-events:none;
-        background:rgba(168,85,247,0.18);`;
-    document.body.appendChild(flash);
-    setTimeout(() => flash.remove(), 400);
+    const meta = {
+        solar_blaster:  { icon: '☀️',  label: 'Solar Blaster'  },
+        lunar_shield:   { icon: '🌙',  label: 'Lunar Shield'   },
+        eclipse_blast:  { icon: '🌑',  label: 'Eclipse Blast'  },
+        sand_tornado:   { icon: '🌪️', label: 'Sand Tornado'   },
+        ice_blast:      { icon: '❄️',  label: 'Ice Blast'      },
+        ice_spike:      { icon: '🧊',  label: 'Ice Spike'      },
+        tidal_wave:     { icon: '🌊',  label: 'Tidal Wave'     },
+        wave_shield:    { icon: '💧',  label: 'Wave Shield'    },
+        valentine_dual: { icon: '💕',  label: 'Valentine'      },
+    }[type] || { icon: '⚡', label: abilityType };
 
-    // Destroy obstacles near ghost (mimic ability effect)
-    if (typeof obstacles !== 'undefined') {
+    mpToast(meta.icon + ' ' + (mpState.opponentName || '?') + ' pakai ' + meta.label + '!');
+    oppAbility.type = type;
+
+    if (type === 'solar_blaster') {
+        oppAbility.active = true;
+        oppAbility.duration = 120;
+        oppAbility.beams = [];
+
+    } else if (type === 'lunar_shield' || type === 'wave_shield') {
+        oppAbility.shieldActive = true;
+        oppAbility.shieldHits = (type === 'lunar_shield') ? 3 : 2;
+
+    } else if (type === 'eclipse_blast') {
+        oppAbility.active = true;
+        oppAbility.eclipseDuration = 660;
+        oppAbility.lightningStrikes = [];
+
+    } else if (type === 'sand_tornado') {
+        const isPortrait = canvas.height > canvas.width;
+        const tornadoH = isPortrait ? Math.min(220, groundY * 0.85) : Math.min(180, groundY * 0.75);
+        const tornadoW = isPortrait ? 90 : 100;
+        const randomPath = [];
+        for (let i = 0; i < 20; i++) randomPath.push({
+            offsetL: (Math.random() - 0.5) * 20,
+            offsetR: (Math.random() - 0.5) * 20,
+            wobble: Math.random() * 360
+        });
+        const distFromGhost = isPortrait ? 40 : 120;
+        oppAbility.sandTornado = {
+            x: gX + 40 + distFromGhost,
+            y: groundY - tornadoH,
+            width: tornadoW, height: tornadoH,
+            rotation: 0, randomPath, pulledObstacles: [],
+            particles: Array.from({length:50}, () => ({
+                angle: Math.random()*360, radius: Math.random()*50,
+                height: Math.random()*tornadoH, speed: 2+Math.random()*4
+            }))
+        };
+        oppAbility.sandTornadoDuration = 300;
+
+    } else if (type === 'ice_blast') {
+        oppAbility.iceBlastActive = true;
+        oppAbility.iceBlastDuration = 180;
+        oppAbility.iceBlastBalls = [];
+
+    } else if (type === 'ice_spike') {
+        for (let i = 0; i < 3; i++) {
+            oppAbility.iceSpikes.push({
+                x: gX + 50 + i * 80, y: groundY,
+                width: 30, height: 0, maxHeight: 60 + Math.random() * 20,
+                growing: true, life: 90, speed: 8
+            });
+        }
+
+    } else if (type === 'tidal_wave') {
+        const isLandscape = canvas.width > canvas.height;
+        oppAbility.tidalActive = true;
+        oppAbility.tidalDuration = 420;
+        oppAbility.tidalX = gX - 20;
+        oppAbility.tidalPhase = 'riding';
+        oppAbility.tidalHeight = isLandscape
+            ? Math.min(canvas.height * 0.38, 110)
+            : Math.min(canvas.height * 0.48, 190);
+
+    } else if (type === 'valentine_dual') {
+        oppAbility.heartShots.push({
+            x: gX + 40, y: gY + 20 - 12,
+            vx: 14, size: 24, life: 70, rotation: 0
+        });
+    }
+}
+
+// ---- UPDATE every frame ----
+function updateOppAbility() {
+    if (!mpState.isPlaying) return;
+    const gX = mpState.oppX || (canvas.width * 0.25);
+    const gY = (mpState.oppY && mpState.oppY > 0) ? mpState.oppY : (groundY - 40);
+    const fc  = typeof frameCount !== 'undefined' ? frameCount : 0;
+
+    // ── SOLAR BLASTER ────────────────────────────────
+    if (oppAbility.active && oppAbility.type === 'solar_blaster') {
+        oppAbility.duration--;
+        // Spawn beam from ghost right side, stretching to screen edge
+        if (fc % 2 === 0) {
+            oppAbility.beams.push({
+                startX: gX + 40,
+                y: gY + 20 - 5,
+                width: canvas.width - (gX + 40),
+                height: 10,
+                life: 5
+            });
+        }
+        // Destroy obstacles in beam path
         for (let i = obstacles.length - 1; i >= 0; i--) {
             const obs = obstacles[i];
-            // Destroy obstacles ahead of ghost
-            if (obs.x > gX - 20) {
-                if (typeof particles !== 'undefined') {
-                    for (let j = 0; j < 12; j++) particles.push({
-                        x: obs.x + obs.width/2, y: obs.y + obs.height/2,
-                        vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
-                        life: 30, color: '#a855f7'
-                    });
-                }
+            if (obs.x < canvas.width && obs.x + obs.width > gX + 40 &&
+                obs.y < gY + 20 + 20 && obs.y + obs.height > gY + 20 - 20) {
+                const pc = Math.floor(25 * (typeof particleMultiplier !== 'undefined' ? particleMultiplier : 1));
+                for (let j = 0; j < pc; j++) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+                    life: 35, color: '#FFA500'
+                });
+                for (let j = 0; j < Math.floor(pc*0.6); j++) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                    life: 30, color: '#FFD700'
+                });
                 obstacles.splice(i, 1);
+            }
+        }
+        if (oppAbility.duration <= 0) { oppAbility.active = false; oppAbility.beams = []; }
+    }
+    for (let i = oppAbility.beams.length - 1; i >= 0; i--) {
+        oppAbility.beams[i].life--;
+        if (oppAbility.beams[i].life <= 0) oppAbility.beams.splice(i, 1);
+    }
+
+    // ── ECLIPSE BLAST ────────────────────────────────
+    if (oppAbility.active && oppAbility.type === 'eclipse_blast') {
+        oppAbility.eclipseDuration--;
+        if (fc % 40 === 0 && oppAbility.eclipseDuration > 0) {
+            // Find nearest obstacle ahead of ghost
+            let target = null, closestD = Infinity;
+            for (const obs of obstacles) {
+                if (obs.x > gX && obs.x < canvas.width + 100) {
+                    const d = obs.x - gX;
+                    if (d < closestD) { closestD = d; target = obs; }
+                }
+            }
+            if (target) {
+                const tx = target.x + target.width / 2;
+                // Generate path ONCE and store it
+                const path1 = _genLightningPath(tx, canvas.height);
+                const path2 = _genLightningPath(tx, canvas.height);
+                const branches = [];
+                for (let i = 0; i < 4; i++) branches.push({
+                    startY: Math.random() * canvas.height * 0.6,
+                    endX: tx + (Math.random() > 0.5 ? 1 : -1) * (20 + Math.random() * 40),
+                    endY: Math.random() * canvas.height * 0.6 + 20
+                });
+                oppAbility.lightningStrikes.push({ x: tx, path1, path2, branches, life: 15, flashLife: 4 });
+                // Destroy
+                const idx = obstacles.indexOf(target);
+                if (idx !== -1) {
+                    for (let j = 0; j < 25; j++) particles.push({
+                        x: target.x + target.width/2, y: target.y + target.height/2,
+                        vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+                        life: 35, color: '#8B5CF6'
+                    });
+                    obstacles.splice(idx, 1);
+                }
+            }
+        }
+        if (oppAbility.eclipseDuration <= 0) { oppAbility.active = false; oppAbility.lightningStrikes = []; }
+    }
+    for (let i = oppAbility.lightningStrikes.length - 1; i >= 0; i--) {
+        oppAbility.lightningStrikes[i].life--;
+        oppAbility.lightningStrikes[i].flashLife--;
+        if (oppAbility.lightningStrikes[i].life <= 0) oppAbility.lightningStrikes.splice(i, 1);
+    }
+
+    // ── SAND TORNADO ─────────────────────────────────
+    if (oppAbility.sandTornado && oppAbility.sandTornadoDuration > 0) {
+        oppAbility.sandTornadoDuration--;
+        const st = oppAbility.sandTornado;
+        const isPortrait = canvas.height > canvas.width;
+        const distFromGhost = isPortrait ? 40 : 120;
+        // Tornado follows ghost position every frame (same as player)
+        st.x = gX + 40 + distFromGhost;
+        st.y = groundY - st.height;
+        st.rotation += 12;
+        st.randomPath.forEach(p => { p.wobble += 8 + Math.random() * 8; });
+        st.particles.forEach(p => {
+            p.angle += p.speed;
+            const hr = p.height / st.height;
+            p.radius = (25 + hr * 30) * Math.sin(p.angle * 0.05 + hr * Math.PI);
+        });
+
+        const tornadoCX = st.x + st.width / 2;
+        const tornadoCY = st.y + st.height / 2;
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            const obs = obstacles[i];
+            const dx = tornadoCX - (obs.x + obs.width/2);
+            const dy = tornadoCY - (obs.y + obs.height/2);
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 250) {
+                const pf = 0.15 * (1 - dist/250);
+                obs.x += dx * pf; obs.y += dy * pf;
+                if (!st.pulledObstacles.includes(obs)) st.pulledObstacles.push(obs);
+                if (fc % 2 === 0) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: dx * 0.2, vy: dy * 0.2, life: 25,
+                    color: ['#CD853F','#DEB887','#D2691E'][Math.floor(Math.random()*3)]
+                });
+            }
+            if (st.x + st.width + 20 > obs.x && st.x - 20 < obs.x + obs.width &&
+                st.y + st.height + 10 > obs.y && st.y - 10 < obs.y + obs.height) {
+                const dx2 = tornadoCX - (obs.x + obs.width/2);
+                const dy2 = tornadoCY - (obs.y + obs.height/2);
+                for (let j = 0; j < 15; j++) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: dx2 * 0.5, vy: dy2 * 0.5, life: 30, color: '#CD853F'
+                });
+                obstacles.splice(i, 1);
+            }
+        }
+        if (oppAbility.sandTornadoDuration <= 0) {
+            st.pulledObstacles.forEach(obs => { const i = obstacles.indexOf(obs); if (i !== -1) obstacles.splice(i,1); });
+            const exCX = tornadoCX, exCY = tornadoCY;
+            for (let i = 0; i < 80; i++) {
+                const a = Math.random() * Math.PI * 2, sp = 5 + Math.random() * 15;
+                particles.push({ x: exCX, y: exCY, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp-3,
+                    life: 60+Math.random()*20, color: ['#CD853F','#DEB887','#D2691E'][Math.floor(Math.random()*3)] });
+            }
+            oppAbility.sandTornado = null;
+        }
+    }
+
+    // ── ICE BLAST ────────────────────────────────────
+    if (oppAbility.iceBlastActive) {
+        oppAbility.iceBlastDuration--;
+        if (fc % 20 === 0) oppAbility.iceBlastBalls.push({
+            x: gX + 40, y: gY + 20 - 10, vx: 12, radius: 10, life: 60, rotation: 0
+        });
+        if (oppAbility.iceBlastDuration <= 0) oppAbility.iceBlastActive = false;
+    }
+    for (let i = oppAbility.iceBlastBalls.length - 1; i >= 0; i--) {
+        const ball = oppAbility.iceBlastBalls[i];
+        ball.x += ball.vx; ball.rotation += 5; ball.life--;
+        let hit = false;
+        for (let j = obstacles.length - 1; j >= 0; j--) {
+            const obs = obstacles[j];
+            const cx = Math.max(obs.x, Math.min(ball.x, obs.x + obs.width));
+            const cy = Math.max(obs.y, Math.min(ball.y, obs.y + obs.height));
+            if (Math.sqrt((ball.x-cx)**2 + (ball.y-cy)**2) < ball.radius) {
+                for (let k = 0; k < 20; k++) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                    life: 30, color: '#87CEEB'
+                });
+                obstacles.splice(j, 1);
+                hit = true; break;
+            }
+        }
+        if (hit || ball.life <= 0 || ball.x > canvas.width + 50) oppAbility.iceBlastBalls.splice(i, 1);
+    }
+
+    // ── ICE SPIKES ───────────────────────────────────
+    for (let i = oppAbility.iceSpikes.length - 1; i >= 0; i--) {
+        const spike = oppAbility.iceSpikes[i];
+        if (spike.growing) {
+            spike.height += 6;
+            if (spike.height >= spike.maxHeight) { spike.height = spike.maxHeight; spike.growing = false; }
+        } else { spike.x += spike.speed; spike.life--; }
+        let hit = false;
+        for (let j = obstacles.length - 1; j >= 0; j--) {
+            const obs = obstacles[j];
+            if (spike.x < obs.x + obs.width && spike.x + spike.width > obs.x &&
+                spike.y - spike.height < obs.y + obs.height && spike.y > obs.y) {
+                for (let k = 0; k < 25; k++) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+                    life: 35, color: '#87CEEB'
+                });
+                obstacles.splice(j, 1);
+                hit = true; break;
+            }
+        }
+        if (hit || spike.life <= 0 || spike.x > canvas.width + 50) oppAbility.iceSpikes.splice(i, 1);
+    }
+
+    // ── TIDAL WAVE ───────────────────────────────────
+    if (oppAbility.tidalActive) {
+        const isLandscape = canvas.width > canvas.height;
+        oppAbility.tidalHeight = isLandscape
+            ? Math.min(canvas.height*0.38, 110)
+            : Math.min(canvas.height*0.48, 190);
+
+        if (oppAbility.tidalPhase === 'riding') {
+            oppAbility.tidalDuration--;
+            oppAbility.tidalX = gX - 20; // follows ghost
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                if (obs.x < oppAbility.tidalX + 110 && obs.x + obs.width > oppAbility.tidalX - 40) {
+                    for (let k = 0; k < 18; k++) particles.push({
+                        x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                        vx: (Math.random()-0.5)*14, vy: -(Math.random()*8+2), life: 40,
+                        color: ['#00B4D8','#90E0EF','#FFFFFF'][Math.floor(Math.random()*3)]
+                    });
+                    obstacles.splice(i, 1);
+                }
+            }
+            if (oppAbility.tidalDuration <= 0) { oppAbility.tidalPhase = 'launch'; oppAbility.tidalDuration = 120; }
+
+        } else if (oppAbility.tidalPhase === 'launch') {
+            oppAbility.tidalDuration--;
+            oppAbility.tidalX += 24;
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                if (obs.x < oppAbility.tidalX + 110 && obs.x + obs.width > oppAbility.tidalX - 20) {
+                    for (let k = 0; k < 22; k++) particles.push({
+                        x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                        vx: (Math.random()-0.2)*18, vy: -(Math.random()*10+3), life: 50,
+                        color: ['#00B4D8','#90E0EF','#FFFFFF'][Math.floor(Math.random()*3)]
+                    });
+                    obstacles.splice(i, 1);
+                }
+            }
+            if (oppAbility.tidalX > canvas.width + 160) {
+                oppAbility.tidalActive = false;
+                oppAbility.tidalX = -200;
+                oppAbility.tidalPhase = 'riding';
             }
         }
     }
 
-    mpToast('⚡ ' + mpState.opponentName + ' pakai ' + abilityType + '!');
+    // ── HEART SHOTS ──────────────────────────────────
+    for (let i = oppAbility.heartShots.length - 1; i >= 0; i--) {
+        const heart = oppAbility.heartShots[i];
+        heart.x += heart.vx; heart.rotation += 3; heart.life--;
+        let hit = false;
+        for (let j = obstacles.length - 1; j >= 0; j--) {
+            const obs = obstacles[j];
+            if (heart.x < obs.x + obs.width && heart.x + heart.size > obs.x &&
+                heart.y < obs.y + obs.height && heart.y + heart.size > obs.y) {
+                for (let k = 0; k < 25; k++) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+                    life: 35, color: '#FF69B4'
+                });
+                obstacles.splice(j, 1);
+                hit = true; break;
+            }
+        }
+        if (hit || heart.life <= 0 || heart.x > canvas.width + 50) oppAbility.heartShots.splice(i, 1);
+    }
 }
+
+// ---- DRAW every frame — same visuals as player ability ----
+function drawOppAbility() {
+    if (!mpState.isPlaying) return;
+    const fc  = typeof frameCount !== 'undefined' ? frameCount : 0;
+    const gX  = mpState.oppX || (canvas.width * 0.25);
+    const gY  = (mpState.oppY && mpState.oppY > 0) ? mpState.oppY : (groundY - 40);
+
+    // ── SOLAR BLASTER — identical to drawSolarBlaster() ──
+    oppAbility.beams.forEach(beam => {
+        const alpha = beam.life / 5;
+        const beamCenterY = beam.y + beam.height / 2;
+        // Outer glow
+        ctx.fillStyle = `rgba(255,165,0,${alpha*0.25})`;
+        for (let x = beam.startX; x < beam.startX + beam.width; x += 8) {
+            const wo = Math.sin((x + fc) * 0.1) * 6;
+            ctx.fillRect(Math.floor(x/4)*4, Math.floor((beamCenterY+wo)/4)*4 - 16, 8, 32);
+        }
+        // Mid glow
+        ctx.fillStyle = `rgba(255,215,0,${alpha*0.5})`;
+        for (let x = beam.startX; x < beam.startX + beam.width; x += 6) {
+            const wo = Math.sin((x + fc) * 0.15) * 4;
+            ctx.fillRect(Math.floor(x/4)*4, Math.floor((beamCenterY+wo)/4)*4 - 10, 6, 20);
+        }
+        // Core
+        ctx.fillStyle = `rgba(255,255,200,${alpha*0.8})`;
+        for (let x = beam.startX; x < beam.startX + beam.width; x += 4) {
+            const wo = Math.sin((x + fc) * 0.2) * 2;
+            ctx.fillRect(Math.floor(x/4)*4, Math.floor((beamCenterY+wo)/4)*4 - 6, 4, 12);
+        }
+        // Brightest core
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        for (let x = beam.startX; x < beam.startX + beam.width; x += 4)
+            ctx.fillRect(Math.floor(x/4)*4, Math.floor(beamCenterY/4)*4 - 2, 4, 4);
+        // Sparkle pixels (same as drawSolarBlaster)
+        if (fc % 3 === 0) {
+            for (let i = 0; i < 5; i++) {
+                const sx = Math.floor((beam.startX + Math.random()*beam.width)/4)*4;
+                const sy = Math.floor((beamCenterY + (Math.random()-0.5)*16)/4)*4;
+                ctx.fillStyle = `rgba(255,255,255,${alpha*0.9})`;
+                ctx.fillRect(sx, sy, 4, 4);
+                ctx.fillRect(sx-4, sy, 4, 4);
+                ctx.fillRect(sx+4, sy, 4, 4);
+            }
+        }
+        // Edge particle (leading edge)
+        const edgeX = Math.floor((beam.startX + beam.width - 12)/4)*4;
+        for (let i = 0; i < 3; i++) {
+            const ey = Math.floor((beamCenterY + (i-1)*8)/4)*4;
+            ctx.fillStyle = `rgba(255,165,0,${alpha*0.6})`; ctx.fillRect(edgeX+8, ey, 8, 4);
+            ctx.fillStyle = `rgba(255,215,0,${alpha*0.8})`; ctx.fillRect(edgeX+12, ey, 4, 4);
+            ctx.fillStyle = `rgba(255,255,255,${alpha})`;   ctx.fillRect(edgeX+16, ey, 4, 4);
+        }
+    });
+
+    // ── ECLIPSE BLAST — identical to drawEclipseBlast() ──
+    // Uses stored path, no Math.random() per frame
+    oppAbility.lightningStrikes.forEach(strike => {
+        const alpha = strike.life / 15;
+        if (strike.flashLife > 0) {
+            ctx.fillStyle = `rgba(200,150,255,${alpha*0.25})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        const segH = 12;
+        // Outer glow (path1)
+        ctx.fillStyle = `rgba(139,92,246,${alpha*0.3})`;
+        strike.path1.forEach(seg => {
+            const w = Math.abs(seg.nz) + 16;
+            ctx.fillRect(seg.x - 8, seg.y, w, segH);
+        });
+        // Middle (path1)
+        ctx.fillStyle = `rgba(192,132,252,${alpha*0.6})`;
+        strike.path1.forEach(seg => {
+            ctx.fillRect(seg.x - 4, seg.y, Math.abs(seg.nz) + 8, segH);
+        });
+        // Core white (path2 — slightly different path for flicker effect)
+        ctx.fillStyle = `rgba(255,255,255,${alpha*0.9})`;
+        strike.path2.forEach(seg => {
+            ctx.fillRect(Math.floor(seg.x/4)*4, seg.y, 4, segH);
+        });
+        // Branches
+        ctx.strokeStyle = `rgba(192,132,252,${alpha*0.5})`;
+        ctx.lineWidth = 2;
+        strike.branches.forEach(b => {
+            ctx.beginPath();
+            ctx.moveTo(strike.x, b.startY);
+            ctx.lineTo(b.endX, b.endY);
+            ctx.stroke();
+        });
+    });
+
+    // ── SHIELD (lunar/wave) — identical to drawLunarShield() ──
+    if (oppAbility.shieldActive && oppAbility.shieldHits > 0) {
+        const time = fc * 0.1;
+        const isWave = oppAbility.type === 'wave_shield';
+        const sc = isWave ? '0,180,216' : '139,92,246';
+        const sc2 = isWave ? '0,212,255' : '192,132,252';
+        const cx = gX + 20, cy = gY + 20;
+        ctx.strokeStyle = `rgba(${sc},${0.6 + Math.sin(time)*0.3})`;
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(cx, cy, 35 + Math.sin(time)*3, 0, Math.PI*2); ctx.stroke();
+        ctx.strokeStyle = `rgba(${sc2},${0.4 + Math.sin(time+1)*0.2})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(cx, cy, 42 + Math.sin(time+1)*3, 0, Math.PI*2); ctx.stroke();
+        ctx.fillStyle = `rgba(${sc},0.1)`;
+        ctx.beginPath(); ctx.arc(cx, cy, 35, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#FFF';
+        ctx.font = 'bold 16px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText(oppAbility.shieldHits, cx, cy - 48);
+    }
+
+    // ── SAND TORNADO — identical to drawSandTornado() ──
+    if (oppAbility.sandTornado) {
+        const st = oppAbility.sandTornado;
+        const alpha = Math.min(1, oppAbility.sandTornadoDuration / 60);
+        const centerX = st.x + st.width / 2;
+        const baseY   = st.y + st.height;
+        const path = [];
+        for (let i = 0; i < 20; i++) {
+            const hr  = i / 19;
+            const y   = Math.floor((baseY - hr*st.height)/4)*4;
+            const bw  = st.width * (1 - hr*0.7);
+            const wbL = Math.sin(st.randomPath[i].wobble * Math.PI/180) * 20;
+            const wbR = Math.sin((st.randomPath[i].wobble + 90) * Math.PI/180) * 20;
+            path.push({ y, leftX: centerX - bw/2 + st.randomPath[i].offsetL + wbL,
+                           rightX: centerX + bw/2 + st.randomPath[i].offsetR + wbR });
+        }
+        // Outer glow
+        ctx.fillStyle = `rgba(222,184,135,${alpha*0.25})`;
+        path.forEach(seg => ctx.fillRect(seg.leftX - 10, seg.y, Math.abs(seg.rightX-seg.leftX)+20, 10));
+        // Mid glow
+        ctx.fillStyle = `rgba(210,180,140,${alpha*0.4})`;
+        path.forEach(seg => ctx.fillRect(seg.leftX - 6, seg.y, Math.abs(seg.rightX-seg.leftX)+12, 8));
+        // Main body blocks
+        path.forEach(seg => {
+            for (let bx = seg.leftX; bx < seg.rightX; bx += 8) {
+                if (Math.random() > 0.7) continue;
+                const px = Math.floor(bx/4)*4;
+                const colors = [`rgba(205,133,63,${alpha*0.8})`,`rgba(210,180,140,${alpha*0.7})`,
+                                `rgba(222,184,135,${alpha*0.6})`,`rgba(139,69,19,${alpha*0.75})`];
+                ctx.fillStyle = colors[Math.floor(Math.random()*4)];
+                ctx.fillRect(px, seg.y, 8, Math.random()>0.5 ? 8 : 12);
+            }
+        });
+        // Swirling debris (12 pieces same as original)
+        for (let i = 0; i < 12; i++) {
+            const angle = (st.rotation * 2.5 + i * 30) * Math.PI/180;
+            const orbit = 35 + Math.sin(fc*0.1+i) * 20;
+            const hp    = (Math.sin(fc*0.07+i*0.7)+1)*0.5;
+            const dy    = Math.floor((baseY - hp*st.height)/4)*4;
+            const dx    = Math.floor((centerX + Math.cos(angle)*orbit)/4)*4;
+            ctx.fillStyle = `rgba(160,82,45,${alpha*0.8})`; ctx.fillRect(dx, dy, 12, 12);
+            ctx.fillStyle = `rgba(101,67,33,${alpha})`;     ctx.fillRect(dx+2, dy+2, 8, 8);
+            for (let t = 1; t <= 2; t++) {
+                ctx.fillStyle = `rgba(222,184,135,${alpha*0.3})`;
+                ctx.fillRect(dx - Math.floor(Math.cos(angle)*t*8/4)*4, dy + Math.floor((Math.random()-0.5)*8/4)*4, 4, 4);
+            }
+        }
+        // Ground dust base
+        const bw = st.width * 1.6;
+        for (let x = -bw/2; x < bw/2; x += 4) {
+            if (Math.random() > 0.6) continue;
+            const offX = Math.sin(fc*0.15 + x*0.08) * 15;
+            const offY = Math.floor(Math.random()*8/4)*4;
+            const bsize = Math.random() > 0.6 ? 8 : 12;
+            ctx.fillStyle = `rgba(210,180,140,${alpha*(0.6-Math.abs(x)/bw*0.3)})`;
+            ctx.fillRect(Math.floor((centerX+x+offX)/4)*4, Math.floor(baseY/4)*4 + offY, bsize, bsize);
+        }
+    }
+
+    // ── ICE BLAST balls — identical to drawIceBlast() ──
+    oppAbility.iceBlastBalls.forEach(ball => {
+        const alpha = ball.life / 60;
+        ctx.save();
+        ctx.translate(ball.x, ball.y);
+        ctx.rotate(ball.rotation * Math.PI/180);
+        // Glow layers
+        ctx.fillStyle = `rgba(135,206,235,${alpha*0.4})`;
+        ctx.beginPath(); ctx.arc(0,0,ball.radius+8,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = `rgba(224,247,255,${alpha*0.8})`;
+        ctx.beginPath(); ctx.arc(0,0,ball.radius+4,0,Math.PI*2); ctx.fill();
+        // Main body
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.beginPath(); ctx.arc(0,0,ball.radius,0,Math.PI*2); ctx.fill();
+        // Ice crystal 6-pointed star
+        ctx.fillStyle = `rgba(135,206,235,${alpha*0.6})`;
+        for (let i = 0; i < 6; i++) {
+            const a = (i*60)*Math.PI/180;
+            ctx.fillRect(Math.cos(a)*3-1, Math.sin(a)*3-1, 2, 2);
+            ctx.fillRect(Math.cos(a)*8-1, Math.sin(a)*8-1, 2, 2);
+            ctx.beginPath(); ctx.moveTo(Math.cos(a)*3, Math.sin(a)*3);
+            ctx.lineTo(Math.cos(a)*8, Math.sin(a)*8);
+            ctx.strokeStyle = `rgba(135,206,235,${alpha*0.4})`; ctx.lineWidth = 2; ctx.stroke();
+        }
+        // Sparkles
+        if (ball.life % 10 < 5) {
+            ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+            ctx.fillRect(-2, -ball.radius-2, 2, 2);
+            ctx.fillRect(ball.radius, 0, 2, 2);
+        }
+        ctx.restore();
+    });
+
+    // ── ICE SPIKES — identical to drawIceSpikes() ──
+    oppAbility.iceSpikes.forEach(spike => {
+        const alpha = spike.life / 90;
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(spike.x+5, spike.y-5, spike.width, 8);
+        // Body gradient
+        const grad = ctx.createLinearGradient(spike.x, spike.y-spike.height, spike.x, spike.y);
+        grad.addColorStop(0, `rgba(224,247,255,${alpha})`);
+        grad.addColorStop(0.5, `rgba(135,206,235,${alpha*0.9})`);
+        grad.addColorStop(1, `rgba(176,224,230,${alpha*0.8})`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(spike.x+spike.width/2, spike.y-spike.height);
+        ctx.lineTo(spike.x, spike.y); ctx.lineTo(spike.x+spike.width, spike.y);
+        ctx.closePath(); ctx.fill();
+        // Highlight edges
+        ctx.strokeStyle = `rgba(255,255,255,${alpha*0.7})`; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(spike.x+spike.width/2, spike.y-spike.height);
+        ctx.lineTo(spike.x+3, spike.y-5); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(spike.x+spike.width/2, spike.y-spike.height);
+        ctx.lineTo(spike.x+spike.width-3, spike.y-5); ctx.stroke();
+        // Facets
+        ctx.fillStyle = `rgba(200,240,255,${alpha*0.5})`;
+        ctx.fillRect(spike.x+8, spike.y-spike.height*0.7, 4, spike.height*0.3);
+        // Glow if moving
+        if (!spike.growing) {
+            ctx.shadowBlur = 15; ctx.shadowColor = `rgba(135,206,235,${alpha*0.5})`;
+            ctx.strokeStyle = `rgba(135,206,235,${alpha*0.3})`; ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(spike.x+spike.width/2, spike.y-spike.height);
+            ctx.lineTo(spike.x, spike.y); ctx.lineTo(spike.x+spike.width, spike.y);
+            ctx.closePath(); ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+        // Base
+        ctx.fillStyle = `rgba(176,224,230,${alpha*0.4})`;
+        ctx.fillRect(spike.x-5, spike.y-3, spike.width+10, 3);
+        // Sparkle while growing
+        if (spike.growing && fc % 5 < 3) {
+            ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+            ctx.fillRect(spike.x+spike.width/2-2, spike.y-spike.height-5, 4, 4);
+            ctx.fillRect(spike.x+spike.width/2-6, spike.y-spike.height-3, 4, 2);
+            ctx.fillRect(spike.x+spike.width/2+2, spike.y-spike.height-3, 4, 2);
+        }
+    });
+
+    // ── TIDAL WAVE — identical to drawTidalWave() ──
+    if (oppAbility.tidalActive) {
+        const wh = oppAbility.tidalHeight;
+        const wx = oppAbility.tidalX;
+        const waveTop = groundY - wh;
+        const waveW = 88;
+        // Body layers
+        ctx.fillStyle = '#023E8A';
+        for (let y = waveTop+16; y < groundY; y += 4) {
+            const t = (y-waveTop)/wh, exp = Math.floor(t*18);
+            ctx.fillRect(wx - exp, y, waveW + exp*2, 4);
+        }
+        ctx.fillStyle = '#0077B6';
+        for (let y = waveTop+10; y < groundY-4; y += 4) {
+            const t = (y-waveTop)/wh;
+            ctx.fillRect(wx+6-Math.floor(t*10), y, waveW-12+Math.floor(t*10)*2, 4);
+        }
+        ctx.fillStyle = '#00B4D8';
+        for (let y = waveTop+18; y < groundY-4; y += 4)
+            ctx.fillRect(wx+waveW-22, y, 18, 4);
+        ctx.fillStyle = '#48CAE4';
+        for (let y = waveTop+8; y < waveTop+wh*0.45; y += 8)
+            ctx.fillRect(wx+6, y, 10, 4);
+        // Crest curl
+        [0,4,8,12,16,20,24,28,24,20,16,12,8,4,0].forEach((off, i) => {
+            const cy = waveTop + i*4;
+            if (cy < groundY) {
+                ctx.fillStyle = i < 7 ? '#0077B6' : '#023E8A';
+                ctx.fillRect(wx+waveW-6+off, cy, 14, 4);
+            }
+        });
+        // Foam
+        ctx.fillStyle = '#FFFFFF';
+        for (let x = wx-10; x < wx+waveW+32; x += 8) {
+            const wobble = Math.sin((x*0.12)+fc*0.22) > 0 ? 0 : 4;
+            ctx.fillRect(x, waveTop+wobble, 8, 4);
+        }
+        ctx.fillStyle = 'rgba(255,255,255,0.65)';
+        for (let x = wx-4; x < wx+waveW+20; x += 12)
+            ctx.fillRect(x, waveTop+8, 8, 4);
+        // Spray particles
+        if (fc % 3 === 0) {
+            for (let i = 0; i < 2; i++) particles.push({
+                x: wx + Math.random()*(waveW+20) - 4, y: waveTop - Math.random()*6,
+                vx: (Math.random()-0.3)*3, vy: -(Math.random()*3+1), life: 18+Math.random()*10,
+                color: Math.random() > 0.4 ? '#FFFFFF' : '#90E0EF'
+            });
+        }
+        // Ground foam
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        for (let x = wx-16; x < wx+waveW+40; x += 8)
+            ctx.fillRect(x, groundY-4, 8, 4);
+    }
+
+    // ── HEART SHOTS — identical to drawHeartShot() ──
+    oppAbility.heartShots.forEach(heart => {
+        const alpha = heart.life / 70;
+        ctx.save();
+        const cx = heart.x + heart.size/2, cy2 = heart.y + heart.size/2;
+        ctx.translate(cx, cy2); ctx.rotate(heart.rotation * Math.PI/180);
+        // Outer glow
+        ctx.globalAlpha = alpha * 0.3;
+        const og = ctx.createRadialGradient(0,0,0, 0,0, heart.size*1.5);
+        og.addColorStop(0,'rgba(255,105,180,0.6)'); og.addColorStop(1,'rgba(255,105,180,0)');
+        ctx.fillStyle = og;
+        ctx.beginPath(); ctx.arc(0,0,heart.size*1.5,0,Math.PI*2); ctx.fill();
+        // Main heart
+        ctx.globalAlpha = alpha;
+        const hg = ctx.createLinearGradient(0,-heart.size/2, 0,heart.size/2);
+        hg.addColorStop(0,'#FF69B4'); hg.addColorStop(0.4,'#FF1493'); hg.addColorStop(1,'#C71585');
+        ctx.fillStyle = hg;
+        const s = heart.size / 30;
+        ctx.beginPath();
+        ctx.moveTo(0,-12*s);
+        ctx.bezierCurveTo(-10*s,-20*s,-18*s,-16*s,-18*s,-6*s);
+        ctx.bezierCurveTo(-18*s,0,-12*s,6*s,0,16*s);
+        ctx.bezierCurveTo(12*s,6*s,18*s,0,18*s,-6*s);
+        ctx.bezierCurveTo(18*s,-16*s,10*s,-20*s,0,-12*s);
+        ctx.closePath(); ctx.fill();
+        // Shine
+        const sg = ctx.createRadialGradient(-6*s,-8*s,0,-6*s,-8*s,14*s);
+        sg.addColorStop(0,'rgba(255,255,255,0.9)'); sg.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.fillStyle = sg; ctx.fill();
+        ctx.restore();
+    });
+}
+
+
+
+
 
 // MP game over screen
 function _mpShowMpGameOver() {
@@ -15389,7 +16113,7 @@ const _mpOrigAddEventListener = document.addEventListener.bind(document);
                         isDucking: player.isDucking
                     });
                     // Draw ghost
-                    mpDrawOpponentGhost();
+                    mpDrawOpponent();
                 }
             }
         });
