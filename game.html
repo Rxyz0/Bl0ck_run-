@@ -13409,10 +13409,11 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
     obs.update();
     obs.draw();
     
-    // In MP: skip collision if respawning OR if I'm the back player (back is safe)
+    // In MP: skip collision if respawning
+    // Note: both front AND back players face the same obstacles in co-op mode
+    // (back player is just positioned differently on screen)
     const mpSkipCollision = typeof mpState !== 'undefined' && mpState.isMultiplayerGame && (
-      window._mpRespawnInProgress === true ||
-      mpState.myPosition === 'back'
+      window._mpRespawnInProgress === true
     );
 
     // Skip player collision only when solar blaster is actively destroying this obstacle
@@ -14581,7 +14582,7 @@ const mpSettings = { oppName: true, oppLives: true, oppScore: true, oppPosition:
 
 // Opponent "ghost" player object for rendering
 let opponentGhost = {
-  x: 150, y: 0, width: 40, height: 40,
+  x: 150, y: -1, width: 40, height: 40,
   isJumping: false, isDucking: false,
   name: '', skinColor: '#a855f7', skinGradient: null, skinId: ''
 };
@@ -14755,25 +14756,34 @@ function connectSocket() {
     const displayName = name || mpState.opponentName || 'Teman';
     showMpToast('⚡ ' + displayName + ' pakai ' + (abilityType || 'ability') + '!');
     
-    // Show big visual burst at ghost position (longer duration)
+    // Fix: always compute gY fresh from groundY, never use 0
     const gX = opponentGhost.x || 160;
-    const gY = opponentGhost.y || (typeof groundY !== 'undefined' ? groundY - 40 : 260);
+    const gYbase = typeof groundY !== 'undefined' ? groundY : 300;
+    const gY = (opponentGhost.y && opponentGhost.y > 0) ? opponentGhost.y : (gYbase - 40);
     mpOppAbilityEffect = {
       x: gX, y: gY,
       type: abilityType || abilityId || 'generic',
-      duration: 120, // 2 seconds
-      maxDuration: 120
+      duration: 150, // 2.5 seconds for better visibility
+      maxDuration: 150
     };
 
-    // Destroy obstacles on THIS screen matching the ability (with delay for visual sync)
-    setTimeout(() => {
-      mpApplyOpponentAbilityEffect(abilityType);
-    }, 100);
+    // Apply effect immediately (no delay - delay caused missed obstacle destruction)
+    mpApplyOpponentAbilityEffect(abilityType || abilityId);
   });
 
-  // Obstacle sync
+  // Obstacle sync - use index as hint but also match by position for robustness
   socket.on('sync_obstacle_destroy', ({ obstacleIndex, reason }) => {
-    if (typeof obstacles !== 'undefined' && obstacles[obstacleIndex]) {
+    if (typeof obstacles === 'undefined') return;
+    // Try exact index first
+    if (obstacleIndex >= 0 && obstacleIndex < obstacles.length) {
+      const obs = obstacles[obstacleIndex];
+      // Spawn destruction particles
+      if (typeof particles !== 'undefined' && obs) {
+        const cx = obs.x + obs.width/2, cy = obs.y + obs.height/2;
+        for (let j = 0; j < 10; j++) {
+          particles.push({ x: cx, y: cy, vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8, life: 25, color: '#a855f7' });
+        }
+      }
       obstacles.splice(obstacleIndex, 1);
     }
   });
@@ -15047,11 +15057,12 @@ function _drawOpponentName(gx, gy) {
 let mpOppAbilityEffect = null;
 
 function mpShowOpponentAbilityEffect(abilityType, abilityId) {
-  const gX = opponentGhost.x || 160;
-  const gY = opponentGhost.y || (typeof groundY !== 'undefined' ? groundY - 40 : 260);
+  const gXbase = opponentGhost.x || 160;
+  const gYbase = typeof groundY !== 'undefined' ? groundY : 300;
+  const gY = (opponentGhost.y && opponentGhost.y > 0) ? opponentGhost.y : (gYbase - 40);
   // Store effect to draw in next frames
   mpOppAbilityEffect = {
-    x: gX, y: gY,
+    x: gXbase, y: gY,
     type: abilityType || abilityId || 'generic',
     duration: 60, // ~1 second at 60fps
     maxDuration: 60
@@ -15064,41 +15075,59 @@ function mpApplyOpponentAbilityEffect(abilityType) {
   if (!mpState.isMultiplayerGame) return;
 
   const destroyAll = (color) => {
+    const gXbase = opponentGhost.x || 0;
+    const toDestroy = [];
     for (let i = obstacles.length - 1; i >= 0; i--) {
       const obs = obstacles[i];
-      const cx = obs.x + obs.width/2, cy = obs.y + obs.height/2;
-      for (let j = 0; j < 12; j++) {
+      // Only destroy obstacles ahead of the ghost (to the right)
+      if (obs.x >= gXbase - 20) toDestroy.push(i);
+    }
+    for (const idx of toDestroy) {
+      const obs = obstacles[idx];
+      if (!obs) continue;
+      const cx = obs.x + obs.width/2;
+      const cy = obs.y + obs.height/2;
+      for (let j = 0; j < 15; j++) {
         particles.push({ x: cx, y: cy,
-          vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
-          life: 30, color });
+          vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+          life: 40, color });
       }
-      obstacles.splice(i, 1);
+      obstacles.splice(idx, 1);
     }
   };
 
-  if (abilityType === 'solar_blaster') {
+  const type = (abilityType || '').toLowerCase();
+
+  if (type === 'solar_blaster' || type.includes('solar')) {
     // Show beam effect for ~2 seconds (120 frames)
-    window._mpOppSolarActive = 120;
+    window._mpOppSolarActive = 140;
     destroyAll('#FFA500');
-  } else if (abilityType === 'eclipse_blast') {
-    window._mpOppEclipseActive = 120;
+  } else if (type === 'eclipse_blast' || type.includes('eclipse')) {
+    window._mpOppEclipseActive = 140;
     destroyAll('#8B5CF6');
-  } else if (abilityType === 'sand_tornado') {
-    window._mpOppTornadoActive = 120;
+  } else if (type === 'sand_tornado' || type.includes('tornado') || type.includes('sand')) {
+    window._mpOppTornadoActive = 140;
     destroyAll('#C19A6B');
-  } else if (abilityType === 'ice_blast' || abilityType === 'ice_spike') {
+  } else if (type === 'ice_blast' || type === 'ice_spike' || type.includes('ice') || type.includes('snow')) {
+    window._mpOppIceActive = 100;
     destroyAll('#87CEEB');
-  } else if (abilityType === 'tidal_wave') {
+  } else if (type === 'tidal_wave' || type.includes('tidal') || type.includes('wave')) {
+    window._mpOppTidalActive = 100;
     destroyAll('#00CED1');
-  } else if (abilityType === 'lunar_shield') {
+  } else if (type === 'lunar_shield' || type.includes('lunar') || type.includes('shield')) {
     // Give shield to this player too (co-op benefit!)
     if (typeof shieldActive !== 'undefined') {
       shieldActive = true;
       shieldHits = 2;
       showMpToast('🛡️ Teman kasih shield!');
     }
+  } else if (type === 'heart_shot' || type.includes('heart') || type.includes('valentine')) {
+    // Valentine heart shot - destroy obstacles + particles
+    destroyAll('#FF69B4');
+  } else {
+    // Unknown ability type - still destroy obstacles as fallback
+    destroyAll('#ffffff');
   }
-  // valentine_dual - no obstacle destruction needed
 }
 
 // Draw opponent ability overlays (solar beam, eclipse flash, tornado swirl)
@@ -15151,6 +15180,48 @@ function drawMpOppActiveAbilities() {
     }
     ctx.restore();
   }
+
+  // Opponent Ice blast flash
+  if (window._mpOppIceActive > 0) {
+    window._mpOppIceActive--;
+    if (window._mpOppIceActive % 30 < 15) {
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = '#87CEEB';
+      ctx.fillRect(0, 0, typeof canvas !== 'undefined' ? canvas.width : 400, typeof canvas !== 'undefined' ? canvas.height : 300);
+      ctx.restore();
+    }
+    // Ice crystal particles
+    const gXi = opponentGhost.x + 20;
+    const gYi = typeof groundY !== 'undefined' ? groundY - 60 : 240;
+    ctx.save();
+    ctx.globalAlpha = window._mpOppIceActive / 100 * 0.8;
+    ctx.fillStyle = '#87CEEB';
+    for (let i = 0; i < 6; i++) {
+      const ang = (i / 6) * Math.PI * 2 + fc * 0.05;
+      const dist = 30 + Math.sin(fc * 0.1 + i) * 10;
+      ctx.fillRect(gXi + Math.cos(ang) * dist - 4, gYi + Math.sin(ang) * dist - 4, 8, 8);
+    }
+    ctx.restore();
+  }
+
+  // Opponent Tidal wave indicator
+  if (window._mpOppTidalActive > 0) {
+    window._mpOppTidalActive--;
+    ctx.save();
+    ctx.globalAlpha = window._mpOppTidalActive / 100 * 0.6;
+    ctx.fillStyle = '#00CED1';
+    const wH = 60;
+    const wY = (typeof groundY !== 'undefined' ? groundY : 300) - wH;
+    ctx.fillRect(opponentGhost.x + 40, wY, typeof canvas !== 'undefined' ? canvas.width : 400, wH);
+    // Wave top pixels
+    ctx.fillStyle = '#7FFFD4';
+    for (let wx = opponentGhost.x + 40; wx < (typeof canvas !== 'undefined' ? canvas.width : 400); wx += 8) {
+      const wy = wY + Math.sin((wx + fc * 3) * 0.1) * 8;
+      ctx.fillRect(wx, wy, 8, 6);
+    }
+    ctx.restore();
+  }
 }
 
 function drawOpponentAbilityEffect() {
@@ -15159,8 +15230,9 @@ function drawOpponentAbilityEffect() {
   if (eff.duration <= 0) { mpOppAbilityEffect = null; return; }
 
   // Track ghost position live so the effect follows the opponent
-  const liveX = opponentGhost.x || eff.x;
-  const liveY = opponentGhost.y || eff.y;
+  const gYbase = typeof groundY !== 'undefined' ? groundY : 300;
+  const liveX = opponentGhost.x || 160;
+  const liveY = (opponentGhost.y && opponentGhost.y > 0) ? opponentGhost.y : (gYbase - 40);
 
   const progress = eff.duration / eff.maxDuration;
   const alpha = progress;

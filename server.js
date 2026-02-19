@@ -80,12 +80,11 @@ function startServerGameLoop(code) {
     const fc = room.frameCount;
     const events = [];
 
-    // Obstacle spawning
+    // Obstacle spawning - sync with client's obstacleSpawnRate (90 frames)
     const spawnRate = 90;
     if (fc % spawnRate === 0) {
       const rval = room.rng();
-      const isHigh = room.rng() > 0.5;
-      events.push({ type: 'obstacle', rval, isHigh, fc });
+      events.push({ type: 'obstacle', rval, fc });
     }
 
     // Quicksand (Egypt)
@@ -93,9 +92,9 @@ function startServerGameLoop(code) {
       events.push({ type: 'quicksand', fc });
     }
 
-    // Coin spawn - more frequent in multiplayer
-    const coinRate = 45; // faster than solo
-    if (fc % coinRate === 0 && room.rng() > 0.2) {
+    // Coin spawn - match client rate (60 frames)
+    const coinRate = 60;
+    if (fc % coinRate === 0 && room.rng() > 0.3) {
       const airborne = room.rng() > 0.5;
       events.push({ type: 'coin', airborne, fc });
     }
@@ -135,6 +134,7 @@ function startServerGameLoop(code) {
     if (allDead) {
       room.gameRunning = false;
       clearInterval(room.interval);
+      room.interval = null;
       io.to(code).emit('game_over_all', {});
     }
 
@@ -252,7 +252,21 @@ io.on('connection', (socket) => {
     socket.to(code).emit('opponent_state', { playerId: socket.id, y, isJumping, isDucking, x });
   });
 
-  // Ability used
+  // Ability used — client emits 'use_ability' (fix event name mismatch)
+  socket.on('use_ability', ({ abilityType, abilityId }) => {
+    const result = getRoomBySocket(socket.id);
+    if (!result) return;
+    const { code, room } = result;
+    const player = room.players.find(p => p.id === socket.id);
+    socket.to(code).emit('opponent_ability', { 
+      playerId: socket.id, 
+      abilityType, 
+      abilityId,
+      name: player ? player.name : '???'
+    });
+  });
+
+  // Also keep old name for backward compat
   socket.on('ability_used', ({ abilityType, abilityId }) => {
     const result = getRoomBySocket(socket.id);
     if (!result) return;
@@ -267,10 +281,12 @@ io.on('connection', (socket) => {
   });
 
   // Obstacle destroyed by player/ability - sync to opponent
+  // Server broadcasts to BOTH so both screens stay in sync
   socket.on('obstacle_destroyed', ({ obstacleIndex, reason }) => {
     const result = getRoomBySocket(socket.id);
     if (!result) return;
     const { code } = result;
+    // Relay to opponent only (destroyer already removed it locally)
     socket.to(code).emit('sync_obstacle_destroy', { obstacleIndex, reason });
   });
 
@@ -318,11 +334,11 @@ io.on('connection', (socket) => {
     if (!ps || !ps.alive) return;
 
     ps.alive = false;
-    ps.respawnTimer = 25 * 60;
+    ps.respawnTimer = 5 * 60; // 5 seconds at 60fps (was 25 - too long!)
     ps.lives = 0;
 
-    socket.to(code).emit('opponent_died', { playerId: socket.id, respawnIn: 25 });
-    socket.emit('you_died', { respawnIn: 25 });
+    socket.to(code).emit('opponent_died', { playerId: socket.id, respawnIn: 5 });
+    socket.emit('you_died', { respawnIn: 5 });
   });
 
   socket.on('disconnect', () => {
@@ -338,6 +354,9 @@ io.on('connection', (socket) => {
     if (room.gameRunning) {
       socket.to(code).emit('opponent_disconnected', { name: disconnected.name });
       if (room.playerStates[socket.id]) room.playerStates[socket.id].alive = false;
+      // Stop game loop since opponent disconnected
+      room.gameRunning = false;
+      if (room.interval) { clearInterval(room.interval); room.interval = null; }
     } else {
       socket.to(code).emit('player_left', { players: room.players });
     }
