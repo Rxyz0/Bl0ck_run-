@@ -1,0 +1,14 @@
+{
+  "name": "blokrun-multiplayer",
+  "version": "1.0.0",
+  "description": "bl0ck run multiplayer server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}
