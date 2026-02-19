@@ -14524,46 +14524,132 @@ function mpDrawSkinPreview(canvasEl, skinId) {
     const skin = allSkins.find(s => s.id === skinId) || allSkins[0];
     if (!skin) return;
 
-    const ctx2 = canvasEl.getContext('2d');
-    const w = canvasEl.width, h = canvasEl.height;
-    ctx2.clearRect(0, 0, w, h);
+    const c = canvasEl.getContext('2d');
+    c.clearRect(0, 0, 50, 50);
 
-    // Background fill
+    // === Cape (behind body) ===
+    if (skin.cape) {
+        if (skin.id === 'egypt_epic') {
+            c.fillStyle = '#654321';
+            c.fillRect(0, 12, 8, 26);
+            c.strokeStyle = '#DAA520'; c.lineWidth = 2;
+            c.strokeRect(0, 12, 8, 26);
+        } else if (skin.id === 'egypt_legendary') {
+            const g = c.createLinearGradient(0, 12, 8, 38);
+            g.addColorStop(0, '#3E2723'); g.addColorStop(1, '#8B6914');
+            c.fillStyle = g;
+            c.fillRect(0, 11, 10, 28);
+            c.strokeStyle = '#FFD700'; c.lineWidth = 2;
+            c.strokeRect(0, 11, 10, 28);
+        } else if (skin.id && skin.id.startsWith('night_')) {
+            // Wings hint
+            c.fillStyle = '#1a1a2e';
+            c.fillRect(0, 13, 6, 20);
+            c.strokeStyle = '#8B5CF6'; c.lineWidth = 1;
+            c.strokeRect(0, 13, 6, 20);
+        } else {
+            c.fillStyle = '#8B4513';
+            c.fillRect(2, 13, 6, 25);
+            c.strokeStyle = '#654321'; c.lineWidth = 1;
+            c.strokeRect(2, 13, 6, 25);
+        }
+    }
+
+    // === Valentine heart shape ===
+    if (skin.valentineHeart) {
+        c.fillStyle = skin.color;
+        const hp = [
+            [0,1,1,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1],
+            [0,1,1,1,1,1,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,1,0,0,0]
+        ];
+        const ps = 5, ox = 8, oy = 12;
+        hp.forEach((row, y) => row.forEach((px, x) => {
+            if (px) c.fillRect(ox + x*ps, oy + y*ps, ps, ps);
+        }));
+        c.strokeStyle = '#000'; c.lineWidth = 1;
+        hp.forEach((row, y) => row.forEach((px, x) => {
+            if (px) c.strokeRect(ox + x*ps, oy + y*ps, ps, ps);
+        }));
+        // Eyes
+        c.fillStyle = '#fff'; c.fillRect(16,22,4,4); c.fillRect(24,22,4,4);
+        c.fillStyle = '#000'; c.fillRect(17,23,2,2); c.fillRect(25,23,2,2);
+        return; // no regular block needed
+    }
+
+    // === Main body block ===
+    // Glow shadow
+    if (skin.glow) {
+        const glowColors = {
+            egypt: 'rgba(255,215,0,0.8)', day: 'rgba(255,215,0,0.8)',
+            night: 'rgba(139,92,246,0.8)', snow: 'rgba(135,206,235,0.8)',
+            ocean: 'rgba(0,180,216,0.8)'
+        };
+        const type = skin.id ? skin.id.split('_')[0] : '';
+        c.shadowBlur = 8;
+        c.shadowColor = glowColors[type] || 'rgba(255,215,0,0.8)';
+    }
+
+    // Fill with gradient or color
     if (skin.gradient) {
-        // Parse gradient string roughly — just use color as fallback
-        ctx2.fillStyle = skin.color || '#888';
+        const colors = skin.gradient.match(/#[0-9A-Fa-f]{6}/gi);
+        if (colors && colors.length >= 2) {
+            const g = c.createLinearGradient(9, 9, 41, 41);
+            colors.forEach((col, i) => g.addColorStop(i / (colors.length - 1), col));
+            c.fillStyle = g;
+        } else { c.fillStyle = skin.color; }
+    } else if (skin.color2) {
+        const g = c.createLinearGradient(9, 9, 41, 41);
+        g.addColorStop(0, skin.color); g.addColorStop(1, skin.color2);
+        c.fillStyle = g;
     } else {
-        ctx2.fillStyle = skin.color || '#888';
+        c.fillStyle = skin.color;
     }
-    ctx2.fillRect(2, 2, w - 4, h - 4);
+    c.fillRect(9, 9, 32, 32);
+    c.shadowBlur = 0;
+    c.strokeStyle = '#000'; c.lineWidth = 2;
+    c.strokeRect(9, 9, 32, 32);
 
-    // Border
-    ctx2.strokeStyle = '#000';
-    ctx2.lineWidth = 2;
-    ctx2.strokeRect(2, 2, w - 4, h - 4);
+    // === Icons on top of block ===
+    c.textAlign = 'center'; c.textBaseline = 'middle';
 
-    // Rarity glow border
-    const rarityColors = { common: null, rare: '#4169E1', epic: '#9370DB', legendary: '#FFD700' };
-    const glowColor = rarityColors[skin.rarity];
-    if (glowColor) {
-        ctx2.strokeStyle = glowColor;
-        ctx2.lineWidth = 2;
-        ctx2.strokeRect(0, 0, w, h);
+    // Crown (egypt/day legendary)
+    if (skin.crown) {
+        if (skin.id && skin.id.startsWith('day_')) {
+            const cg = c.createLinearGradient(13, 1, 37, 7);
+            cg.addColorStop(0, '#FFA500'); cg.addColorStop(0.5, '#FFD700'); cg.addColorStop(1, '#FFED4E');
+            c.fillStyle = cg;
+            c.fillRect(13, 1, 24, 7);
+            c.fillStyle = '#FFD700';
+            c.fillRect(15, -3, 4, 4); c.fillRect(21, -5, 4, 6); c.fillRect(27, -3, 4, 4);
+            c.strokeStyle = '#B8860B'; c.lineWidth = 1; c.strokeRect(13, 1, 24, 7);
+        } else if (skin.id && skin.id.startsWith('night_')) {
+            c.fillStyle = '#8B5CF6';
+            c.fillRect(13, 1, 24, 7);
+            c.fillStyle = '#C084FC';
+            c.fillRect(15, -3, 4, 4); c.fillRect(21, -5, 4, 6); c.fillRect(27, -3, 4, 4);
+            c.strokeStyle = '#6D28D9'; c.lineWidth = 1; c.strokeRect(13, 1, 24, 7);
+        } else if (skin.id && skin.id.startsWith('ocean_')) {
+            c.font = '16px Arial'; c.fillText('🌊', 25, 28);
+        } else {
+            // Egypt default crown
+            c.fillStyle = '#FFD700';
+            c.fillRect(14, 1, 22, 6);
+            c.fillRect(16, -4, 4, 5); c.fillRect(22, -6, 4, 7); c.fillRect(28, -4, 4, 5);
+            c.strokeStyle = '#B8860B'; c.lineWidth = 1; c.strokeRect(14, 1, 22, 6);
+        }
     }
+    if (skin.sunCrown) { c.font = '14px Arial'; c.fillText('👑', 25, 25); }
+    if (skin.moonCrown) { c.font = '14px Arial'; c.fillText('🌙', 25, 25); }
+    if (skin.snowflakeCrown) { c.font = '18px Arial'; c.fillText('❄️', 25, 25); }
 
-    // Icon overlay
-    const icons = [];
-    if (skin.crown || skin.sunCrown) icons.push('👑');
-    if (skin.moonCrown) icons.push('🌙');
-    if (skin.rarity === 'epic' && skin.id && skin.id.startsWith('night_')) icons.push('🛡️');
-    if (skin.rarity === 'epic' && skin.id && skin.id.startsWith('day_')) icons.push('💥');
-    if (skin.rarity === 'legendary') icons.push('⭐');
-
-    if (icons.length > 0) {
-        ctx2.font = `${Math.floor(w * 0.45)}px serif`;
-        ctx2.textAlign = 'center';
-        ctx2.textBaseline = 'middle';
-        ctx2.fillText(icons[0], w / 2, h / 2);
+    // Rarity icons
+    if (skin.rarity === 'epic') {
+        if (skin.id && skin.id.startsWith('day_')) { c.font = 'bold 16px Arial'; c.fillStyle='#FFA500'; c.fillText('☀️', 25, 25); }
+        else if (skin.id && skin.id.startsWith('night_')) { c.font = 'bold 16px Arial'; c.fillStyle='#FFE66D'; c.fillText('🌙', 25, 25); }
     }
 }
 
@@ -14661,11 +14747,141 @@ function _mpInitSocket() {
         }
     });
 
-    // Game start handled in Tahap 2
-    socket.on('game_start', (data) => {
-        // TODO Tahap 2
+    // === TAHAP 2: INGAME MP ===
+    socket.on('game_start', ({ seed, mode, positions, players }) => {
         document.getElementById('mpCountdownOverlay').style.display = 'none';
-        mpToast('🚀 Game dimulai! (coming soon)');
+
+        // Store MP game state
+        mpState.isPlaying = true;
+        mpState.myPosition = positions[mpState.myId]; // 'front' or 'back'
+        mpState.myAlive = true;
+        mpState.sessionCoins = 0;
+        mpState._rng = _mpCreateRng(seed);
+
+        // Find opponent info
+        const opp = players.find(p => p.id !== mpState.myId);
+        if (opp) {
+            mpState.opponentId = opp.id;
+            mpState.opponentName = opp.name;
+            mpState.opponentSkin = opp.skin;
+            mpState.opponentAlive = true;
+            mpState.oppX = 80;
+            mpState.oppY = 0;
+            mpState.oppJumping = false;
+            mpState.oppDucking = false;
+        }
+
+        // Start the actual game
+        startGame(mode);
+
+        // Show MP HUD
+        _mpShowHUD();
+    });
+
+    // Opponent position update (for ghost rendering)
+    socket.on('opponent_state', ({ y, isJumping, isDucking, x }) => {
+        mpState.oppY = y;
+        mpState.oppX = x;
+        mpState.oppJumping = isJumping;
+        mpState.oppDucking = isDucking;
+    });
+
+    // Swap positions
+    socket.on('game_tick', ({ fc, events }) => {
+        if (!events) return;
+        for (const ev of events) {
+            if (ev.type === 'swap') {
+                mpState.myPosition = ev.positions[mpState.myId];
+                _mpUpdatePositionUI();
+                _mpFlashSwap();
+            } else if (ev.type === 'respawn' && ev.playerId === mpState.myId) {
+                // My respawn
+                mpState.myAlive = true;
+                window._mpRespawnInProgress = false;
+                obstacles = [];
+                if (typeof playerLives !== 'undefined') {
+                    const sk = getCurrentSkin();
+                    playerLives = sk.lives || 1; maxLives = playerLives;
+                    updateAbilityButton();
+                }
+                player.y = groundY - 40; player.velocityY = 0;
+                player.isJumping = false; player.isDucking = false;
+                _mpHideRespawnOverlay();
+                mpToast('✅ Kamu respawn!');
+            } else if (ev.type === 'respawn' && ev.playerId === mpState.opponentId) {
+                mpState.opponentAlive = true;
+                _mpUpdateOppHUD();
+                mpToast('✅ ' + mpState.opponentName + ' respawn!');
+            }
+        }
+    });
+
+    // Swap countdown
+    socket.on('swap_countdown', ({ seconds }) => {
+        const el = document.getElementById('mpSwapCountdown');
+        if (el) el.textContent = '🔄 ' + seconds + 's';
+    });
+
+    // Opponent position for ghost
+    socket.on('opponent_state', ({ y, isJumping, isDucking, x }) => {
+        mpState.oppY = y; mpState.oppX = x;
+        mpState.oppJumping = isJumping; mpState.oppDucking = isDucking;
+    });
+
+    // Opponent died
+    socket.on('opponent_died', ({ respawnIn }) => {
+        mpState.opponentAlive = false;
+        _mpUpdateOppHUD();
+        mpToast('💀 ' + mpState.opponentName + ' mati! Respawn ' + respawnIn + 's...');
+    });
+
+    // I died → respawn
+    socket.on('you_died', ({ respawnIn }) => {
+        mpState.myAlive = false;
+        window._mpRespawnInProgress = true;
+        if (typeof playerLives !== 'undefined') playerLives = 999;
+        obstacles = [];
+        _mpShowRespawnOverlay(respawnIn);
+    });
+
+    // Coin collected by anyone → sync both
+    socket.on('sync_coin_collect', ({ index, totalCoins }) => {
+        if (typeof coins !== 'undefined' && coins[index]) coins.splice(index, 1);
+        mpState.sessionCoins = totalCoins;
+        document.getElementById('coinCount').textContent = totalCoins;
+        sessionCoins = totalCoins;
+    });
+
+    // Opponent used ability → run it locally from ghost position
+    socket.on('opponent_ability', ({ abilityType }) => {
+        _mpRunOpponentAbility(abilityType);
+    });
+
+    // Obstacle destroyed by opponent → remove from my array
+    socket.on('sync_obstacle_destroy', ({ obstacleIndex }) => {
+        if (typeof obstacles !== 'undefined' && obstacleIndex >= 0 && obstacleIndex < obstacles.length) {
+            const obs = obstacles[obstacleIndex];
+            if (obs && typeof particles !== 'undefined') {
+                for (let j = 0; j < 10; j++) particles.push({
+                    x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                    vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8,
+                    life: 25, color: '#a855f7'
+                });
+            }
+            obstacles.splice(obstacleIndex, 1);
+        }
+    });
+
+    // Opponent disconnect
+    socket.on('opponent_disconnected', ({ name }) => {
+        mpState.opponentAlive = false;
+        mpToast('⚠️ ' + name + ' disconnect!');
+    });
+
+    // Game over (both dead)
+    socket.on('game_over_all', () => {
+        mpState.isPlaying = false;
+        _mpShowMpGameOver();
     });
 }
 
@@ -14844,6 +15060,341 @@ function mpSelectMap(mode, el) {
     if (el) el.classList.add('selected');
     document.getElementById('mpSelectedMap').textContent = '✅ MAP: ' + mode.toUpperCase();
 }
+
+// =====================
+// TAHAP 2 HELPERS
+// =====================
+
+// Seeded RNG (match server)
+function _mpCreateRng(seed) {
+    let s = seed;
+    return function() {
+        s = (s * 1664525 + 1013904223) & 0xffffffff;
+        return (s >>> 0) / 0xffffffff;
+    };
+}
+
+// Show MP HUD overlay on game screen
+function _mpShowHUD() {
+    let hud = document.getElementById('mpHUD');
+    if (!hud) {
+        hud = document.createElement('div');
+        hud.id = 'mpHUD';
+        hud.style.cssText = `
+            position:fixed; top:8px; right:8px; z-index:1000;
+            display:flex; flex-direction:column; align-items:flex-end; gap:4px;
+            pointer-events:none;
+        `;
+        document.body.appendChild(hud);
+    }
+
+    const skinName = mpState.opponentSkin ? mpState.opponentSkin.name || '???' : '???';
+    hud.innerHTML = `
+        <div id="mpOppHUD" style="
+            background:rgba(0,0,0,0.75); border:2px solid #a855f7;
+            padding:5px 8px; font-family:'Press Start 2P',monospace;
+            font-size:clamp(6px,1.5vw,8px); color:#fff; text-align:right;
+            box-shadow:2px 2px 0 #4c1d95; line-height:1.8;
+        ">
+            <div style="color:#a855f7">${mpState.opponentName}</div>
+            <div id="mpOppLivesHUD">❤️ ...</div>
+            <div style="color:#aaa; font-size:6px;">${skinName}</div>
+        </div>
+        <div id="mpSwapCountdown" style="
+            background:rgba(0,0,0,0.75); border:2px solid #00ff88;
+            padding:4px 8px; font-family:'Press Start 2P',monospace;
+            font-size:clamp(6px,1.5vw,8px); color:#00ff88;
+            box-shadow:2px 2px 0 #006644;
+        ">🔄 --s</div>
+        <div id="mpPositionHUD" style="
+            background:rgba(0,0,0,0.75); border:2px solid #FFD700;
+            padding:4px 8px; font-family:'Press Start 2P',monospace;
+            font-size:clamp(6px,1.5vw,8px); color:#FFD700;
+            box-shadow:2px 2px 0 #aa9000;
+        ">POS: --</div>
+    `;
+    _mpUpdateOppHUD();
+    _mpUpdatePositionUI();
+}
+
+function _mpHideHUD() {
+    const hud = document.getElementById('mpHUD');
+    if (hud) hud.remove();
+}
+
+function _mpUpdateOppHUD() {
+    const el = document.getElementById('mpOppLivesHUD');
+    if (!el) return;
+    el.textContent = mpState.opponentAlive ? '❤️ HIDUP' : '💀 MATI';
+    el.style.color = mpState.opponentAlive ? '#00ff88' : '#ff6b6b';
+}
+
+function _mpUpdatePositionUI() {
+    const el = document.getElementById('mpPositionHUD');
+    if (!el) return;
+    const pos = mpState.myPosition === 'front' ? '⚔️ DEPAN' : '🛡️ BELAKANG';
+    el.textContent = 'POS: ' + pos;
+}
+
+function _mpFlashSwap() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position:fixed; inset:0; background:rgba(168,85,247,0.25);
+        z-index:999; pointer-events:none;
+        display:flex; justify-content:center; align-items:center;
+        font-family:'Press Start 2P',monospace; font-size:clamp(18px,5vw,32px);
+        color:#fff; text-shadow:2px 2px 0 #4c1d95;
+    `;
+    overlay.textContent = '🔄 SWAP!';
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.remove(), 900);
+    mpToast('🔄 Posisi ditukar!');
+}
+
+// Respawn overlay
+function _mpShowRespawnOverlay(seconds) {
+    let ov = document.getElementById('mpRespawnOv');
+    if (!ov) {
+        ov = document.createElement('div');
+        ov.id = 'mpRespawnOv';
+        ov.style.cssText = `
+            position:fixed; inset:0; background:rgba(0,0,0,0.7);
+            z-index:2000; display:flex; flex-direction:column;
+            justify-content:center; align-items:center; gap:16px;
+        `;
+        document.body.appendChild(ov);
+    }
+    let t = seconds;
+    ov.style.display = 'flex';
+    const render = () => {
+        ov.innerHTML = `
+            <div style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,4vw,22px);color:#ff6b6b;text-shadow:2px 2px 0 #880000;">💀 KAMU MATI</div>
+            <div style="font-family:'Press Start 2P',monospace;font-size:clamp(28px,8vw,52px);color:#a855f7;text-shadow:3px 3px 0 #4c1d95;">${t}</div>
+            <div style="font-family:'Press Start 2P',monospace;font-size:clamp(8px,2vw,11px);color:#aaa;">Respawn dalam ${t} detik...</div>
+        `;
+    };
+    render();
+    const iv = setInterval(() => {
+        t--;
+        if (t <= 0) { clearInterval(iv); return; }
+        render();
+    }, 1000);
+    mpState._respawnInterval = iv;
+}
+
+function _mpHideRespawnOverlay() {
+    const ov = document.getElementById('mpRespawnOv');
+    if (ov) ov.style.display = 'none';
+    if (mpState._respawnInterval) clearInterval(mpState._respawnInterval);
+}
+
+// Draw opponent ghost on canvas (called from gameLoop patch)
+function mpDrawOpponentGhost() {
+    if (!mpState.isPlaying || !mpState.opponentId) return;
+    if (!mpState.opponentAlive) return;
+
+    const gY = (mpState.oppY && mpState.oppY > 0) ? mpState.oppY : (groundY - 40);
+    const gX = mpState.oppX || (canvas.width * 0.25);
+    const gH = mpState.oppDucking ? 25 : 40;
+    const gW = 40;
+    const yPos = mpState.oppDucking ? gY + 15 : gY;
+
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+
+    // Draw skin-colored ghost block
+    const sk = mpState.opponentSkin;
+    if (sk) {
+        if (sk.gradient) {
+            const colors = sk.gradient.match(/#[0-9A-Fa-f]{6}/gi);
+            if (colors && colors.length >= 2) {
+                const g = ctx.createLinearGradient(gX, yPos, gX + gW, yPos + gH);
+                colors.forEach((c, i) => g.addColorStop(i / (colors.length - 1), c));
+                ctx.fillStyle = g;
+            } else ctx.fillStyle = sk.color || '#a855f7';
+        } else if (sk.color2) {
+            const g = ctx.createLinearGradient(gX, yPos, gX + gW, yPos + gH);
+            g.addColorStop(0, sk.color); g.addColorStop(1, sk.color2);
+            ctx.fillStyle = g;
+        } else {
+            ctx.fillStyle = sk.color || '#a855f7';
+        }
+    } else {
+        ctx.fillStyle = '#a855f7';
+    }
+
+    ctx.fillRect(gX, yPos, gW, gH);
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+    ctx.strokeRect(gX, yPos, gW, gH);
+
+    // Name label above ghost
+    ctx.globalAlpha = 0.85;
+    ctx.font = `bold ${clamp(7, 1.8, 10)}px 'Press Start 2P', monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+    ctx.strokeText(mpState.opponentName || '?', gX + gW / 2, yPos - 3);
+    ctx.fillText(mpState.opponentName || '?', gX + gW / 2, yPos - 3);
+
+    ctx.restore();
+}
+
+function clamp(min, mid, max) {
+    const val = mid * window.innerWidth / 100;
+    return Math.min(max, Math.max(min, val));
+}
+
+// Run opponent ability locally from ghost position
+function _mpRunOpponentAbility(abilityType) {
+    const type = (abilityType || '').toLowerCase();
+    const gX = mpState.oppX || (canvas.width * 0.25);
+    const gY = (mpState.oppY && mpState.oppY > 0) ? mpState.oppY : (groundY - 40);
+
+    // Visual flash
+    const flash = document.createElement('div');
+    flash.style.cssText = `position:fixed;inset:0;z-index:998;pointer-events:none;
+        background:rgba(168,85,247,0.18);`;
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 400);
+
+    // Destroy obstacles near ghost (mimic ability effect)
+    if (typeof obstacles !== 'undefined') {
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            const obs = obstacles[i];
+            // Destroy obstacles ahead of ghost
+            if (obs.x > gX - 20) {
+                if (typeof particles !== 'undefined') {
+                    for (let j = 0; j < 12; j++) particles.push({
+                        x: obs.x + obs.width/2, y: obs.y + obs.height/2,
+                        vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                        life: 30, color: '#a855f7'
+                    });
+                }
+                obstacles.splice(i, 1);
+            }
+        }
+    }
+
+    mpToast('⚡ ' + mpState.opponentName + ' pakai ' + abilityType + '!');
+}
+
+// MP game over screen
+function _mpShowMpGameOver() {
+    mpState.isPlaying = false;
+    window._mpRespawnInProgress = false;
+    _mpHideHUD();
+    _mpHideRespawnOverlay();
+    gameRunning = false;
+
+    // Show custom MP game over
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const go = document.getElementById('mpGameOver');
+    if (go) {
+        document.getElementById('mpGoScoreRun').textContent = 'RUN: ' + (typeof scoreRun !== 'undefined' ? scoreRun : 0);
+        document.getElementById('mpGoScoreJump').textContent = 'JUMP: ' + (typeof scoreJump !== 'undefined' ? scoreJump : 0);
+        document.getElementById('mpGoCoins').textContent = '+' + mpState.sessionCoins + ' COINS';
+        go.classList.add('active');
+    }
+}
+
+function mpPlayAgain() {
+    // Disconnect and re-join same room
+    if (socket && socket.connected) socket.disconnect();
+    socket = null;
+    mpState.isPlaying = false;
+    mpState.ready = false;
+    mpState.selectedMap = null;
+    // Reconnect and go back to setup with same name
+    mpConnect();
+    setTimeout(() => {
+        mpShowScreen('mpSetup');
+        if (mpState.myName) document.getElementById('mpNameInput').value = mpState.myName;
+    }, 600);
+}
+
+// === PATCH gameLoop to add ghost + coin sync + endGame override ===
+window.addEventListener('load', () => {
+    // Patch coin collection to sync in MP
+    const _origGameLoop = window.gameLoop;
+
+    // Override endGame for MP
+    const _origEndGame = window.endGame;
+    window.endGame = function() {
+        if (mpState.isPlaying) {
+            if (mpState.myAlive) {
+                mpState.myAlive = false;
+                if (socket) socket.emit('player_died');
+            }
+            // Keep game loop alive, show respawn
+            if (typeof playerLives !== 'undefined') playerLives = 999;
+            window._mpRespawnInProgress = true;
+            gameRunning = true;
+            return;
+        }
+        _origEndGame();
+    };
+
+    // Patch spawnObstacle/spawnCoin — server controls timing in MP
+    const _origSpawnObs = window.spawnObstacle;
+    window.spawnObstacle = function() {
+        if (mpState.isPlaying) return; // server controls
+        if (_origSpawnObs) _origSpawnObs();
+    };
+    const _origSpawnCoin = window.spawnCoin;
+    window.spawnCoin = function() {
+        if (mpState.isPlaying) return;
+        if (_origSpawnCoin) _origSpawnCoin();
+    };
+});
+
+// Patch coin collection to emit to server in MP
+// (inserted via override of the coin loop behavior)
+const _mpOrigAddEventListener = document.addEventListener.bind(document);
+// We patch coin collection by wrapping sessionCoins increment
+// This is done by overriding the coin collection check via a MutationObserver on coinCount
+(function() {
+    let _lastCoinCount = 0;
+    const _coinObserver = new MutationObserver(() => {
+        if (!mpState.isPlaying) return;
+        const el = document.getElementById('coinCount');
+        if (!el) return;
+        const cur = parseInt(el.textContent) || 0;
+        if (cur > _lastCoinCount) {
+            // A coin was just collected by me
+            const idx = typeof coins !== 'undefined' ? coins.length : 0;
+            if (socket) socket.emit('coin_collected', { index: idx });
+            mpState.sessionCoins = cur;
+        }
+        _lastCoinCount = cur;
+    });
+    window.addEventListener('load', () => {
+        const el = document.getElementById('coinCount');
+        if (el) _coinObserver.observe(el, { childList: true, subtree: true, characterData: true });
+    });
+})();
+
+// Emit player state to server every ~3 frames for ghost
+(function() {
+    let _mpStateFrame = 0;
+    const _origRaf = window.requestAnimationFrame;
+    window.requestAnimationFrame = function(cb) {
+        return _origRaf(function(ts) {
+            cb(ts);
+            if (mpState.isPlaying && socket && typeof player !== 'undefined' && gameRunning) {
+                _mpStateFrame++;
+                if (_mpStateFrame % 3 === 0) {
+                    socket.emit('player_state', {
+                        y: player.y, x: player.x,
+                        isJumping: player.isJumping,
+                        isDucking: player.isDucking
+                    });
+                    // Draw ghost
+                    mpDrawOpponentGhost();
+                }
+            }
+        });
+    };
+})();
     </script>
 
 <!-- =====================
@@ -14854,6 +15405,18 @@ function mpSelectMap(mode, el) {
 <div id="mpToast"></div>
 <!-- Countdown overlay -->
 <div id="mpCountdownOverlay"></div>
+
+<!-- MP GAME OVER SCREEN -->
+<div id="mpGameOver" class="screen" style="background:#0a0a0a;">
+    <div class="mp-screen-container" style="align-items:center;text-align:center;">
+        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(14px,4vw,22px);color:#ff6b6b;text-shadow:3px 3px 0 #880000;">GAME OVER</div>
+        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.5vw,13px);color:#00ff88;" id="mpGoScoreRun">RUN: 0</div>
+        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.5vw,13px);color:#FFD700;" id="mpGoScoreJump">JUMP: 0</div>
+        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.5vw,13px);color:#aaa;" id="mpGoCoins">+0 COINS</div>
+        <button class="mp-btn green" onclick="mpPlayAgain()">🔄 MAIN LAGI</button>
+        <button class="mp-btn red" onclick="showMenu()">🏠 MENU</button>
+    </div>
+</div>
 
 <!-- SCREEN 1: Setup (nama + buat/join) -->
 <div id="mpSetup" class="screen" style="background:#0a0a0a;">

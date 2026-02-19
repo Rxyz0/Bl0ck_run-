@@ -295,6 +295,53 @@ io.on('connection', (socket) => {
     socket.to(code).emit('opponent_skill', { playerId: socket.id, skillId });
   });
 
+  // --- ABILITY USED (relay to opponent) ---
+  socket.on('use_ability', ({ abilityType }) => {
+    const result = getRoomBySocket(socket.id);
+    if (!result) return;
+    const { code, room } = result;
+    const player = room.players.find(p => p.id === socket.id);
+    socket.to(code).emit('opponent_ability', {
+      playerId: socket.id, abilityType,
+      name: player ? player.name : '???'
+    });
+  });
+
+  // --- PLAYER STATE (position sync for ghost) ---
+  socket.on('player_state', ({ y, x, isJumping, isDucking }) => {
+    const result = getRoomBySocket(socket.id);
+    if (!result) return;
+    const { code } = result;
+    socket.to(code).emit('opponent_state', { playerId: socket.id, y, x, isJumping, isDucking });
+  });
+
+  // --- OBSTACLE DESTROYED ---
+  socket.on('obstacle_destroyed', ({ obstacleIndex, reason }) => {
+    const result = getRoomBySocket(socket.id);
+    if (!result) return;
+    const { code } = result;
+    socket.to(code).emit('sync_obstacle_destroy', { obstacleIndex, reason });
+  });
+
+  // --- COIN COLLECTED (shared) ---
+  socket.on('coin_collected', ({ index }) => {
+    const result = getRoomBySocket(socket.id);
+    if (!result) return;
+    const { code, room } = result;
+    if (!room.sessionCoins) room.sessionCoins = 0;
+    room.sessionCoins++;
+    // Sync to BOTH players (coin disappears from both screens, both get count)
+    io.to(code).emit('sync_coin_collect', { index, totalCoins: room.sessionCoins });
+  });
+
+  // --- SCORE UPDATE ---
+  socket.on('score_update', ({ scoreRun, scoreJump }) => {
+    const result = getRoomBySocket(socket.id);
+    if (!result) return;
+    const { code } = result;
+    socket.to(code).emit('opponent_score', { playerId: socket.id, scoreRun, scoreJump });
+  });
+
   // --- PLAYER UNREADY (cancel ready in lobby) ---
   socket.on('player_unready', () => {
     const result = getRoomBySocket(socket.id);
