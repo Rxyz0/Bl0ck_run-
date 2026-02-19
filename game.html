@@ -3715,8 +3715,16 @@
         <div class="score-display" id="finalScoreRun" style="font-size: 16px; color: #00ff88;">RUN: 0</div>
         <div class="score-display" id="finalScoreJump" style="font-size: 13px; color: #FFD700; margin-top: -10px;">JUMP: 0</div>
         <div class="score-display" id="coinsEarned" style="font-size: 13px; margin-top: -8px;">+0 COINS</div>
-        <button class="btn" onclick="restartGame()">Main Lagi</button>
-        <button class="btn" onclick="showMenu()">Menu</button>
+        <!-- Solo buttons (hidden in MP) -->
+        <div id="gameOverSoloBtns">
+          <button class="btn" onclick="restartGame()">Main Lagi</button>
+          <button class="btn" onclick="showMenu()">Menu</button>
+        </div>
+        <!-- MP buttons (hidden in solo) -->
+        <div id="gameOverMpBtns" style="display:none;">
+          <button class="btn" onclick="mpBackToRoom()">🎮 Kembali ke Room</button>
+          <button class="btn secondary" onclick="mpLeaveRoom()">🏠 Kembali ke Menu</button>
+        </div>
     </div>
 
     <!-- Pause Screen -->
@@ -14253,6 +14261,10 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
     
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('gameOver').classList.add('active');
+    // Show correct buttons
+    const isMp = typeof mpState !== 'undefined' && mpState._gameOverAll;
+    document.getElementById('gameOverSoloBtns').style.display = isMp ? 'none' : 'block';
+    document.getElementById('gameOverMpBtns').style.display = isMp ? 'block' : 'none';
 }
 
         function restartGame() {
@@ -14537,6 +14549,7 @@ let mpState = {
   isMultiplayerGame: false,
   myPosition: 'front', myAlive: true,
   respawnInterval: null, swapTimerDisplay: 12,
+  _gameOverAll: false,
 };
 
 const mpSettings = { oppName: true, oppLives: true, oppScore: true, oppPosition: true };
@@ -14660,8 +14673,17 @@ function connectSocket() {
       else if (ev.type === 'swap') handleSwapEvent(ev.positions, ev.reason);
       else if (ev.type === 'respawn' && ev.playerId === mpState.myId) {
         mpState.myAlive = true;
+        window._mpRespawnInProgress = false;
         document.getElementById('respawnOverlay').style.display = 'none';
-        if (mpState.respawnInterval) clearInterval(mpState.respawnInterval);
+        if (mpState.respawnInterval) { clearInterval(mpState.respawnInterval); mpState.respawnInterval = null; }
+        // Restore player state
+        if (typeof playerLives !== 'undefined') { playerLives = 1; }
+        if (typeof player !== 'undefined') {
+          const gY = typeof groundY !== 'undefined' ? groundY : 300;
+          player.y = gY - 40; player.velocityY = 0; player.isJumping = false; player.isDucking = false;
+        }
+        if (typeof obstacles !== 'undefined') obstacles = [];
+        showMpToast('✅ RESPAWN! Kamu kembali!');
       }
     }
   });
@@ -14680,13 +14702,21 @@ function connectSocket() {
   socket.on('opponent_state', ({ y, isJumping, isDucking, x }) => {
     opponentGhost.isJumping = isJumping;
     opponentGhost.isDucking = isDucking;
-    opponentGhost.y = y;
+    // Use server Y when jumping, snap to groundY when on ground to prevent floating
+    const gY = typeof groundY !== 'undefined' ? groundY : 300;
+    if (isJumping) {
+      opponentGhost.y = y;
+    } else {
+      opponentGhost.y = gY - 40;
+    }
     if (x !== undefined) opponentGhost.targetX = x;
   });
 
   // Opponent ability
-  socket.on('opponent_ability', ({ abilityType, name }) => {
+  socket.on('opponent_ability', ({ abilityType, abilityId, name }) => {
     showMpToast('⚡ ' + name + ' menggunakan ' + (abilityType || 'ability') + '!');
+    // Show visual burst effect at opponent ghost position
+    mpShowOpponentAbilityEffect(abilityType, abilityId);
   });
 
   // Obstacle sync
@@ -14730,9 +14760,16 @@ function connectSocket() {
   socket.on('you_died', ({ respawnIn }) => {
     mpState.myAlive = false;
     startRespawnCountdown(respawnIn);
+    // Keep game loop running but make player invisible/invincible during respawn
+    // Set lives to a large number temporarily so obstacles don't re-trigger endGame
+    if (typeof playerLives !== 'undefined') {
+      window._mpRespawnInProgress = true;
+    }
   });
 
   socket.on('game_over_all', () => {
+    mpState._gameOverAll = true;
+    teardownMpIngame();
     if (typeof endGame === 'function') endGame();
   });
 
@@ -14786,13 +14823,15 @@ function handleSwapEvent(positions, reason) {
 }
 
 function updateGhostPositions() {
-  // Front player is at x=100, back player is at x=160
-  // (opponent is rendered at different X based on position)
+  // Match exact player X positions: player is at x=100 when front
+  // When opponent is front: x=100, when back: x=160 (behind player)
   if (mpState.opponentPosition === 'front') {
-    opponentGhost.displayX = 100; // Front position
+    opponentGhost.displayX = 100; // Same as player.x front position
   } else {
-    opponentGhost.displayX = 170; // Behind my player
+    opponentGhost.displayX = 160; // Slightly behind
   }
+  // Force immediate jump for swap visibility
+  opponentGhost.x = opponentGhost.x + (opponentGhost.displayX - opponentGhost.x) * 0.5;
 }
 
 // =====================
@@ -14827,65 +14866,215 @@ function drawOpponentGhost() {
   const ghost = opponentGhost;
   const groundY_val = typeof groundY !== 'undefined' ? groundY : 300;
   
-  // Smooth X positioning
+  // Smooth X positioning - faster lerp for more responsive swap
   const targetX = ghost.displayX || (mpState.opponentPosition === 'front' ? 100 : 170);
-  ghost.x = ghost.x + (targetX - ghost.x) * 0.1;
+  ghost.x = ghost.x + (targetX - ghost.x) * 0.18;
   
-  // Y from server state
-  const size = ghost.isDucking ? 25 : ghost.height;
-  const yPos = ghost.isDucking ? (ghost.y + 15) : ghost.y;
-  const renderY = ghost.y || (groundY_val - 40);
+  // Y clamped to groundY when not jumping
+  const baseY = ghost.isJumping ? (ghost.y || groundY_val - 40) : (groundY_val - 40);
 
   ctx.save();
-  ctx.globalAlpha = 0.85;
+  ctx.globalAlpha = 0.88;
 
-  // Draw block body
+  // Use actual skin data to draw opponent properly
+  const oppSkin = getSkinById(ghost.skinId);
+  const size = ghost.isDucking ? 25 : 40;
+  const yPos = ghost.isDucking ? baseY + 15 : baseY;
+
+  // === DRAW SKIN BODY (same as player.draw() logic) ===
   if (ghost.skinGradient) {
     try {
-      const grd = ctx.createLinearGradient(ghost.x, renderY, ghost.x + ghost.width, renderY + size);
+      const grd = ctx.createLinearGradient(ghost.x, yPos, ghost.x + 40, yPos + size);
       const parts = ghost.skinGradient.match(/#[0-9a-fA-F]{3,6}/g) || [ghost.skinColor, ghost.skinColor];
       parts.forEach((c, i) => grd.addColorStop(i / (parts.length - 1), c));
       ctx.fillStyle = grd;
-    } catch(e) { ctx.fillStyle = ghost.skinColor; }
+    } catch(e) { ctx.fillStyle = ghost.skinColor || '#a855f7'; }
   } else {
     ctx.fillStyle = ghost.skinColor || '#a855f7';
   }
-  
-  const bSize = ghost.isDucking ? 25 : 40;
-  const bY = ghost.isDucking ? renderY + 15 : renderY;
-  ctx.fillRect(ghost.x + 9, bY + 9, 32, bSize);
+  ctx.fillRect(ghost.x, yPos, 40, size);
 
-  // Purple outline to distinguish from self
-  ctx.strokeStyle = '#a855f7';
+  // Glow for night/snow/day skins
+  if (oppSkin.glow && !ghost.isDucking) {
+    const glowColor = ghost.skinId && ghost.skinId.startsWith('night_') ? 'rgba(139,92,246,0.7)' :
+                      ghost.skinId && ghost.skinId.startsWith('snow_')  ? 'rgba(135,206,235,0.6)' :
+                                                                          'rgba(255,215,0,0.6)';
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = glowColor;
+    ctx.fillRect(ghost.x, yPos, 40, size);
+    ctx.shadowBlur = 0;
+  }
+
+  // Outline
+  ctx.strokeStyle = '#000';
   ctx.lineWidth = 3;
-  ctx.strokeRect(ghost.x + 8, bY + 8, 34, bSize + 2);
+  ctx.strokeRect(ghost.x, yPos, 40, size);
 
-  // Name above head
+  // === CAPE / WINGS ===
+  if (oppSkin.cape && !ghost.isDucking) {
+    const wingTime = (typeof frameCount !== 'undefined' ? frameCount : 0) * 0.15;
+    const wingFlap = Math.sin(wingTime) * 3;
+    if (ghost.skinId && ghost.skinId.startsWith('night_')) {
+      // Night wings
+      ctx.fillStyle = '#1a1a2e';
+      ctx.beginPath(); ctx.moveTo(ghost.x, yPos+10); ctx.lineTo(ghost.x-20, yPos+5+wingFlap); ctx.lineTo(ghost.x-18, yPos+20+wingFlap); ctx.lineTo(ghost.x, yPos+25); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(ghost.x+40, yPos+10); ctx.lineTo(ghost.x+60, yPos+5+wingFlap); ctx.lineTo(ghost.x+58, yPos+20+wingFlap); ctx.lineTo(ghost.x+40, yPos+25); ctx.closePath(); ctx.fill();
+    } else if (oppSkin.jubah || (ghost.skinId && ghost.skinId.includes('egypt'))) {
+      ctx.fillStyle = '#8B4513';
+      ctx.fillRect(ghost.x - 15, yPos - 5, 15, size + 10);
+    } else {
+      // Generic cape
+      const capeFlow = Math.sin((typeof frameCount !== 'undefined' ? frameCount : 0) * 0.1) * 2;
+      ctx.fillStyle = ghost.skinColor || '#a855f7';
+      ctx.fillRect(ghost.x - 14, yPos + 2, 14, size - 4 + capeFlow);
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+      ctx.strokeRect(ghost.x - 14, yPos + 2, 14, size - 4 + capeFlow);
+    }
+  }
+
+  // === CROWN ===
+  if (oppSkin.crown && !ghost.isDucking) {
+    const fc = typeof frameCount !== 'undefined' ? frameCount : 0;
+    if (ghost.skinId === 'egypt_legendary' || ghost.skinId === 'egypt_epic') {
+      // Pharaoh crown
+      ctx.fillStyle = '#FFD700';
+      ctx.fillRect(ghost.x + 5, yPos - 15, 30, 4);
+      ctx.fillRect(ghost.x + 5, yPos - 19, 30, 4);
+      ctx.fillRect(ghost.x + 8, yPos - 22, 6, 3);
+      ctx.fillRect(ghost.x + 17, yPos - 25, 6, 6);
+      ctx.fillRect(ghost.x + 26, yPos - 22, 6, 3);
+    } else if (ghost.skinId && ghost.skinId.startsWith('day_')) {
+      // Sun crown
+      const sunPulse = Math.sin(fc * 0.08) * 0.3 + 0.7;
+      ctx.fillStyle = `rgba(255,215,0,${sunPulse})`;
+      for (let r = 0; r < 8; r++) {
+        const ang = (r / 8) * Math.PI * 2;
+        ctx.fillRect(ghost.x + 18 + Math.cos(ang) * 14 - 2, yPos - 18 + Math.sin(ang) * 7 - 2, 4, 4);
+      }
+      ctx.fillStyle = '#FFD700'; ctx.beginPath(); ctx.arc(ghost.x+20, yPos-16, 8, 0, Math.PI*2); ctx.fill();
+    } else if (ghost.skinId && ghost.skinId.startsWith('snow_')) {
+      // Snowflake crown
+      ctx.fillStyle = '#87CEEB';
+      ctx.fillRect(ghost.x+14, yPos-12, 12, 4);
+      ctx.fillRect(ghost.x+18, yPos-16, 4, 12);
+      ctx.fillRect(ghost.x+12, yPos-14, 16, 2);
+    } else if (ghost.skinId && ghost.skinId.startsWith('night_')) {
+      // Eclipse crown
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(ghost.x+10, yPos-16, 20, 8);
+      ctx.fillStyle = `rgba(139,92,246,${Math.sin(fc*0.1)*0.3+0.7})`;
+      ctx.fillRect(ghost.x+12, yPos-18, 4, 4);
+      ctx.fillRect(ghost.x+20, yPos-20, 4, 6);
+      ctx.fillRect(ghost.x+26, yPos-18, 4, 4);
+    } else {
+      // Generic crown
+      ctx.fillStyle = '#FFD700';
+      ctx.fillRect(ghost.x+8, yPos-10, 24, 8);
+      ctx.fillRect(ghost.x+8, yPos-14, 4, 4);
+      ctx.fillRect(ghost.x+18, yPos-16, 4, 6);
+      ctx.fillRect(ghost.x+28, yPos-14, 4, 4);
+    }
+  }
+
+  // === PURPLE OUTLINE to distinguish from local player ===
+  ctx.strokeStyle = '#a855f7';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(ghost.x - 2, yPos - 2, 44, size + 4);
+
+  // === NAME ABOVE HEAD ===
   if (mpSettings.oppName && ghost.name) {
     ctx.globalAlpha = 0.95;
     ctx.font = '6px "Press Start 2P", monospace';
-    ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
-    const nameX = ghost.x + 28;
-    const nameY = bY + 4;
-    // Background pill
+    const nameX = ghost.x + 20;
+    const nameY = yPos - 6;
     const textW = ctx.measureText(ghost.name).width;
-    ctx.fillStyle = 'rgba(168,85,247,0.8)';
+    ctx.fillStyle = 'rgba(168,85,247,0.85)';
     ctx.fillRect(nameX - textW/2 - 3, nameY - 8, textW + 6, 10);
     ctx.fillStyle = '#fff';
     ctx.fillText(ghost.name.substring(0, 8), nameX, nameY);
   }
 
-  // Dead indicator
+  // === DEAD INDICATOR ===
   if (mpState.opponentLives <= 0) {
-    ctx.globalAlpha = 0.4;
-    ctx.font = '16px Arial';
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(ghost.x, yPos, 40, size);
+    ctx.globalAlpha = 0.9;
+    ctx.font = '18px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('💀', ghost.x + 28, bY + 20);
+    ctx.fillText('💀', ghost.x + 20, yPos + size/2 + 6);
   }
 
   ctx.restore();
   ctx.textAlign = 'left';
+}
+
+// =====================
+// OPPONENT ABILITY VISUAL EFFECT
+// =====================
+let mpOppAbilityEffect = null;
+
+function mpShowOpponentAbilityEffect(abilityType, abilityId) {
+  const gX = opponentGhost.x || 160;
+  const gY = opponentGhost.y || (typeof groundY !== 'undefined' ? groundY - 40 : 260);
+  // Store effect to draw in next frames
+  mpOppAbilityEffect = {
+    x: gX, y: gY,
+    type: abilityType || abilityId || 'generic',
+    duration: 60, // ~1 second at 60fps
+    maxDuration: 60
+  };
+}
+
+function drawOpponentAbilityEffect() {
+  if (!mpOppAbilityEffect || !mpState.isMultiplayerGame) return;
+  const eff = mpOppAbilityEffect;
+  if (eff.duration <= 0) { mpOppAbilityEffect = null; return; }
+
+  const progress = eff.duration / eff.maxDuration;
+  const alpha = progress;
+  const radius = (1 - progress) * 80 + 10;
+  const fc = typeof frameCount !== 'undefined' ? frameCount : 0;
+
+  ctx.save();
+  ctx.globalAlpha = alpha * 0.8;
+
+  // Get color based on skin type
+  let color = '#a855f7';
+  if (eff.type && eff.type.includes('solar')) color = '#FFD700';
+  else if (eff.type && eff.type.includes('ice')) color = '#87CEEB';
+  else if (eff.type && eff.type.includes('sand')) color = '#C19A6B';
+  else if (eff.type && eff.type.includes('tidal')) color = '#00CED1';
+  else if (eff.type && eff.type.includes('heart')) color = '#FF69B4';
+  else if (eff.type && (eff.type.includes('lunar') || eff.type.includes('eclipse'))) color = '#8B5CF6';
+
+  // Expanding ring
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(eff.x + 20, eff.y + 20, radius, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Pixel burst particles
+  for (let i = 0; i < 8; i++) {
+    const ang = (i / 8) * Math.PI * 2 + fc * 0.1;
+    const dist = radius * 0.7;
+    const px = eff.x + 20 + Math.cos(ang) * dist;
+    const py = eff.y + 20 + Math.sin(ang) * dist;
+    ctx.fillStyle = color;
+    ctx.fillRect(px - 3, py - 3, 6, 6);
+  }
+
+  // Center flash
+  if (eff.duration > eff.maxDuration * 0.7) {
+    ctx.globalAlpha = alpha * 1.2;
+    ctx.fillStyle = color;
+    ctx.fillRect(eff.x + 8, eff.y + 8, 24, 24);
+  }
+
+  ctx.restore();
+  eff.duration--;
 }
 
 // =====================
@@ -14974,6 +15163,24 @@ function mpDoScoreSync() {
       isDucking: player.isDucking
     });
   }
+}
+
+function mpBackToRoom() {
+  mpState.isMultiplayerGame = false;
+  mpState.myAlive = true;
+  mpState._gameOverAll = false;
+  // Reset players ready state and go back to lobby
+  if (socket) {
+    socket.emit('player_unready');
+  }
+  showMpLobby();
+  // Reset lobby buttons
+  document.getElementById('mpReadyBtn').textContent = '✅ READY';
+  document.getElementById('mpReadyBtn').style.background = '#a855f7';
+  document.getElementById('mpReadyBtn').style.boxShadow = '4px 4px 0 #4c1d95';
+  mpState.ready = false;
+  const el = document.querySelectorAll('.lobby-player-card');
+  el.forEach(c => { const badge = c.querySelector('.lobby-waiting-badge, .lobby-ready-badge'); if(badge) badge.className = 'lobby-waiting-badge'; });
 }
 
 // =====================
@@ -15138,10 +15345,19 @@ window.addEventListener('load', () => {
     const orig = window.endGame;
     window.endGame = function() {
       if (mpState.isMultiplayerGame) {
-        // Don't show gameover screen if only I died (let respawn happen)
-        if (!mpState.myAlive && mpState.opponentId) return;
+        // In multiplayer, endGame is called by game engine when obstacle hits
+        // But we intercept it: if my opponent is still alive, just emit player_died
+        // and show respawn overlay. Only end game for real if game_over_all from server.
+        if (!mpState._gameOverAll) {
+          // Don't show game over screen - let respawn handle it
+          // Keep game running so canvas doesn't stop
+          gameRunning = true;
+          return;
+        }
+        // game_over_all received - do full teardown
         teardownMpIngame();
         mpState.isMultiplayerGame = false;
+        mpState._gameOverAll = false;
       }
       orig.apply(this, arguments);
     };
@@ -15155,6 +15371,8 @@ window.addEventListener('load', () => {
       if (mpState.isMultiplayerGame && val <= 0 && mpState.myAlive) {
         mpState.myAlive = false;
         if (socket) socket.emit('player_died');
+        // Show respawn overlay immediately in case you_died event has latency
+        startRespawnCountdown(25);
       }
     }).observe(livesEl, { childList: true, characterData: true, subtree: true });
   }
@@ -15173,6 +15391,7 @@ window.addEventListener('load', () => {
 
         // Draw opponent ghost AFTER player draw (inject into render)
         drawOpponentGhost();
+        drawOpponentAbilityEffect();
 
         // Detect front player hit by obstacle
         rafCounter++;
