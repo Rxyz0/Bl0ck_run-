@@ -14600,8 +14600,14 @@ function getSkinById(skinId) {
     ...(typeof snowSkins !== 'undefined' ? snowSkins : []),
     ...(typeof oceanSkins !== 'undefined' ? oceanSkins : []),
     ...(typeof valentineSkins !== 'undefined' ? valentineSkins : []),
+    ...(typeof sakuraSkins !== 'undefined' ? sakuraSkins : []),
   ];
-  return allSkins.find(s => s.id === skinId) || { id: skinId, color: '#a855f7', name: '???' };
+  const found = allSkins.find(s => s.id === skinId);
+  if (found) {
+    // Return a COPY so we can safely override color/gradient without mutating original
+    return Object.assign({}, found);
+  }
+  return { id: skinId || 'white', color: opponentGhost.skinColor || '#a855f7', name: '???' };
 }
 
 // =====================
@@ -14862,150 +14868,109 @@ function updateSwapBadge() {
 // =====================
 function drawOpponentGhost() {
   if (!mpState.isMultiplayerGame || !mpState.opponentId || typeof ctx === 'undefined') return;
+  if (typeof player === 'undefined' || typeof player.draw !== 'function') return;
 
   const ghost = opponentGhost;
   const groundY_val = typeof groundY !== 'undefined' ? groundY : 300;
   
-  // Smooth X positioning - faster lerp for more responsive swap
-  const targetX = ghost.displayX || (mpState.opponentPosition === 'front' ? 100 : 170);
+  // Smooth X positioning - faster lerp for swap visibility
+  const targetX = ghost.displayX || (mpState.opponentPosition === 'front' ? 100 : 160);
   ghost.x = ghost.x + (targetX - ghost.x) * 0.18;
   
-  // Y clamped to groundY when not jumping
+  // Y: snap to ground when not jumping
   const baseY = ghost.isJumping ? (ghost.y || groundY_val - 40) : (groundY_val - 40);
 
-  ctx.save();
+  // If opponent is dead, draw faded skull
+  if (mpState.opponentLives <= 0) {
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.font = '28px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('💀', ghost.x + 20, baseY + 30);
+    ctx.restore();
+    ctx.textAlign = 'left';
+    // Still draw name
+    _drawOpponentName(ghost.x, baseY);
+    return;
+  }
+
+  // === THE KEY TRICK: call player.draw() with fake 'this' + temp skin override ===
+  const oppSkinData = getSkinById(ghost.skinId);
+  // Attach color/gradient to skin object so draw() uses them
+  if (ghost.skinColor) oppSkinData.color = ghost.skinColor;
+  if (ghost.skinGradient) oppSkinData.gradient = ghost.skinGradient;
+
+  // Temporarily override getCurrentSkin to return opponent skin
+  const _origGetCurrentSkin = window.getCurrentSkin;
+  window.getCurrentSkin = function() { return oppSkinData; };
+
+  // Also temporarily override frameCount-based particles so opponent doesn't spawn dust etc
+  const _origParticlesPush = typeof particles !== 'undefined' ? particles.push.bind(particles) : null;
+  if (typeof particles !== 'undefined') {
+    particles.push = function() {}; // swallow opponent dust/trail particles
+  }
+
+  // Fake 'this' object matching player's interface exactly
+  const fakePlayer = {
+    x: ghost.x,
+    y: baseY,
+    width: 40,
+    height: 40,
+    isJumping: ghost.isJumping,
+    isDucking: ghost.isDucking,
+  };
+
+  const _origAlpha = ctx.globalAlpha;
   ctx.globalAlpha = 0.88;
 
-  // Use actual skin data to draw opponent properly
-  const oppSkin = getSkinById(ghost.skinId);
-  const size = ghost.isDucking ? 25 : 40;
-  const yPos = ghost.isDucking ? baseY + 15 : baseY;
-
-  // === DRAW SKIN BODY (same as player.draw() logic) ===
-  if (ghost.skinGradient) {
-    try {
-      const grd = ctx.createLinearGradient(ghost.x, yPos, ghost.x + 40, yPos + size);
-      const parts = ghost.skinGradient.match(/#[0-9a-fA-F]{3,6}/g) || [ghost.skinColor, ghost.skinColor];
-      parts.forEach((c, i) => grd.addColorStop(i / (parts.length - 1), c));
-      ctx.fillStyle = grd;
-    } catch(e) { ctx.fillStyle = ghost.skinColor || '#a855f7'; }
-  } else {
+  try {
+    player.draw.call(fakePlayer);
+  } catch(e) {
+    // Fallback: simple colored rect
     ctx.fillStyle = ghost.skinColor || '#a855f7';
-  }
-  ctx.fillRect(ghost.x, yPos, 40, size);
-
-  // Glow for night/snow/day skins
-  if (oppSkin.glow && !ghost.isDucking) {
-    const glowColor = ghost.skinId && ghost.skinId.startsWith('night_') ? 'rgba(139,92,246,0.7)' :
-                      ghost.skinId && ghost.skinId.startsWith('snow_')  ? 'rgba(135,206,235,0.6)' :
-                                                                          'rgba(255,215,0,0.6)';
-    ctx.shadowBlur = 18;
-    ctx.shadowColor = glowColor;
-    ctx.fillRect(ghost.x, yPos, 40, size);
-    ctx.shadowBlur = 0;
+    const sz = ghost.isDucking ? 25 : 40;
+    const fy = ghost.isDucking ? baseY + 15 : baseY;
+    ctx.fillRect(ghost.x, fy, 40, sz);
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+    ctx.strokeRect(ghost.x, fy, 40, sz);
   }
 
-  // Outline
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(ghost.x, yPos, 40, size);
+  ctx.globalAlpha = _origAlpha;
 
-  // === CAPE / WINGS ===
-  if (oppSkin.cape && !ghost.isDucking) {
-    const wingTime = (typeof frameCount !== 'undefined' ? frameCount : 0) * 0.15;
-    const wingFlap = Math.sin(wingTime) * 3;
-    if (ghost.skinId && ghost.skinId.startsWith('night_')) {
-      // Night wings
-      ctx.fillStyle = '#1a1a2e';
-      ctx.beginPath(); ctx.moveTo(ghost.x, yPos+10); ctx.lineTo(ghost.x-20, yPos+5+wingFlap); ctx.lineTo(ghost.x-18, yPos+20+wingFlap); ctx.lineTo(ghost.x, yPos+25); ctx.closePath(); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(ghost.x+40, yPos+10); ctx.lineTo(ghost.x+60, yPos+5+wingFlap); ctx.lineTo(ghost.x+58, yPos+20+wingFlap); ctx.lineTo(ghost.x+40, yPos+25); ctx.closePath(); ctx.fill();
-    } else if (oppSkin.jubah || (ghost.skinId && ghost.skinId.includes('egypt'))) {
-      ctx.fillStyle = '#8B4513';
-      ctx.fillRect(ghost.x - 15, yPos - 5, 15, size + 10);
-    } else {
-      // Generic cape
-      const capeFlow = Math.sin((typeof frameCount !== 'undefined' ? frameCount : 0) * 0.1) * 2;
-      ctx.fillStyle = ghost.skinColor || '#a855f7';
-      ctx.fillRect(ghost.x - 14, yPos + 2, 14, size - 4 + capeFlow);
-      ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-      ctx.strokeRect(ghost.x - 14, yPos + 2, 14, size - 4 + capeFlow);
-    }
+  // Restore overrides
+  window.getCurrentSkin = _origGetCurrentSkin;
+  if (typeof particles !== 'undefined' && _origParticlesPush) {
+    particles.push = _origParticlesPush;
   }
 
-  // === CROWN ===
-  if (oppSkin.crown && !ghost.isDucking) {
-    const fc = typeof frameCount !== 'undefined' ? frameCount : 0;
-    if (ghost.skinId === 'egypt_legendary' || ghost.skinId === 'egypt_epic') {
-      // Pharaoh crown
-      ctx.fillStyle = '#FFD700';
-      ctx.fillRect(ghost.x + 5, yPos - 15, 30, 4);
-      ctx.fillRect(ghost.x + 5, yPos - 19, 30, 4);
-      ctx.fillRect(ghost.x + 8, yPos - 22, 6, 3);
-      ctx.fillRect(ghost.x + 17, yPos - 25, 6, 6);
-      ctx.fillRect(ghost.x + 26, yPos - 22, 6, 3);
-    } else if (ghost.skinId && ghost.skinId.startsWith('day_')) {
-      // Sun crown
-      const sunPulse = Math.sin(fc * 0.08) * 0.3 + 0.7;
-      ctx.fillStyle = `rgba(255,215,0,${sunPulse})`;
-      for (let r = 0; r < 8; r++) {
-        const ang = (r / 8) * Math.PI * 2;
-        ctx.fillRect(ghost.x + 18 + Math.cos(ang) * 14 - 2, yPos - 18 + Math.sin(ang) * 7 - 2, 4, 4);
-      }
-      ctx.fillStyle = '#FFD700'; ctx.beginPath(); ctx.arc(ghost.x+20, yPos-16, 8, 0, Math.PI*2); ctx.fill();
-    } else if (ghost.skinId && ghost.skinId.startsWith('snow_')) {
-      // Snowflake crown
-      ctx.fillStyle = '#87CEEB';
-      ctx.fillRect(ghost.x+14, yPos-12, 12, 4);
-      ctx.fillRect(ghost.x+18, yPos-16, 4, 12);
-      ctx.fillRect(ghost.x+12, yPos-14, 16, 2);
-    } else if (ghost.skinId && ghost.skinId.startsWith('night_')) {
-      // Eclipse crown
-      ctx.fillStyle = '#0F172A';
-      ctx.fillRect(ghost.x+10, yPos-16, 20, 8);
-      ctx.fillStyle = `rgba(139,92,246,${Math.sin(fc*0.1)*0.3+0.7})`;
-      ctx.fillRect(ghost.x+12, yPos-18, 4, 4);
-      ctx.fillRect(ghost.x+20, yPos-20, 4, 6);
-      ctx.fillRect(ghost.x+26, yPos-18, 4, 4);
-    } else {
-      // Generic crown
-      ctx.fillStyle = '#FFD700';
-      ctx.fillRect(ghost.x+8, yPos-10, 24, 8);
-      ctx.fillRect(ghost.x+8, yPos-14, 4, 4);
-      ctx.fillRect(ghost.x+18, yPos-16, 4, 6);
-      ctx.fillRect(ghost.x+28, yPos-14, 4, 4);
-    }
-  }
-
-  // === PURPLE OUTLINE to distinguish from local player ===
-  ctx.strokeStyle = '#a855f7';
+  // Purple outline to distinguish
+  const sz = ghost.isDucking ? 25 : 40;
+  const fy = ghost.isDucking ? baseY + 15 : baseY;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(168,85,247,0.7)';
   ctx.lineWidth = 2;
-  ctx.strokeRect(ghost.x - 2, yPos - 2, 44, size + 4);
+  ctx.setLineDash([4, 3]);
+  ctx.strokeRect(ghost.x - 2, fy - 2, 44, sz + 4);
+  ctx.setLineDash([]);
+  ctx.restore();
 
-  // === NAME ABOVE HEAD ===
-  if (mpSettings.oppName && ghost.name) {
-    ctx.globalAlpha = 0.95;
-    ctx.font = '6px "Press Start 2P", monospace';
-    ctx.textAlign = 'center';
-    const nameX = ghost.x + 20;
-    const nameY = yPos - 6;
-    const textW = ctx.measureText(ghost.name).width;
-    ctx.fillStyle = 'rgba(168,85,247,0.85)';
-    ctx.fillRect(nameX - textW/2 - 3, nameY - 8, textW + 6, 10);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(ghost.name.substring(0, 8), nameX, nameY);
-  }
+  // Name label
+  _drawOpponentName(ghost.x, fy);
+}
 
-  // === DEAD INDICATOR ===
-  if (mpState.opponentLives <= 0) {
-    ctx.globalAlpha = 0.35;
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(ghost.x, yPos, 40, size);
-    ctx.globalAlpha = 0.9;
-    ctx.font = '18px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('💀', ghost.x + 20, yPos + size/2 + 6);
-  }
-
+function _drawOpponentName(gx, gy) {
+  if (!mpSettings.oppName || !opponentGhost.name) return;
+  ctx.save();
+  ctx.globalAlpha = 0.95;
+  ctx.font = '6px "Press Start 2P", monospace';
+  ctx.textAlign = 'center';
+  const nameX = gx + 20;
+  const nameY = gy - 6;
+  const textW = ctx.measureText(opponentGhost.name).width;
+  ctx.fillStyle = 'rgba(168,85,247,0.85)';
+  ctx.fillRect(nameX - textW/2 - 3, nameY - 8, textW + 6, 10);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(opponentGhost.name.substring(0, 8), nameX, nameY);
   ctx.restore();
   ctx.textAlign = 'left';
 }
