@@ -3724,8 +3724,11 @@
                         <span id="coinIcon">🔺</span>
                         <span id="coinCount">0</span>
                     </div>
-                    <div id="livesDisplay" style="display: none; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 10px; margin-top: 4px; font-size: 11px; font-family: 'Press Start 2P', monospace; color: #ff6b6b;">
-                        ❤️ <span id="livesCount">1</span>
+                    <div id="livesDisplay" style="display: none; margin-top: 5px;">
+                        <div style="font-size: 7px; font-family: 'Press Start 2P', monospace; color: #ff6b6b; margin-bottom: 2px;">❤️ HP</div>
+                        <div style="display:flex; gap:3px; align-items:center;" id="hpBarContainer">
+                            <!-- HP segments filled by JS -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -6950,7 +6953,7 @@ function createAndUpdateLoveTrail() {
         vibrate(100);
         
         playerLives++;
-        document.getElementById('livesCount').textContent = playerLives;
+        // HP bar will update on next frame via gameLoop
         
         // Heart particles
         const particleCount = Math.floor(30 * particleMultiplier);
@@ -7210,6 +7213,10 @@ function updateSolarBlaster() {
                 }
                 
                 obstacles.splice(i, 1);
+                // Sync to opponent in MP
+                if (typeof mpState !== 'undefined' && mpState.isPlaying && typeof socket !== 'undefined' && socket) {
+                    socket.emit('obstacle_destroyed', { obstacleIndex: i });
+                }
                 playSound('ability');
                 vibrate(30);
             }
@@ -13190,6 +13197,11 @@ function updateAllCoinDisplays() {
                 scoreRun++;
                 document.getElementById('scoreRun').textContent = 'RUN: ' + scoreRun;
             }
+
+            // Sync score ke server setiap 60 frame (1 detik) saat MP
+            if (frameCount % 60 === 0 && typeof mpState !== 'undefined' && mpState.isPlaying && typeof socket !== 'undefined' && socket) {
+                socket.emit('score_update', { scoreRun, scoreJump });
+            }
             
             if (abilityCooldown > 0) {
                 abilityCooldown--;
@@ -13215,7 +13227,16 @@ function updateAllCoinDisplays() {
             const livesDisplay = document.getElementById('livesDisplay');
             if (maxLives > 1) {
                 livesDisplay.style.display = 'block';
-                document.getElementById('livesCount').textContent = playerLives;
+                // Update HP bar horizontal
+                const hpBar = document.getElementById('hpBarContainer');
+                if (hpBar) {
+                    hpBar.innerHTML = '';
+                    for (let i = 0; i < maxLives; i++) {
+                        const seg = document.createElement('div');
+                        seg.style.cssText = `width:14px;height:10px;border:2px solid #ff6b6b;box-sizing:border-box;background:${i < playerLives ? '#ff4444' : 'rgba(255,70,70,0.15)'};box-shadow:${i < playerLives ? '0 0 4px #ff4444' : 'none'};`;
+                        hpBar.appendChild(seg);
+                    }
+                }
             } else {
                 livesDisplay.style.display = 'none';
             }
@@ -13383,6 +13404,9 @@ if (meteorShowerActive && currentMode === 'night') {
 player.update();
 player.draw();
 
+// Draw opponent ghost in MP (sebelum draw abilities supaya ability di atas ghost)
+if (typeof mpState !== "undefined" && mpState.isPlaying) mpDrawOpponent();
+
 drawSolarBlaster();
 drawLunarShield();
 drawEclipseBlast();
@@ -13465,6 +13489,10 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
     if (collided) {
         if (shieldActive && shieldHits > 0) {
             shieldHits--;
+            // Sync obstacle destroy to opponent in MP
+            if (typeof mpState !== 'undefined' && mpState.isPlaying && typeof socket !== 'undefined' && socket) {
+                socket.emit('obstacle_destroyed', { obstacleIndex: i });
+            }
             obstacles.splice(i, 1);
 
            playSound('hit');
@@ -13486,6 +13514,10 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
             }
         } else if (playerLives > 1) {
             playerLives--;
+            // Sync obstacle destroy to opponent in MP
+            if (typeof mpState !== 'undefined' && mpState.isPlaying && typeof socket !== 'undefined' && socket) {
+                socket.emit('obstacle_destroyed', { obstacleIndex: i });
+            }
             obstacles.splice(i, 1);
 
             playSound('hit');
@@ -14784,6 +14816,22 @@ function _mpInitSocket() {
         // Start the actual game
         startGame(mode);
 
+        // === MP POSITION: Set spawn X based on role ===
+        // 'back' = posisi belakang (kiri), 'front' = posisi depan (kanan dari belakang)
+        if (mpState.myPosition === 'front') {
+            player.x = Math.round(canvas.width * 0.42); // Depan - lebih ke kanan
+        } else {
+            player.x = 100; // Belakang - posisi normal kiri
+        }
+        // Set opponent initial X berkebalikan
+        if (mpState.myPosition === 'front') {
+            mpState.oppX = 100; // Opp di belakang
+        } else {
+            mpState.oppX = Math.round(canvas.width * 0.42); // Opp di depan
+        }
+        mpState._mySpawnX = player.x;
+        mpState._oppSpawnX = mpState.oppX;
+
         // Show MP HUD
         _mpShowHUD();
     });
@@ -14791,9 +14839,10 @@ function _mpInitSocket() {
     // Opponent position update (for ghost rendering)
     socket.on('opponent_state', ({ y, isJumping, isDucking, x }) => {
         mpState.oppY = y;
-        mpState.oppX = x;
         mpState.oppJumping = isJumping;
         mpState.oppDucking = isDucking;
+        // Jangan pakai oppX dari server langsung (itu koordinat lokal lawan)
+        // oppX tetap di posisi spawn yang sudah ditetapkan
     });
 
     // Swap positions
@@ -14802,6 +14851,15 @@ function _mpInitSocket() {
         for (const ev of events) {
             if (ev.type === 'swap') {
                 mpState.myPosition = ev.positions[mpState.myId];
+                // Update spawn X sesuai posisi baru
+                if (mpState.myPosition === 'front') {
+                    player.x = Math.round(canvas.width * 0.42);
+                    mpState._oppSpawnX = 100;
+                } else {
+                    player.x = 100;
+                    mpState._oppSpawnX = Math.round(canvas.width * 0.42);
+                }
+                mpState._mySpawnX = player.x;
                 _mpUpdatePositionUI();
                 _mpFlashSwap();
             } else if (ev.type === 'respawn' && ev.playerId === mpState.myId) {
@@ -14816,6 +14874,8 @@ function _mpInitSocket() {
                 }
                 player.y = groundY - 40; player.velocityY = 0;
                 player.isJumping = false; player.isDucking = false;
+                // Respawn di posisi yang benar
+                player.x = mpState._mySpawnX || 100;
                 _mpHideRespawnOverlay();
                 mpToast('✅ Kamu respawn!');
             } else if (ev.type === 'respawn' && ev.playerId === mpState.opponentId) {
@@ -14832,10 +14892,12 @@ function _mpInitSocket() {
         if (el) el.textContent = '🔄 ' + seconds + 's';
     });
 
-    // Opponent position for ghost
-    socket.on('opponent_state', ({ y, isJumping, isDucking, x }) => {
-        mpState.oppY = y; mpState.oppX = x;
-        mpState.oppJumping = isJumping; mpState.oppDucking = isDucking;
+    // Opponent score update
+    socket.on('opponent_score', ({ scoreRun, scoreJump }) => {
+        // Optional: bisa tampilkan score lawan di HUD
+        // Untuk sekarang cukup update internal state
+        mpState.oppScoreRun = scoreRun;
+        mpState.oppScoreJump = scoreJump;
     });
 
     // Opponent died
@@ -15206,8 +15268,11 @@ function mpDrawOpponent() {
     const oppSkin = mpState.opponentSkin;
     if (!oppSkin) return;
 
+    // Gunakan posisi spawn tetap berdasarkan role, bukan koordinat raw dari server
+    // oppX dari server = koordinat lokal lawan (tidak berguna langsung)
+    // Kita render lawan di posisi spawn-nya yang sudah ditetapkan saat game_start
+    const gX = mpState._oppSpawnX || (canvas.width * 0.42);
     const gY = (mpState.oppY && mpState.oppY > 0) ? mpState.oppY : (groundY - 40);
-    const gX = mpState.oppX || (canvas.width * 0.25);
     const isDucking = mpState.oppDucking;
     const gW = 40;
     const gH = 40;
@@ -16037,9 +16102,6 @@ function mpPlayAgain() {
 
 // === PATCH gameLoop to add ghost + coin sync + endGame override ===
 window.addEventListener('load', () => {
-    // Patch coin collection to sync in MP
-    const _origGameLoop = window.gameLoop;
-
     // Override endGame for MP
     const _origEndGame = window.endGame;
     window.endGame = function() {
@@ -16057,17 +16119,10 @@ window.addEventListener('load', () => {
         _origEndGame();
     };
 
-    // Patch spawnObstacle/spawnCoin — server controls timing in MP
-    const _origSpawnObs = window.spawnObstacle;
-    window.spawnObstacle = function() {
-        if (mpState.isPlaying) return; // server controls
-        if (_origSpawnObs) _origSpawnObs();
-    };
-    const _origSpawnCoin = window.spawnCoin;
-    window.spawnCoin = function() {
-        if (mpState.isPlaying) return;
-        if (_origSpawnCoin) _origSpawnCoin();
-    };
+    // === FIX: Obstacle & coin spawning tetap jalan di MP (seeded RNG supaya sama di kedua layar) ===
+    // TIDAK lagi diblok — tiap client spawn sendiri pakai seeded RNG yang sama (seed dari server)
+    // Jadi obstacle yang muncul di screen kamu SAMA dengan yang muncul di screen teman
+    // Kalau teman kena/hancurkan obstacle → server broadcast 'sync_obstacle_destroy' ke kamu
 });
 
 // Patch coin collection to emit to server in MP
@@ -16111,8 +16166,7 @@ const _mpOrigAddEventListener = document.addEventListener.bind(document);
                         isJumping: player.isJumping,
                         isDucking: player.isDucking
                     });
-                    // Draw ghost
-                    mpDrawOpponent();
+                    // mpDrawOpponent dipanggil dari gameLoop langsung, tidak perlu double call di sini
                 }
             }
         });

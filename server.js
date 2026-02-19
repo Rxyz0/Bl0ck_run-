@@ -88,28 +88,19 @@ function startServerGameLoop(code) {
     room.frameCount++;
     const fc = room.frameCount;
 
-    // --- Obstacle spawn events ---
-    const spawnRate = 90; // medium quality default
-    const coinRate = 60;
-
     const events = [];
-
-    if (fc % spawnRate === 0) {
-      const rval = room.rng();
-      events.push({ type: 'obstacle', rval, fc });
-    }
-
-    if (fc % 240 === 0 && room.mode === 'egypt') {
-      events.push({ type: 'quicksand', fc });
-    }
-
-    if (fc % coinRate === 0 && room.rng() > 0.3) {
-      const airborne = room.rng() > 0.5;
-      events.push({ type: 'coin', airborne, fc });
-    }
 
     // --- Swap position countdown ---
     room.swapTimer++;
+
+    // Emit countdown every second (60 frames)
+    if (room.swapTimer % 60 === 0) {
+      const secondsLeft = Math.ceil((room.swapInterval - room.swapTimer) / 60);
+      if (secondsLeft > 0 && secondsLeft <= 5) {
+        io.to(code).emit('swap_countdown', { seconds: secondsLeft });
+      }
+    }
+
     if (room.swapTimer >= room.swapInterval) {
       room.swapTimer = 0;
       // Swap positions
@@ -117,7 +108,12 @@ function startServerGameLoop(code) {
         const ps = room.playerStates[pid];
         ps.position = ps.position === 'front' ? 'back' : 'front';
       }
-      events.push({ type: 'swap', positions: { ...Object.fromEntries(Object.entries(room.playerStates).map(([id, s]) => [id, s.position])) } });
+      events.push({
+        type: 'swap',
+        positions: Object.fromEntries(
+          Object.entries(room.playerStates).map(([id, s]) => [id, s.position])
+        )
+      });
     }
 
     // --- Respawn timers ---
@@ -127,12 +123,11 @@ function startServerGameLoop(code) {
         if (ps.respawnTimer === 0) {
           ps.alive = true;
           events.push({ type: 'respawn', playerId: pid });
-          io.to(code).emit('player_respawn', { playerId: pid });
         }
       }
     }
 
-    // Emit tick
+    // Emit tick only if there are events
     if (events.length > 0) {
       io.to(code).emit('game_tick', { fc, events });
     }
@@ -287,14 +282,6 @@ io.on('connection', (socket) => {
     socket.to(code).emit('opponent_score', { playerId: socket.id, scoreRun, scoreJump });
   });
 
-  // --- SKILL USED (relay to opponent for visual) ---
-  socket.on('skill_used', ({ skillId }) => {
-    const result = getRoomBySocket(socket.id);
-    if (!result) return;
-    const { code } = result;
-    socket.to(code).emit('opponent_skill', { playerId: socket.id, skillId });
-  });
-
   // --- ABILITY USED (relay to opponent) ---
   socket.on('use_ability', ({ abilityType }) => {
     const result = getRoomBySocket(socket.id);
@@ -332,14 +319,6 @@ io.on('connection', (socket) => {
     room.sessionCoins++;
     // Sync to BOTH players (coin disappears from both screens, both get count)
     io.to(code).emit('sync_coin_collect', { index, totalCoins: room.sessionCoins });
-  });
-
-  // --- SCORE UPDATE ---
-  socket.on('score_update', ({ scoreRun, scoreJump }) => {
-    const result = getRoomBySocket(socket.id);
-    if (!result) return;
-    const { code } = result;
-    socket.to(code).emit('opponent_score', { playerId: socket.id, scoreRun, scoreJump });
   });
 
   // --- PLAYER UNREADY (cancel ready in lobby) ---
