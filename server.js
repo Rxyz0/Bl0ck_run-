@@ -257,10 +257,15 @@ app.get('/game', (req, res) => res.sendFile(path.join(__dirname, 'game.html')));
 // ============================================================
 // START
 // ============================================================
-initDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🚀 bl0ck run server running on port ${PORT}`);
-    });
+// Jalankan server dulu supaya tidak 502
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// Init database, tapi jangan bikin server mati kalau gagal
+initDB().catch(err => {
+    console.error("❌ Database init failed:", err.message);
+});
 }).catch(err => {
     console.error('Failed to init DB:', err);
     process.exit(1);
