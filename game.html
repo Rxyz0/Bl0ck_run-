@@ -861,57 +861,212 @@
             cursor: not-allowed;
             opacity: 0.6;
         }
+        /* ===== SKIN SELECTOR REDESIGN ===== */
+        #skinSelector {
+            background: #050505;
+        }
+        .skin-selector-inner {
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: clamp(60px,12vh,80px) 0 40px;
+        }
+        /* Filter tabs */
+        .skin-filter-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 0 14px;
+            margin-bottom: 18px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .skin-filter-tabs::-webkit-scrollbar { display: none; }
+        .skin-filter-tab {
+            flex-shrink: 0;
+            padding: 6px 12px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(5px, 1.1vw, 7px);
+            border: 2px solid #333;
+            background: #111;
+            color: #555;
+            cursor: pointer;
+            transition: .15s;
+            white-space: nowrap;
+        }
+        .skin-filter-tab.active {
+            border-color: #00ff88;
+            color: #00ff88;
+            background: rgba(0,255,136,.08);
+            box-shadow: 0 0 8px rgba(0,255,136,.2);
+        }
+        /* Section header */
+        .skin-section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 14px;
+            margin: 24px 0 14px;
+        }
+        .skin-section-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(8px, 1.8vw, 11px);
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0,255,136,.4);
+            letter-spacing: 1px;
+        }
+        .skin-section-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, #00ff88 0%, transparent 100%);
+            opacity: .3;
+        }
+        .skin-section-badge {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(4px, .8vw, 5px);
+            padding: 3px 7px;
+            border-radius: 2px;
+            letter-spacing: 1px;
+        }
+        .badge-limited { background: linear-gradient(135deg, #FF6B6B, #FF1493); color: #fff; }
+        .badge-new     { background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; }
+        /* Skin grid */
         .skin-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(clamp(80px, 20vw, 100px), 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(clamp(80px, 22vw, 105px), 1fr));
             gap: clamp(8px, 2vw, 12px);
-            width: 90%;
-            max-width: 600px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 0 10px;
+            padding: 0 14px;
+            margin-bottom: 8px;
         }
+        /* ===== SKIN CARD — konsisten semua rarity ===== */
         .skin-card {
-            background: #1a1a1a;
-            border: 3px solid #00ff88;
-            box-shadow: 4px 4px 0 #006644;
-            padding: clamp(8px, 2vw, 10px);
+            /* layout flex column agar urutan elemen selalu sama */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #0e0e0e;
+            border: 2px solid #2a2a2a;
+            padding: 10px 6px 8px;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: transform .12s, box-shadow .12s, border-color .12s, background .12s;
             text-align: center;
-        }
-        .skin-card.equipped {
-            border-color: #ffd93d;
-            background: #2a2a2a;
-            box-shadow: 
-                4px 4px 0 #ccae31,
-                0 0 12px #ffd93d;
-        }
-        .skin-card.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: #666;
-            box-shadow: 4px 4px 0 #444;
-        }
-        .skin-card:active:not(.locked) { 
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0 #006644;
-        }
-        .skin-preview {
-            width: clamp(40px, 10vw, 50px);
-            height: clamp(40px, 10vw, 50px);
-            margin: 0 auto clamp(6px, 2vw, 8px);
-            border: 2px solid #000;
             position: relative;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+            overflow: hidden;
+            min-height: clamp(120px, 28vw, 148px);
         }
-        .skin-name {
-            font-size: clamp(7px, 2vw, 10px);
-            font-weight: bold;
-            margin-bottom: 3px;
-            color: #00ff88;
+        /* rarity border colors */
+        .skin-card.common    { border-color: #3a3a3a; }
+        .skin-card.rare      { border-color: #1e3d8a; }
+        .skin-card.epic      { border-color: #4a1a7a; }
+        .skin-card.legendary { border-color: #7a5e0a; background: linear-gradient(180deg,#0e0e0e 55%,#130f00 100%); }
+        .skin-card.limited   { border-color: #7a1a4a; }
+        /* hover glow per rarity */
+        .skin-card.common:hover:not(.locked)    { border-color: #999; box-shadow: 0 0 10px rgba(180,180,180,.2); }
+        .skin-card.rare:hover:not(.locked)      { border-color: #4169E1; box-shadow: 0 0 12px rgba(65,105,225,.35); }
+        .skin-card.epic:hover:not(.locked)      { border-color: #9370DB; box-shadow: 0 0 14px rgba(147,112,219,.4); }
+        .skin-card.legendary:hover:not(.locked) { border-color: #FFD700; box-shadow: 0 0 18px rgba(255,215,0,.45); }
+        .skin-card.limited:hover:not(.locked)   { border-color: #FF69B4; box-shadow: 0 0 14px rgba(255,105,180,.4); }
+        /* equipped */
+        .skin-card.equipped {
+            border-color: #FFD700 !important;
+            background: linear-gradient(180deg,#131100 0%,#0a0a00 100%) !important;
+            box-shadow: 0 0 16px rgba(255,215,0,.45), inset 0 0 16px rgba(255,215,0,.04) !important;
+        }
+        /* equipped checkmark top-right */
+        .skin-card.equipped::after {
+            content: '✓ EQUIPPED';
+            position: absolute;
+            top: 4px; right: 5px;
+            font-size: clamp(3.5px,.7vw,5px);
+            color: #FFD700;
             font-family: 'Press Start 2P', monospace;
-            line-height: 1.3;
+            letter-spacing: .5px;
+        }
+        /* locked */
+        .skin-card.locked {
+            opacity: .35;
+            cursor: not-allowed;
+            filter: grayscale(.7);
+        }
+        .skin-card:active:not(.locked) { transform: scale(.94); }
+
+        /* preview canvas — sama ukurannya untuk semua */
+        .skin-preview {
+            width: clamp(42px, 11vw, 52px);
+            height: clamp(42px, 11vw, 52px);
+            display: block;
+            image-rendering: pixelated;
+            flex-shrink: 0;
+            margin-bottom: 7px;
+        }
+
+        /* nama skin — baris 2 */
+        .skin-name {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(5.5px, 1.3vw, 7.5px);
+            color: #e8e8e8;
+            line-height: 1.4;
+            margin-bottom: 5px;
+            word-break: break-word;
+            width: 100%;
+        }
+
+        /* tier badge — baris 3, selalu ada */
+        .skin-tier-badge {
+            display: inline-block;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(3.5px, .75vw, 5px);
+            letter-spacing: .8px;
+            padding: 2px 6px;
+            border-radius: 1px;
+            margin-bottom: 5px;
+        }
+        .skin-tier-badge.common    { background: rgba(140,140,140,.15); border: 1px solid #555; color: #999; }
+        .skin-tier-badge.rare      { background: rgba(65,105,225,.15);  border: 1px solid #3358b8; color: #7090FF; }
+        .skin-tier-badge.epic      { background: rgba(147,112,219,.15); border: 1px solid #6a40bb; color: #b080f0; }
+        .skin-tier-badge.legendary { background: rgba(255,215,0,.12);   border: 1px solid #aa8800; color: #FFD700; }
+        .skin-tier-badge.limited   { background: rgba(255,105,180,.15); border: 1px solid #cc3377; color: #FF80C0; }
+
+        /* ability line — push ke paling bawah card */
+        .skin-ability-line {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(3px, .65vw, 4.5px);
+            color: #00cc66;
+            letter-spacing: .4px;
+            margin-top: auto;
+            padding-top: 6px;
+            border-top: 1px solid rgba(0,204,102,.15);
+            width: 100%;
+        }
+
+        /* lock icon overlay */
+        .skin-lock-icon {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -65%);
+            font-size: 18px;
+            pointer-events: none;
+            opacity: .55;
+        }
+        /* Lock overlay icon */
+        .skin-lock-icon {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-60%);
+            font-size: 20px;
+            pointer-events: none;
+            opacity: .6;
+        }
+        /* Owned count chip */
+        .skin-owned-chip {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(4px, .8vw, 5px);
+            color: #00ff88;
+            background: rgba(0,255,136,.1);
+            border: 1px solid rgba(0,255,136,.25);
+            padding: 2px 8px;
+            margin: 0 14px 4px;
+            display: inline-block;
         }
         .skin-ability {
             font-size: clamp(6px, 1.5vw, 8px);
@@ -1292,17 +1447,7 @@
             line-height: 1.4;
         }
         .section-divider {
-            color: #00ff88;
-            font-size: clamp(14px, 3.5vw, 18px);
-            margin: clamp(15px, 3vh, 20px) 0 clamp(8px, 2vh, 10px) 0;
-            font-weight: bold;
-            text-align: left;
-            width: 90%;
-            max-width: 600px;
-            border-bottom: 3px solid #00ff88;
-            padding-bottom: 8px;
-            font-family: 'Press Start 2P', monospace;
-            text-shadow: 2px 2px 0 #006644;
+            display: none; /* replaced by skin-section-header */
         }
 /* === SETTINGS MENU STYLES === */
 #settings {
@@ -3402,26 +3547,116 @@
     </div>
 
     <div id="skinSelector" class="screen">
-        <button class="close-btn" onclick="showMenu()">×</button>
-        
-        <div style="width: 100%; padding: clamp(70px, 15vh, 90px) 0 20px 0; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
-            <div class="page-title">SKINS</div>
-            <div class="section-divider">DEFAULT SKINS</div>
-            <div class="skin-grid" id="defaultSkinGrid"></div>
-            <div class="section-divider">MESIR SKINS</div>
-            <div class="skin-grid" id="egyptSkinGrid"></div>
-            <div class="section-divider">SIANG SKINS</div>
-            <div class="skin-grid" id="daySkinGrid"></div>
-            <div class="section-divider">MALAM SKINS</div>
-            <div class="skin-grid" id="nightSkinGrid"></div>
-            <div class="section-divider">SALJU SKINS</div>
-            <div class="skin-grid" id="snowSkinGrid"></div>
-<div class="section-divider">🏖️ PANTAI SKINS</div>
-<div class="skin-grid" id="oceanSkinGrid"></div>
-<div class="section-divider">🌸 SAKURA SKINS</div>
-<div class="skin-grid" id="sakuraSkinGrid"></div>
-<div class="section-divider">💕 VALENTINE SKINS (LIMITED)</div>
-<div class="skin-grid" id="valentineSkinGrid"></div>
+        <button class="close-btn" onclick="showMenu()" style="z-index:10;">×</button>
+
+        <div style="width:100%;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;padding-bottom:30px;">
+          <div class="skin-selector-inner">
+
+            <!-- Title + equipped info -->
+            <div style="padding:0 14px;margin-bottom:14px;">
+              <div class="page-title" style="text-align:left;font-size:clamp(12px,3vw,18px);margin:0 0 6px;">
+                🎨 SKINS
+              </div>
+              <div id="equippedSkinLabel" style="font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.1vw,7px);color:#555;">
+                Equipped: —
+              </div>
+            </div>
+
+            <!-- Filter tabs -->
+            <div class="skin-filter-tabs" id="skinFilterTabs">
+              <button class="skin-filter-tab active" onclick="filterSkins('all')" id="stab-all">ALL</button>
+              <button class="skin-filter-tab" onclick="filterSkins('default')" id="stab-default">DEFAULT</button>
+              <button class="skin-filter-tab" onclick="filterSkins('egypt')" id="stab-egypt">🏺 MESIR</button>
+              <button class="skin-filter-tab" onclick="filterSkins('day')" id="stab-day">☀️ SIANG</button>
+              <button class="skin-filter-tab" onclick="filterSkins('night')" id="stab-night">🌙 MALAM</button>
+              <button class="skin-filter-tab" onclick="filterSkins('ocean')" id="stab-ocean">🏖️ PANTAI</button>
+              <button class="skin-filter-tab" onclick="filterSkins('sakura')" id="stab-sakura">🌸 SAKURA</button>
+              <button class="skin-filter-tab" id="stab-snow" onclick="filterSkins('snow')" style="display:none;">❄️ SALJU</button>
+              <button class="skin-filter-tab" id="stab-valentine" onclick="filterSkins('valentine')" style="display:none;">💕 VALENTINE</button>
+            </div>
+
+            <!-- DEFAULT -->
+            <div class="skin-section" id="ssec-default">
+              <div class="skin-section-header">
+                <span class="skin-section-title">DEFAULT</span>
+                <div class="skin-section-line"></div>
+              </div>
+              <div class="skin-grid" id="defaultSkinGrid"></div>
+            </div>
+
+            <!-- MESIR -->
+            <div class="skin-section" id="ssec-egypt">
+              <div class="skin-section-header">
+                <span class="skin-section-title">🏺 MESIR</span>
+                <div class="skin-section-line"></div>
+                <span id="egyptOwnedChip" class="skin-owned-chip"></span>
+              </div>
+              <div class="skin-grid" id="egyptSkinGrid"></div>
+            </div>
+
+            <!-- SIANG -->
+            <div class="skin-section" id="ssec-day">
+              <div class="skin-section-header">
+                <span class="skin-section-title">☀️ SIANG</span>
+                <div class="skin-section-line"></div>
+                <span id="dayOwnedChip" class="skin-owned-chip"></span>
+              </div>
+              <div class="skin-grid" id="daySkinGrid"></div>
+            </div>
+
+            <!-- MALAM -->
+            <div class="skin-section" id="ssec-night">
+              <div class="skin-section-header">
+                <span class="skin-section-title">🌙 MALAM</span>
+                <div class="skin-section-line"></div>
+                <span id="nightOwnedChip" class="skin-owned-chip"></span>
+              </div>
+              <div class="skin-grid" id="nightSkinGrid"></div>
+            </div>
+
+            <!-- SALJU (LIMITED - hidden if no skins) -->
+            <div class="skin-section" id="ssec-snow" style="display:none;">
+              <div class="skin-section-header" id="snowSkinSection">
+                <span class="skin-section-title">❄️ SALJU</span>
+                <span class="skin-section-badge badge-limited">LIMITED</span>
+                <div class="skin-section-line"></div>
+                <span id="snowOwnedChip" class="skin-owned-chip"></span>
+              </div>
+              <div class="skin-grid" id="snowSkinGrid"></div>
+            </div>
+
+            <!-- PANTAI -->
+            <div class="skin-section" id="ssec-ocean">
+              <div class="skin-section-header">
+                <span class="skin-section-title">🏖️ PANTAI</span>
+                <div class="skin-section-line"></div>
+                <span id="oceanOwnedChip" class="skin-owned-chip"></span>
+              </div>
+              <div class="skin-grid" id="oceanSkinGrid"></div>
+            </div>
+
+            <!-- SAKURA -->
+            <div class="skin-section" id="ssec-sakura">
+              <div class="skin-section-header">
+                <span class="skin-section-title">🌸 SAKURA</span>
+                <div class="skin-section-line"></div>
+                <span id="sakuraOwnedChip" class="skin-owned-chip"></span>
+              </div>
+              <div class="skin-grid" id="sakuraSkinGrid"></div>
+            </div>
+
+            <!-- VALENTINE (LIMITED - hidden if no skins) -->
+            <div class="skin-section" id="ssec-valentine" style="display:none;">
+              <div class="skin-section-header" id="valentineSkinSection">
+                <span class="skin-section-title">💕 VALENTINE</span>
+                <span class="skin-section-badge badge-limited">LIMITED</span>
+                <div class="skin-section-line"></div>
+                <span id="valentineOwnedChip" class="skin-owned-chip"></span>
+              </div>
+              <div class="skin-grid" id="valentineSkinGrid"></div>
+            </div>
+
+          </div>
         </div>
     </div>
 
@@ -4045,7 +4280,7 @@ function authHeaders() {
 }
 
 // ---- Auth UI helpers ----
-function switchAuthTab(tab) {
+function switchAuthTab(tab) { playSound('tab');
   const isLogin = tab === 'login';
   document.getElementById('loginForm').style.display    = isLogin ? '' : 'none';
   document.getElementById('registerForm').style.display = isLogin ? 'none' : '';
@@ -4075,8 +4310,9 @@ async function doLogin() {
       body: JSON.stringify({ username, password })
     });
     const data = await res.json();
-    if (!res.ok) { err.textContent = data.error || 'Login gagal'; err.style.display='block'; setAuthLoading(false); return; }
+    if (!res.ok) { playSound('error'); err.textContent = data.error || 'Login gagal'; err.style.display='block'; setAuthLoading(false); return; }
     setAuth(data.token, data.player_id);
+    playSound('login');
     await onAuthSuccess(data.username, data.saveData);
   } catch(e) { err.textContent='Tidak bisa terhubung ke server'; err.style.display='block'; setAuthLoading(false); }
 }
@@ -4099,7 +4335,8 @@ async function doRegister() {
       body: JSON.stringify({ username, password })
     });
     const data = await res.json();
-    if (!res.ok) { err.textContent = data.error || 'Registrasi gagal'; err.style.display='block'; setAuthLoading(false); return; }
+    if (!res.ok) { playSound('error'); err.textContent = data.error || 'Registrasi gagal'; err.style.display='block'; setAuthLoading(false); return; }
+    playSound('register');
     setAuth(data.token, data.player_id);
     await onAuthSuccess(data.username, {});
   } catch(e) { err.textContent='Tidak bisa terhubung ke server'; err.style.display='block'; setAuthLoading(false); }
@@ -4118,31 +4355,140 @@ async function onAuthSuccess(username, serverSaveData) {
   setAuthLoading(false);
   document.getElementById('authScreen').classList.remove('active');
   startLoadingAndGame();
+  // Update admin button visibility setelah login
+  setTimeout(() => checkShowAdminBtn(), 100);
+}
+
+// ============================================================
+// OFFLINE / GUEST MODE — STRICT DETECTION
+// ============================================================
+// isGuestMode = true hanya jika:
+//   1. Tidak ada server.js (bukan Railway deploy) — cek via /api/health
+//   2. DAN tidak ada token tersimpan
+// Jika ada token tapi server mati sementara → JANGAN beri guest mode, minta retry
+let isGuestMode = false;
+let serverReachable = null; // null=unknown, true=ok, false=down
+
+async function checkServerReachable() {
+  try {
+    const res = await fetch(`${SERVER_URL}/api/health`, { 
+      signal: AbortSignal.timeout(4000) // timeout 4 detik
+    });
+    const data = await res.json();
+    serverReachable = res.ok && data.status === 'ok';
+  } catch(e) {
+    serverReachable = false;
+  }
+  return serverReachable;
 }
 
 // Cek token tersimpan saat halaman dibuka
 async function tryAutoLogin() {
   const token = getAuthToken();
+  
+  // Cek server dulu
+  await checkServerReachable();
+  
+  if (!serverReachable) {
+    // Server tidak bisa dijangkau
+    if (token) {
+      // Ada token tapi server mati — JANGAN masuk guest, tampilkan error + retry
+      showServerDownScreen();
+      return;
+    } else {
+      // Tidak ada token DAN tidak ada server — boleh guest
+      enterGuestMode();
+      return;
+    }
+  }
+  
+  // Server online
   if (!token) { showAuthScreen(); return; }
+  
   try {
-    const res = await fetch(`${SERVER_URL}/api/auth/me`, { headers: authHeaders() });
+    const res = await fetch(`${SERVER_URL}/api/auth/me`, { 
+      headers: authHeaders(),
+      signal: AbortSignal.timeout(5000)
+    });
     if (!res.ok) { clearAuth(); showAuthScreen(); return; }
     const data = await res.json();
     await onAuthSuccess(data.username, data.saveData);
-  } catch(e) { 
-    // Offline mode — pakai data lokal
-    const savedLocal = localStorage.getItem('bl0ckRunData');
-    if (savedLocal) {
-      try { playerData = { ...playerData, ...JSON.parse(savedLocal) }; fixPlayerDataCompat(); } catch(e2){}
-    }
-    const name = playerData.name || '';
-    if (name) {
-      document.getElementById('authScreen').classList.remove('active');
-      startLoadingAndGame();
-    } else {
-      showAuthScreen();
-    }
+  } catch(e) {
+    // Token check gagal padahal server reachable — token invalid
+    clearAuth();
+    showAuthScreen();
   }
+}
+
+function showServerDownScreen() {
+  // Tampilkan pesan server down + tombol retry
+  const authScreen = document.getElementById('authScreen');
+  authScreen.classList.add('active');
+  const box = authScreen.querySelector('.name-box');
+  if (box) {
+    box.innerHTML = `
+      <span class="name-pixel-icon">⚠️</span>
+      <div class="name-title" style="color:#ff6b6b;">SERVER DOWN</div>
+      <div class="name-sub" style="color:#ff9999;">
+        Kamu punya akun terdaftar.<br>
+        Tidak bisa masuk sebagai guest<br>
+        untuk melindungi datamu.<br><br>
+        Coba lagi saat koneksi stabil.
+      </div>
+      <button class="name-submit" onclick="location.reload()" style="margin-bottom:10px;">
+        🔄 COBA LAGI
+      </button>
+    `;
+  }
+}
+
+function enterGuestMode() {
+  isGuestMode = true;
+  // Reset ke data kosong
+  playerData = {
+    name: 'Rex',
+    coins: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScores: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScoresRun: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScoresJump: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    totalCoins:0, totalJumpScore:0,
+    unlockedModes:['egypt','snow','ocean','sakura','ramadan'],
+    skins:{default:['white','blue','red','pink'],egypt:[],day:[],night:[],snow:[],ocean:[],sakura:[],valentine:[],ramadan:[]},
+    equippedSkin:'white',
+    dailyMissions:{lastReset:null,missions:[],claimedToday:[]},
+    achievements:{},
+    dailyCheckin:{lastCheckin:null,streak:0,checkedDays:[]}
+  };
+  // Tampilkan auth screen tapi dengan info guest
+  const authScreen = document.getElementById('authScreen');
+  authScreen.classList.add('active');
+  const box = authScreen.querySelector('.name-box');
+  if (box) {
+    box.innerHTML = `
+      <span class="name-pixel-icon">🎮</span>
+      <div class="name-title">OFFLINE MODE</div>
+      <div class="name-sub">
+        Server tidak tersedia.<br>
+        Main sebagai Rex (offline) — data tersimpan lokal.<br>
+        Admin panel tersedia.
+      </div>
+      <button class="name-submit" onclick="startAsGuest()">
+        MAIN OFFLINE →
+      </button>
+      <div style="margin-top:10px;">
+        <button class="name-submit" onclick="location.reload()" style="background:#333;color:#00ff88;border-color:#00ff88;box-shadow:3px 3px 0 #005533;">
+          🔄 COBA LOGIN
+        </button>
+      </div>
+    `;
+  }
+}
+
+function startAsGuest() {
+  document.getElementById('authScreen').classList.remove('active');
+  // Aktifkan admin panel untuk guest (offline testing)
+  localStorage.setItem('adminUnlocked', 'true');
+  startLoadingAndGame();
 }
 
 function showAuthScreen() {
@@ -4369,64 +4715,204 @@ function initAudio() {
     }
 }
 
+// ── helper: buat oscillator + gain, auto-connect ──
+function _osc(type, freq, gainVal, duration, freqEnd) {
+    if (!audioEnabled || !audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, audioCtx.currentTime + duration);
+    o.start(audioCtx.currentTime);
+    o.stop(audioCtx.currentTime + duration);
+}
+// buat dua osc bersamaan (chord/harmony)
+function _osc2(t1,f1, t2,f2, gain, dur) {
+    _osc(t1,f1,gain,dur); _osc(t2,f2,gain*0.6,dur);
+}
+
 function playSound(type) {
     if (!audioEnabled || !audioCtx) return;
-    
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    
+    const t = audioCtx.currentTime;
+
     switch(type) {
-        case 'jump':
-            oscillator.frequency.value = 500;
-            oscillator.type = 'square';
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 0.1);
+
+        // ── NAVIGASI / UI ──
+        case 'click':
+            // klik tombol biasa — pop pendek
+            _osc('sine', 440, 0.18, 0.08, 520);
             break;
-            
-        case 'coin':
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 0.15);
+
+        case 'click_back':
+            // tombol kembali / close — lebih rendah
+            _osc('sine', 320, 0.15, 0.08, 260);
             break;
-            
-        case 'hit':
-            oscillator.frequency.value = 150;
-            oscillator.type = 'sawtooth';
-            gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 0.3);
+
+        case 'tab':
+            // ganti tab / filter
+            _osc('triangle', 600, 0.12, 0.07, 650);
             break;
-            
+
+        case 'open':
+            // buka menu / screen baru
+            _osc2('sine',400, 'sine',600, 0.18, 0.15);
+            break;
+
+        case 'equip':
+            // equip skin — satisfying "click-lock"
+            _osc('square', 300, 0.15, 0.05);
+            setTimeout(() => _osc('sine', 880, 0.20, 0.12), 55);
+            break;
+
+        case 'toggle_on':
+            _osc('sine', 660, 0.15, 0.1, 880);
+            break;
+
+        case 'toggle_off':
+            _osc('sine', 660, 0.15, 0.1, 440);
+            break;
+
+        // ── GACHA ──
+        case 'gacha_spin':
+            // roll — banyak nada cepat seperti slot
+            [0,60,120,180,240].forEach((delay, i) => {
+                const freq = 300 + i * 120;
+                setTimeout(() => _osc('square', freq, 0.10, 0.07), delay);
+            });
+            break;
+
+        case 'gacha_common':
+            _osc('sine', 523, 0.22, 0.25, 659);
+            break;
+
+        case 'gacha_rare':
+            // 3 nada naik
+            _osc('sine', 523, 0.22, 0.15);
+            setTimeout(() => _osc('sine', 659, 0.22, 0.15), 150);
+            setTimeout(() => _osc('sine', 784, 0.25, 0.25), 300);
+            break;
+
+        case 'gacha_epic':
+            // fanfare kecil
+            _osc('square', 523, 0.18, 0.12);
+            setTimeout(() => _osc('square', 659, 0.18, 0.12), 120);
+            setTimeout(() => _osc('square', 784, 0.18, 0.12), 240);
+            setTimeout(() => _osc2('sine',1047,'sine',1319, 0.22, 0.35), 360);
+            break;
+
+        case 'gacha_legendary':
+            // dramatic — nada rendah kemudian tinggi bersinar
+            _osc('sawtooth', 110, 0.20, 0.25);
+            setTimeout(() => _osc('square', 220, 0.18, 0.20), 200);
+            setTimeout(() => _osc2('sine',880,'sine',1108, 0.25, 0.5), 420);
+            setTimeout(() => _osc('sine', 1760, 0.20, 0.4), 700);
+            break;
+
+        case 'gacha_limited':
+            // pink sparkle
+            _osc('sine', 880, 0.15, 0.1);
+            setTimeout(() => _osc('sine', 1108, 0.18, 0.12), 80);
+            setTimeout(() => _osc('sine', 1320, 0.20, 0.15), 160);
+            setTimeout(() => _osc2('sine',1760,'sine',2093, 0.22, 0.4), 280);
+            break;
+
+        case 'gacha_duplicate':
+            // dapet duplikat — lemah turun
+            _osc('triangle', 440, 0.15, 0.1, 330);
+            setTimeout(() => _osc('triangle', 330, 0.10, 0.15, 220), 100);
+            break;
+
+        // ── SCORE / MILESTONE ──
+        case 'score_100':
+            _osc('triangle', 523, 0.20, 0.12);
+            setTimeout(() => _osc('triangle', 784, 0.22, 0.20), 130);
+            break;
+
+        case 'score_500':
+            _osc('sine', 523, 0.20, 0.1);
+            setTimeout(() => _osc('sine', 659, 0.20, 0.1), 110);
+            setTimeout(() => _osc('sine', 784, 0.20, 0.1), 220);
+            setTimeout(() => _osc2('sine',1047,'sine',1319, 0.25, 0.35), 330);
+            break;
+
+        case 'score_1000':
+            // milestone besar — fanfare
+            _osc('square', 392, 0.18, 0.12);
+            setTimeout(() => _osc('square', 523, 0.18, 0.12), 120);
+            setTimeout(() => _osc('square', 659, 0.18, 0.12), 240);
+            setTimeout(() => _osc('square', 784, 0.18, 0.12), 360);
+            setTimeout(() => _osc2('sine',1047,'sine',1319, 0.25, 0.5), 480);
+            break;
+
         case 'milestone':
-            // Suara khusus setiap 100 score
-            oscillator.frequency.value = 600;
-            oscillator.type = 'triangle';
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            
-            // Nada naik
-            oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.2);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 0.3);
+            // default milestone (100)
+            _osc('triangle', 600, 0.22, 0.1);
+            setTimeout(() => _osc('triangle', 900, 0.22, 0.22), 120);
             break;
-            
+
+        // ── GAMEPLAY ──
+        case 'jump':
+            _osc('square', 440, 0.22, 0.05);
+            setTimeout(() => _osc('square', 600, 0.18, 0.08), 45);
+            break;
+
+        case 'coin':
+            _osc('sine', 880, 0.20, 0.08);
+            setTimeout(() => _osc('sine', 1108, 0.18, 0.10), 60);
+            break;
+
+        case 'hit':
+            _osc('sawtooth', 120, 0.35, 0.08);
+            setTimeout(() => _osc('sawtooth', 80, 0.25, 0.20), 60);
+            break;
+
         case 'ability':
-            oscillator.frequency.value = 400;
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 0.2);
+            _osc('sine', 660, 0.22, 0.08);
+            setTimeout(() => _osc('sine', 880, 0.20, 0.08), 80);
+            setTimeout(() => _osc('sine', 1108, 0.18, 0.18), 160);
+            break;
+
+        case 'ability_ready':
+            _osc('sine', 880, 0.15, 0.07);
+            setTimeout(() => _osc('sine', 1108, 0.18, 0.10), 70);
+            break;
+
+        // ── AUTH / SISTEM ──
+        case 'login':
+            _osc2('sine',523,'sine',659, 0.18, 0.15);
+            setTimeout(() => _osc('sine', 784, 0.20, 0.25), 160);
+            break;
+
+        case 'register':
+            _osc('sine', 523, 0.15, 0.1);
+            setTimeout(() => _osc('sine', 659, 0.15, 0.1), 100);
+            setTimeout(() => _osc('sine', 784, 0.15, 0.1), 200);
+            setTimeout(() => _osc('sine', 1047, 0.20, 0.3), 300);
+            break;
+
+        case 'error':
+            _osc('sawtooth', 220, 0.20, 0.08);
+            setTimeout(() => _osc('sawtooth', 180, 0.18, 0.15), 90);
+            break;
+
+        case 'redeem':
+            _osc('sine', 659, 0.18, 0.1);
+            setTimeout(() => _osc('sine', 880, 0.20, 0.15), 110);
+            setTimeout(() => _osc('sine', 1047, 0.22, 0.25), 230);
+            break;
+
+        case 'checkin':
+            _osc('sine', 523, 0.15, 0.08);
+            setTimeout(() => _osc('sine', 784, 0.18, 0.12), 100);
+            setTimeout(() => _osc2('sine',1047,'sine',1319, 0.22, 0.3), 230);
+            break;
+
+        case 'unlock':
+            _osc('sine', 440, 0.18, 0.1);
+            setTimeout(() => _osc('sine', 660, 0.20, 0.12), 110);
+            setTimeout(() => _osc('sine', 880, 0.22, 0.25), 240);
             break;
     }
 }
@@ -4438,8 +4924,25 @@ function vibrate(pattern) {
     }
 }
 
+// Global click sound untuk semua tombol yang belum punya sound khusus
+document.addEventListener('click', function(e) {
+    if (!audioEnabled || !audioCtx) return;
+    const btn = e.target.closest('button, .btn, .gacha-btn, .mode-card, .close-btn, .settings-icon, .mission-icon, .stats-icon, .skin-filter-tab, .mission-tab, .quality-option');
+    if (!btn) return;
+    // Skip jika fungsi onclick sudah memanggil playSound
+    const skipIds = ['audioToggle','tabLoginBtn','tabRegisterBtn'];
+    if (skipIds.includes(btn.id)) return;
+    // Skip gacha-btn karena sudah ada gacha_spin
+    if (btn.classList.contains('gacha-btn')) { playSound('click'); return; }
+    // close-btn = back
+    if (btn.classList.contains('close-btn')) return; // showMenu sudah handle
+    // Default click
+    playSound('click');
+}, true);
+
 function toggleAudio() {
     audioEnabled = !audioEnabled;
+    if (audioEnabled) { initAudio(); setTimeout(() => playSound('toggle_on'), 50); }
     const toggle = document.getElementById('audioToggle');
     
     if (audioEnabled) {
@@ -5281,7 +5784,7 @@ function claimMissionReward(missionId) {
     alert(`🎉 REWARD CLAIMED!\n\n+${mission.reward} ${mission.mode.toUpperCase()} COINS`);
 }
 
-function showDailyMission() {
+function showDailyMission() { playSound('open');
     checkMissionReset();
     checkDailyCheckin();
     renderMissionList();
@@ -5376,7 +5879,7 @@ const ACHIEVEMENT_LIST = [
     }
 ];
 
-function switchMissionTab(tab) {
+function switchMissionTab(tab) { playSound('tab');
     // Update tab buttons
     document.querySelectorAll('.mission-tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
@@ -5885,7 +6388,7 @@ updateMissionNotification();
             if (coinViewer) coinViewer.style.display = display;
         }
 
-        function showMenu() {
+        function showMenu() { playSound('click_back');
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('menu').classList.add('active');
             gameRunning = false;
@@ -6039,14 +6542,14 @@ if (!playerData.unlockedModes.includes('ocean')) {
 }
         }
 
-        function showShop() {
+        function showShop() { playSound('open');
             updateCoinDisplays();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('shop').classList.add('active');
             setMenuIconsVisibility(false);
         }
 
-        function showSkins() {
+        function showSkins() { playSound('open');
             updateCoinDisplays();
             renderSkinGrids();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -6055,6 +6558,7 @@ if (!playerData.unlockedModes.includes('ocean')) {
         }
 
         function showSettings() {
+    playSound('open');
     setMenuIconsVisibility(false);
     updateStatsDisplay();
     
@@ -6120,17 +6624,19 @@ async function doChangePassword() {
         });
         const data = await res.json();
         if (!res.ok) { msg.textContent = data.error || 'Gagal ganti password'; msg.style.color='#ff6b6b'; }
-        else { msg.textContent = '✓ Password berhasil diganti!'; msg.style.color='#00ff88'; ['cpOld','cpNew','cpNew2'].forEach(id=>{document.getElementById(id).value='';}); }
+        else { playSound('redeem'); msg.textContent = '✓ Password berhasil diganti!'; msg.style.color='#00ff88'; ['cpOld','cpNew','cpNew2'].forEach(id=>{document.getElementById(id).value='';}); }
     } catch(e) { msg.textContent='Tidak bisa terhubung ke server'; msg.style.color='#ff6b6b'; }
 }
 
 function confirmLogout() {
+    playSound('click');
     if (confirm('Yakin mau logout? Semua data sudah tersimpan di server.')) {
         doLogout();
     }
 }
 
         function showStats() {
+            playSound('open');
             updateStatsDisplay();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('statsScreen').classList.add('active');
@@ -6317,13 +6823,29 @@ async function saveName() {
 }
 
 // === REDEEM CODE SYSTEM ===
-const redeemedCodes = JSON.parse(localStorage.getItem('redeemedCodes') || '[]');
+// redeemedCodes disimpan per player_id agar tidak tertukar antar akun
+function getRedeemedCodes() {
+    const pid = getPlayerId() || 'guest';
+    return JSON.parse(localStorage.getItem('redeemedCodes_' + pid) || '[]');
+}
+function saveRedeemedCodes(codes) {
+    const pid = getPlayerId() || 'guest';
+    localStorage.setItem('redeemedCodes_' + pid, JSON.stringify(codes));
+}
+const redeemedCodes = getRedeemedCodes();
 const adminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
 
-// Show admin button if unlocked
-if (adminUnlocked) {
-    document.getElementById('adminPanelBtn').style.display = 'block';
+// Show admin button jika: owner (Rex) ATAU guest mode
+function checkShowAdminBtn() {
+    const isOwner = (playerData.name || '').trim().toLowerCase() === 'rex';
+    const guestMode = typeof isGuestMode !== 'undefined' && isGuestMode;
+    if (isOwner || guestMode) {
+        document.getElementById('adminPanelBtn').style.display = 'block';
+    } else {
+        document.getElementById('adminPanelBtn').style.display = 'none';
+    }
 }
+checkShowAdminBtn();
 
 function redeemCode() {
     const input = document.getElementById('redeemInput');
@@ -6368,7 +6890,7 @@ function redeemCode() {
     } else if (code === 'Admin0209') {
         // Unlock admin panel
         localStorage.setItem('adminUnlocked', 'true');
-        document.getElementById('adminPanelBtn').style.display = 'block';
+        checkShowAdminBtn();
         
         message = '✓ ADMIN PANEL UNLOCKED!';
         success = true;
@@ -6430,7 +6952,7 @@ function redeemCode() {
     if (success) {
         // Save redeemed code
         redeemedCodes.push(code);
-        localStorage.setItem('redeemedCodes', JSON.stringify(redeemedCodes));
+        saveRedeemedCodes(redeemedCodes);
         
         // Save player data
         saveData();
@@ -6439,6 +6961,7 @@ function redeemCode() {
         updateAllCoinDisplays();
         
         // Show success message
+        playSound('redeem');
         showRedeemMessage(message, '#00ff88');
         
         // Clear input
@@ -6466,7 +6989,7 @@ function showRedeemMessage(msg, color) {
 }
 
 // === ADMIN PANEL FUNCTIONS ===
-function showAdminPanel() {
+function showAdminPanel() { playSound('open');
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('adminPanel').classList.add('active');
     setMenuIconsVisibility(false);
@@ -6546,7 +7069,7 @@ function setCoins(mode) {
     }, 200);
 }
 
-function unlockAllModes() {
+function unlockAllModes() { playSound('unlock');
     // Unlock all modes
     if (!playerData.unlockedModes.includes('day')) {
         playerData.unlockedModes.push('day');
@@ -6577,7 +7100,7 @@ function unlockAllModes() {
     }, 3000);
 }
 
-function unlockAllSkins() {
+function unlockAllSkins() { playSound('unlock');
     // Unlock semua Egypt skins
     egyptSkins.forEach(skin => {
         if (!playerData.skins.egypt.includes(skin.id)) {
@@ -6612,7 +7135,33 @@ function unlockAllSkins() {
             playerData.skins.ocean.push(skin.id);
         }
     });
-    
+
+    // Unlock semua Sakura skins
+    sakuraSkins.forEach(skin => {
+        if (!playerData.skins.sakura.includes(skin.id)) {
+            playerData.skins.sakura.push(skin.id);
+        }
+    });
+
+    // Unlock semua Ramadan skins
+    if (typeof ramadanSkins !== 'undefined') {
+        ramadanSkins.forEach(skin => {
+            if (!playerData.skins.ramadan.includes(skin.id)) {
+                playerData.skins.ramadan.push(skin.id);
+            }
+        });
+    }
+
+    // Unlock Valentine skins
+    if (typeof valentineSkins !== 'undefined') {
+        if (!playerData.skins.valentine) playerData.skins.valentine = [];
+        valentineSkins.forEach(skin => {
+            if (!playerData.skins.valentine.includes(skin.id)) {
+                playerData.skins.valentine.push(skin.id);
+            }
+        });
+    }
+
     // Save
     saveData();
     
@@ -6764,11 +7313,30 @@ function unlockAllSkins() {
             packOpening.classList.add('active');
             
             // Play sound
-            playSound('coin');
+            playSound('gacha_spin');
         }
 
         function showGachaResult(skins, count) {
     const resultDiv = document.getElementById('gachaResult');
+    // Play sound based on best rarity in this pull
+    const rarityOrder = ['common','rare','epic','legendary','limited'];
+    const bestRarity = skins.reduce((best, s) => {
+        const ri = rarityOrder.indexOf(s.rarity || 'common');
+        const bi = rarityOrder.indexOf(best);
+        return ri > bi ? (s.rarity || 'common') : best;
+    }, 'common');
+    const isDuplicate = skins.every(s => {
+        const pack = s.id.split('_')[0];
+        return playerData.skins[pack] && playerData.skins[pack].filter(id => id === s.id).length > 0;
+    });
+    setTimeout(() => {
+        if (isDuplicate && bestRarity === 'common') playSound('gacha_duplicate');
+        else if (bestRarity === 'limited')   playSound('gacha_limited');
+        else if (bestRarity === 'legendary') playSound('gacha_legendary');
+        else if (bestRarity === 'epic')      playSound('gacha_epic');
+        else if (bestRarity === 'rare')      playSound('gacha_rare');
+        else                                  playSound('gacha_common');
+    }, 100);
     const resultTitle = document.getElementById('resultTitle');
     const singleResult = document.getElementById('singleResult');
     const multiResults = document.getElementById('multiResults');
@@ -6871,752 +7439,466 @@ function renderSkinBlock(blockDiv, skin, isMini) {
             document.getElementById('gachaResult').classList.remove('active');
         }
 
+        // ===== SKIN UI HELPERS =====
+        const RARITY_LABELS = { common:'COMMON', rare:'RARE', epic:'EPIC', legendary:'LEGEND', limited:'LIMITED' };
+        const RARITY_COLORS = { common:'#888', rare:'#4169E1', epic:'#9370DB', legendary:'#FFD700', limited:'#FF69B4' };
+
+        // Draw skin canvas — akurat per skin, statis, no mata
+        function drawSkinCanvas(canvas, skin, owned) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+
+            const P = 5;
+            const x = P, y = P + 4; // +4 beri ruang crown di atas
+            const w = W - P*2, h = H - P*2 - 4;
+
+            if (!owned) {
+                ctx.fillStyle = '#1c1c1c';
+                ctx.fillRect(x, y, w, h);
+                ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, w, h);
+                return;
+            }
+
+            // ── Helper: gradient dari skin.gradient string atau solid color ──
+            function bodyFill() {
+                if (skin.gradient) {
+                    const cols = skin.gradient.match(/#[0-9A-Fa-f]{6}/g);
+                    if (cols && cols.length >= 2) {
+                        const g = ctx.createLinearGradient(x, y, x+w, y+h);
+                        cols.forEach((c,i) => g.addColorStop(i/(cols.length-1), c));
+                        return g;
+                    }
+                }
+                return skin.color || '#888';
+            }
+
+            // ── 1. CAPE / MANTLE (di belakang body) ──
+            if (skin.cape && skin.id === 'egypt_epic') {
+                // Pharaoh cape — coklat trapezoid di kiri
+                ctx.fillStyle = '#654321';
+                ctx.fillRect(x-4, y+3,  4, 5);
+                ctx.fillRect(x-6, y+8,  6, 5);
+                ctx.fillRect(x-8, y+13, 8, 5);
+                ctx.fillRect(x-9, y+18, 9, 6);
+                // trim emas
+                ctx.fillStyle = '#DAA520';
+                ctx.fillRect(x-10, y+18, 1, 6);
+                ctx.fillRect(x-9,  y+24, 9, 1);
+            } else if (skin.cape && skin.id === 'egypt_legendary') {
+                ctx.fillStyle = '#5C3317';
+                ctx.fillRect(x-5, y+2, 5, h-4);
+                ctx.fillStyle = '#DAA520'; ctx.lineWidth = 1;
+                ctx.strokeRect(x-5, y+2, 5, h-4);
+            } else if (skin.cape) {
+                // Ocean epic — wave mantle biru
+                ctx.fillStyle = '#006994';
+                ctx.fillRect(x-4, y+4, 4, h-8);
+            } else if (skin.iceCape) {
+                // Snow — ice cape biru muda
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(x-4, y+3, 5, h-5);
+                ctx.strokeStyle = '#4682B4'; ctx.lineWidth = 1;
+                ctx.strokeRect(x-4, y+3, 5, h-5);
+            } else if (skin.waveMantle) {
+                ctx.fillStyle = '#03045E';
+                ctx.fillRect(x-4, y+4, 5, h-6);
+                ctx.fillStyle = '#0077B6'; ctx.lineWidth = 1;
+                ctx.strokeRect(x-4, y+4, 5, h-6);
+            } else if (skin.haoriMantle) {
+                // Sakura samurai — haori merah
+                ctx.fillStyle = '#8B0000';
+                ctx.fillRect(x-4, y+2, 5, h-2);
+                ctx.fillStyle = '#FFD700'; ctx.lineWidth = 1;
+                ctx.strokeRect(x-4, y+2, 5, h-2);
+                // pattern garis
+                ctx.fillStyle = '#FF0000';
+                for(let i=0; i<h-4; i+=5) ctx.fillRect(x-3, y+3+i, 3, 2);
+            }
+
+            // ── 2. BODY ──
+            ctx.fillStyle = bodyFill();
+            if (skin.valentineHeart) {
+                // Heart shape
+                const cx2 = x+w/2, cy2 = y+h/2;
+                const s = Math.min(w,h)*0.44;
+                ctx.save(); ctx.translate(cx2, cy2);
+                ctx.beginPath();
+                ctx.moveTo(0,-s*0.35);
+                ctx.bezierCurveTo(-s*.5,-s*.9,-s*.85,-s*.75,-s*.85,-s*.33);
+                ctx.bezierCurveTo(-s*.85,0,-s*.5,s*.33,0,s*.75);
+                ctx.bezierCurveTo(s*.5,s*.33,s*.85,0,s*.85,-s*.33);
+                ctx.bezierCurveTo(s*.85,-s*.75,s*.5,-s*.9,0,-s*.35);
+                ctx.closePath(); ctx.fill();
+                // shine
+                const shine = ctx.createRadialGradient(-s*.2,-s*.25,0,-s*.2,-s*.25,s*.5);
+                shine.addColorStop(0,'rgba(255,255,255,.35)'); shine.addColorStop(1,'rgba(255,255,255,0)');
+                ctx.fillStyle=shine; ctx.fill();
+                ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.stroke();
+                ctx.restore();
+            } else {
+                ctx.fillRect(x, y, w, h);
+            }
+
+            // ── 3. GLOW (epic/legendary/limited) ──
+            const glowMap = { epic:'rgba(147,112,219,.6)', legendary:'rgba(255,215,0,.65)', limited:'rgba(255,105,180,.6)' };
+            if (glowMap[skin.rarity] && !skin.valentineHeart) {
+                ctx.shadowColor = glowMap[skin.rarity]; ctx.shadowBlur = 10;
+                ctx.fillStyle = bodyFill(); ctx.fillRect(x,y,w,h);
+                ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+            }
+
+            // ── 4. PIXEL SHADING (persis gameplay) ──
+            if (!skin.valentineHeart) {
+                ctx.fillStyle = 'rgba(0,0,0,.28)';
+                ctx.fillRect(x+w-3, y+3,   3, h-3);
+                ctx.fillRect(x+3,   y+h-3, w-3, 3);
+                ctx.fillStyle = 'rgba(255,255,255,.20)';
+                ctx.fillRect(x,   y, w-3, 3);
+                ctx.fillRect(x,   y, 3,   h-3);
+            }
+
+            // ── 5. DETAIL KHUSUS PER SKIN ──
+
+            // Kunoichi — ninja mask hijau tua di bagian atas
+            if (skin.ninjaMask) {
+                ctx.fillStyle = '#0a1a0a';
+                ctx.fillRect(x+2, y+2, w-4, Math.floor(h*0.35));
+                ctx.fillStyle = '#1a3a1a';
+                ctx.fillRect(x+2, y+Math.floor(h*0.3), w-4, 4);
+                // mata celah (bukan mata, hanya celah sempit)
+                ctx.fillStyle = '#00ff44';
+                ctx.fillRect(x+4, y+Math.floor(h*0.18), w-8, 3);
+            }
+
+            // Oni Mask — tanduk merah, detail topeng
+            if (skin.oniMask) {
+                // Tanduk kiri
+                ctx.fillStyle = '#8B0000';
+                ctx.fillRect(x+4,  y-6, 4, 7);
+                ctx.fillRect(x+5,  y-9, 2, 3);
+                // Tanduk kanan
+                ctx.fillRect(x+w-8, y-6, 4, 7);
+                ctx.fillRect(x+w-7, y-9, 2, 3);
+                // Gigi putih bawah
+                ctx.fillStyle = '#FFF';
+                ctx.fillRect(x+5,  y+h-5, 4, 5);
+                ctx.fillRect(x+w-9,y+h-5, 4, 5);
+                // Highlight pipi
+                ctx.fillStyle = 'rgba(255,255,255,.2)';
+                ctx.fillRect(x+3, y+Math.floor(h*.4), 5, 5);
+                ctx.fillRect(x+w-8, y+Math.floor(h*.4), 5, 5);
+            }
+
+            // ── 6. OUTLINE HITAM ──
+            if (!skin.valentineHeart) {
+                ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, w, h);
+            }
+
+            // ── 7. CROWN / HEADDRESS (di atas body) ──
+            if (skin.crown) {
+                // Pharaoh crown — 3 puncak emas
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(x+2, y-3, w-4, 3);
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(x+2, y-5, w-4, 2);
+                // 3 puncak
+                ctx.fillRect(x+4,       y-8, 4, 3);
+                ctx.fillRect(x+w/2-2,   y-10, 4, 5);
+                ctx.fillRect(x+w-8,     y-8, 4, 3);
+                // cobra
+                ctx.fillStyle = '#40E0D0';
+                ctx.fillRect(x+w/2-1, y-12, 2, 2);
+                // turquoise accents
+                ctx.fillRect(x+5,   y-4, 2, 2);
+                ctx.fillRect(x+w-7, y-4, 2, 2);
+            } else if (skin.sunCrownAnimated) {
+                // Sun crown — lingkaran + rays emas
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath(); ctx.arc(x+w/2, y-5, 5, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = '#FF8C00'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(x+w/2, y-5, 5, 0, Math.PI*2); ctx.stroke();
+                // rays
+                ctx.fillStyle = '#FFD700';
+                [[-6,-9],[0,-11],[6,-9],[8,-4],[6,0]].forEach(([rx,ry]) => {
+                    ctx.fillRect(x+w/2+rx-1, y+ry-5, 2, 2);
+                });
+            } else if (skin.moonCrownAnimated) {
+                // Moon crown — crescent putih
+                ctx.fillStyle = '#C8C8FF';
+                ctx.beginPath(); ctx.arc(x+w/2, y-5, 5, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#1a1a2e';
+                ctx.beginPath(); ctx.arc(x+w/2+2, y-6, 4, 0, Math.PI*2); ctx.fill();
+                // bintang kecil
+                ctx.fillStyle = '#E0E0FF';
+                ctx.fillRect(x+w/2+5, y-10, 2, 2);
+                ctx.fillRect(x+w/2-6, y-8,  2, 2);
+            } else if (skin.snowflakeCrown) {
+                // Snowflake crown — kristal biru
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(x+w/2-1, y-10, 2, 8);
+                ctx.fillRect(x+w/2-4, y-7,  8, 2);
+                ctx.fillRect(x+w/2-3, y-9,  2, 2);
+                ctx.fillRect(x+w/2+1, y-9,  2, 2);
+                ctx.fillRect(x+w/2-3, y-4,  2, 2);
+                ctx.fillRect(x+w/2+1, y-4,  2, 2);
+                ctx.strokeStyle = '#4682B4'; ctx.lineWidth = 0.5;
+                ctx.strokeRect(x+w/2-1, y-10, 2, 8);
+            } else if (skin.tidalCrown) {
+                // Tidal crown — mahkota emas bergelombang
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(x+2, y-5, w-4, 5);
+                ctx.fillStyle = '#00B4D8';
+                ctx.fillRect(x+4,   y-8, 4, 4);
+                ctx.fillRect(x+w/2-2, y-9, 4, 4);
+                ctx.fillRect(x+w-8,  y-8, 4, 4);
+                ctx.strokeStyle = '#FF8C00'; ctx.lineWidth = 1;
+                ctx.strokeRect(x+2, y-5, w-4, 5);
+            } else if (skin.kabutoCrown) {
+                // Kabuto helmet — hitam + emas
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(x, y-8, w, 8);
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(x, y-9, w, 2);
+                ctx.fillRect(x+w/2-1, y-14, 2, 6);
+                ctx.fillStyle = '#8B0000';
+                ctx.fillRect(x+2, y-7, w-4, 5);
+                ctx.strokeStyle = '#FFD700'; ctx.lineWidth = 1;
+                ctx.strokeRect(x, y-8, w, 8);
+            }
+
+            // ── 8. OUTLINE crown area ──
+            // (crown sudah ada outline sendiri)
+        }
+
+
+        function makeSkinCard(skin, owned, equipped, onEquip) {
+            const rarity = skin.rarity || 'common';
+            const card = document.createElement('div');
+            card.className = 'skin-card ' + rarity
+                + (equipped ? ' equipped' : '')
+                + (!owned  ? ' locked'   : '');
+
+            // 1. Lock overlay (di belakang semua elemen)
+            if (!owned) {
+                const lockEl = document.createElement('div');
+                lockEl.className = 'skin-lock-icon';
+                lockEl.textContent = '🔒';
+                card.appendChild(lockEl);
+            }
+
+            // 2. Preview canvas — selalu ada, ukuran sama
+            const preview = document.createElement('canvas');
+            preview.className = 'skin-preview';
+            preview.width = 52; preview.height = 52;
+            card.appendChild(preview);
+
+            // 3. Nama skin
+            const nameEl = document.createElement('div');
+            nameEl.className = 'skin-name';
+            nameEl.textContent = skin.name;
+            card.appendChild(nameEl);
+
+            // 4. Tier badge — SELALU ada, semua skin
+            const tierEl = document.createElement('span');
+            tierEl.className = 'skin-tier-badge ' + rarity;
+            tierEl.textContent = RARITY_LABELS[rarity] || rarity.toUpperCase();
+            card.appendChild(tierEl);
+
+            // 5. Ability line — hanya jika punya ability (di bawah tier)
+            if (skin.ability) {
+                const abilityEl = document.createElement('div');
+                abilityEl.className = 'skin-ability-line';
+                const abilityName = skin.abilityType
+                    ? skin.abilityType.replace(/_/g,' ').toUpperCase()
+                    : 'ABILITY';
+                abilityEl.textContent = owned
+                    ? '⚡ ' + abilityName
+                    : '🔒 ABILITY';
+                card.appendChild(abilityEl);
+            }
+
+            if (owned) {
+                card.onclick = () => { playSound('equip'); onEquip(); };
+            }
+
+            return { card, preview };
+        }
+
+        function updateOwnedChip(chipId, owned, total) {
+            const chip = document.getElementById(chipId);
+            if (chip) chip.textContent = owned + '/' + total + ' OWNED';
+        }
+
+        function updateEquippedLabel() {
+            const el = document.getElementById('equippedSkinLabel');
+            if (!el) return;
+            const allSkins = [
+                ...defaultSkins,
+                ...egyptSkins, ...daySkins, ...nightSkins, ...snowSkins,
+                ...oceanSkins, ...sakuraSkins, ...valentineSkins,
+                ...(typeof ramadanSkins !== 'undefined' ? ramadanSkins : [])
+            ];
+            const s = allSkins.find(s => s.id === playerData.equippedSkin);
+            if (s) {
+                const rarity = s.rarity || 'common';
+                el.innerHTML = 'Equipped: <span style="color:' + (RARITY_COLORS[rarity]||'#eee') + ';">' + s.name + '</span>';
+            }
+        }
+
+        // Filter tabs logic
+        let activeSkinFilter = 'all';
+        function filterSkins(filter) {
+            playSound('tab');
+            activeSkinFilter = filter;
+            // Update tab styles
+            document.querySelectorAll('.skin-filter-tab').forEach(t => t.classList.remove('active'));
+            const tab = document.getElementById('stab-' + filter);
+            if (tab) tab.classList.add('active');
+            // Show/hide sections
+            const sections = ['default','egypt','day','night','snow','ocean','sakura','valentine'];
+            sections.forEach(sec => {
+                const el = document.getElementById('ssec-' + sec);
+                if (!el) return;
+                if (filter === 'all') {
+                    // Keep limited hidden if no skins
+                    if (sec === 'snow') {
+                        el.style.display = (playerData.skins.snow && playerData.skins.snow.length > 0) ? '' : 'none';
+                    } else if (sec === 'valentine') {
+                        el.style.display = (playerData.skins.valentine && playerData.skins.valentine.length > 0) ? '' : 'none';
+                    } else {
+                        el.style.display = '';
+                    }
+                } else {
+                    el.style.display = (sec === filter) ? '' : 'none';
+                }
+            });
+        }
+
         function renderSkinGrids() {
+            updateEquippedLabel();
+            filterSkins(activeSkinFilter);
+
+            // ---- DEFAULT ----
             const defaultGrid = document.getElementById('defaultSkinGrid');
             defaultGrid.innerHTML = '';
-            
             defaultSkins.forEach(skin => {
-                const owned = playerData.skins.default.includes(skin.id);
+                const owned = true; // default skins always owned
                 const equipped = playerData.equippedSkin === skin.id;
-                
-                const card = document.createElement('div');
-                card.className = 'skin-card' + (equipped ? ' equipped' : '');
-                
-                const preview = document.createElement('canvas');
-                preview.className = 'skin-preview';
-                preview.width = 50;
-                preview.height = 50;
-                const previewCtx = preview.getContext('2d');
-                
-                // Draw skin block
-                previewCtx.fillStyle = skin.color;
-                previewCtx.fillRect(9, 9, 32, 32);
-                previewCtx.strokeStyle = '#000';
-                previewCtx.lineWidth = 2;
-                previewCtx.strokeRect(9, 9, 32, 32);
-                
-                const name = document.createElement('div');
-                name.className = 'skin-name';
-                name.textContent = skin.name;
-                
-                card.appendChild(preview);
-                card.appendChild(name);
-                
-                card.onclick = () => {
-                    playerData.equippedSkin = skin.id;
-                    saveData();
-                    renderSkinGrids();
-                };
-                
+                const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+                    playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
+                });
+                drawSkinCanvas(preview, skin, owned);
                 defaultGrid.appendChild(card);
             });
-            
+
+            // ---- EGYPT ----
             const egyptGrid = document.getElementById('egyptSkinGrid');
             egyptGrid.innerHTML = '';
-            
+            updateOwnedChip('egyptOwnedChip', playerData.skins.egypt.length, egyptSkins.length);
             egyptSkins.forEach(skin => {
                 const owned = playerData.skins.egypt.includes(skin.id);
                 const equipped = playerData.equippedSkin === skin.id;
-                
-                const card = document.createElement('div');
-                card.className = 'skin-card ' + skin.rarity + (equipped ? ' equipped' : '') + (!owned ? ' locked' : '');
-                
-                const preview = document.createElement('canvas');
-                preview.className = 'skin-preview ' + skin.rarity;
-                preview.width = 50;
-                preview.height = 50;
-                const ctx = preview.getContext('2d');
-                
-                if (owned) {
-                    // Draw cape first (behind)
-                    if (skin.cape) {
-                        if (skin.id === 'egypt_epic') {
-                            ctx.fillStyle = 'linear-gradient(90deg, #654321, #8B6914)';
-                            ctx.fillRect(0, 12, 8, 26);
-                            ctx.strokeStyle = '#DAA520';
-                            ctx.lineWidth = 2;
-                            ctx.strokeRect(0, 12, 8, 26);
-                        } else if (skin.id === 'egypt_legendary') {
-                            const grad = ctx.createLinearGradient(0, 12, 8, 38);
-                            grad.addColorStop(0, '#3E2723');
-                            grad.addColorStop(1, '#8B6914');
-                            ctx.fillStyle = grad;
-                            ctx.fillRect(0, 11, 10, 28);
-                            ctx.strokeStyle = '#FFD700';
-                            ctx.lineWidth = 2;
-                            ctx.strokeRect(0, 11, 10, 28);
-                        } else {
-                            ctx.fillStyle = '#8B4513';
-                            ctx.fillRect(2, 13, 6, 25);
-                            ctx.strokeStyle = '#654321';
-                            ctx.lineWidth = 1;
-                            ctx.strokeRect(2, 13, 6, 25);
-                        }
-                    }
-                    
-                    // Draw skin block
-                    if (skin.gradient) {
-                        const grad = ctx.createLinearGradient(9, 9, 41, 41);
-                        const colors = skin.gradient.match(/#[0-9A-F]{6}/gi);
-                        if (colors && colors.length >= 2) {
-                            grad.addColorStop(0, colors[0]);
-                            grad.addColorStop(1, colors[1]);
-                            ctx.fillStyle = grad;
-                        } else {
-                            ctx.fillStyle = skin.color;
-                        }
-                    } else {
-                        ctx.fillStyle = skin.color;
-                    }
-                    ctx.fillRect(9, 9, 32, 32);
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(9, 9, 32, 32);
-                    
-                    // Draw crown on top
-                    if (skin.crown) {
-                        ctx.fillStyle = '#FFD700';
-                        ctx.fillRect(14, 1, 22, 6);
-                        ctx.fillRect(16, -4, 4, 5);
-                        ctx.fillRect(22, -6, 4, 7);
-                        ctx.fillRect(28, -4, 4, 5);
-                        ctx.strokeStyle = '#B8860B';
-                        ctx.lineWidth = 1;
-                        ctx.strokeRect(14, 1, 22, 6);
-                    }
-                } else {
-                    // Locked skin - gray box
-                    ctx.fillStyle = '#999';
-                    ctx.fillRect(9, 9, 32, 32);
-                    ctx.strokeStyle = '#666';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(9, 9, 32, 32);
-                }
-                
-                const name = document.createElement('div');
-                name.className = 'skin-name';
-                name.textContent = owned ? skin.name : '???';
-                
-                card.appendChild(preview);
-                card.appendChild(name);
-                
-                if (skin.ability && owned) {
-                    const ability = document.createElement('div');
-                    ability.className = 'skin-ability';
-                    ability.textContent = '⚡ Tornado Pasir';
-                    card.appendChild(ability);
-                }
-                
-                if (owned) {
-                    card.onclick = () => {
-                        playerData.equippedSkin = skin.id;
-                        saveData();
-                        renderSkinGrids();
-                    };
-                }
-                
+                const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+                    playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
+                });
+                drawSkinCanvas(preview, skin, owned);
                 egyptGrid.appendChild(card);
             });
             
             const dayGrid = document.getElementById('daySkinGrid');
 dayGrid.innerHTML = '';
-
+updateOwnedChip('dayOwnedChip', playerData.skins.day.length, daySkins.length);
 daySkins.forEach(skin => {
     const owned = playerData.skins.day.includes(skin.id);
     const equipped = playerData.equippedSkin === skin.id;
-    
-    const card = document.createElement('div');
-    card.className = 'skin-card ' + skin.rarity + (equipped ? ' equipped' : '') + (!owned ? ' locked' : '');
-    
-    const preview = document.createElement('canvas');
-    preview.className = 'skin-preview ' + skin.rarity;
-    preview.width = 50;
-    preview.height = 50;
-    const ctx = preview.getContext('2d');
-    
-    if (owned) {
-        // Draw skin block with gradient
-        if (skin.color2) {
-            const grad = ctx.createLinearGradient(9, 9, 41, 41);
-            grad.addColorStop(0, skin.color);
-            grad.addColorStop(1, skin.color2);
-            ctx.fillStyle = grad;
-        } else {
-            ctx.fillStyle = skin.color;
-        }
-        
-        // Draw with glow effect for rare+
-        if (skin.glow) {
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
-        }
-        
-        ctx.fillRect(9, 9, 32, 32);
-        ctx.shadowBlur = 0;
-        
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 9, 32, 32);
-        
-        // Draw crown for legendary
-        if (skin.crown && skin.rarity === 'legendary') {
-            const grad = ctx.createLinearGradient(13, 1, 37, 7);
-            grad.addColorStop(0, '#FFA500');
-            grad.addColorStop(0.5, '#FFD700');
-            grad.addColorStop(1, '#FFED4E');
-            ctx.fillStyle = grad;
-            ctx.fillRect(13, 1, 24, 7);
-            
-            // Crown peaks
-            ctx.fillStyle = '#FFD700';
-            ctx.fillRect(15, -3, 4, 4);
-            ctx.fillRect(21, -5, 4, 6);
-            ctx.fillRect(27, -3, 4, 4);
-            
-            ctx.strokeStyle = '#B8860B';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(13, 1, 24, 7);
-        }
-        
-        // Draw sun icon for epic
-        if (skin.rarity === 'epic') {
-            ctx.fillStyle = '#FFA500';
-            ctx.font = 'bold 16px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('☀️', 25, 25);
-        }
-    } else {
-        // Locked skin
-        ctx.fillStyle = '#999';
-        ctx.fillRect(9, 9, 32, 32);
-        ctx.strokeStyle = '#666';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 9, 32, 32);
-    }
-    
-    const name = document.createElement('div');
-    name.className = 'skin-name';
-    name.textContent = owned ? skin.name : '???';
-    
-    card.appendChild(preview);
-    card.appendChild(name);
-    
-    if (skin.ability && owned) {
-        const ability = document.createElement('div');
-        ability.className = 'skin-ability';
-        ability.textContent = '⚡ Solar Blaster';
-        card.appendChild(ability);
-    }
-    
-    if (owned) {
-        card.onclick = () => {
-            playerData.equippedSkin = skin.id;
-            saveData();
-            renderSkinGrids();
-        };
-    }
-    
+    const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+        playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
+    });
+    drawSkinCanvas(preview, skin, owned);
     dayGrid.appendChild(card);
 });
 
 const nightGrid = document.getElementById('nightSkinGrid');
 nightGrid.innerHTML = '';
-
+updateOwnedChip('nightOwnedChip', playerData.skins.night.length, nightSkins.length);
 nightSkins.forEach(skin => {
     const owned = playerData.skins.night.includes(skin.id);
     const equipped = playerData.equippedSkin === skin.id;
-    
-    const card = document.createElement('div');
-    card.className = 'skin-card ' + skin.rarity + (equipped ? ' equipped' : '') + (!owned ? ' locked' : '');
-    
-    const preview = document.createElement('canvas');
-    preview.className = 'skin-preview ' + skin.rarity;
-    preview.width = 50;
-    preview.height = 50;
-    const ctx = preview.getContext('2d');
-    
-    if (owned) {
-        // Draw skin with gradient
-        if (skin.color2) {
-            const grad = ctx.createLinearGradient(9, 9, 41, 41);
-            grad.addColorStop(0, skin.color);
-            grad.addColorStop(1, skin.color2);
-            ctx.fillStyle = grad;
-        } else {
-            ctx.fillStyle = skin.color;
-        }
-        
-        // Glow effect for rare+
-        if (skin.glow) {
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = 'rgba(139, 92, 246, 0.8)';
-        }
-        
-        ctx.fillRect(9, 9, 32, 32);
-        ctx.shadowBlur = 0;
-        
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 9, 32, 32);
-        
-        // Moon icon for epic
-        if (skin.rarity === 'epic') {
-            ctx.fillStyle = '#FFE66D';
-            ctx.font = 'bold 16px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🌙', 25, 25);
-        }
-        
-        // Crown for legendary
-        if (skin.crown && skin.rarity === 'legendary') {
-            ctx.fillStyle = '#8B5CF6';
-            ctx.fillRect(13, 1, 24, 7);
-            
-            ctx.fillStyle = '#C084FC';
-            ctx.fillRect(15, -3, 4, 4);
-            ctx.fillRect(21, -5, 4, 6);
-            ctx.fillRect(27, -3, 4, 4);
-            
-            ctx.strokeStyle = '#6D28D9';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(13, 1, 24, 7);
-        }
-    } else {
-        ctx.fillStyle = '#999';
-        ctx.fillRect(9, 9, 32, 32);
-        ctx.strokeStyle = '#666';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 9, 32, 32);
-    }
-    
-    const name = document.createElement('div');
-    name.className = 'skin-name';
-    name.textContent = owned ? skin.name : '???';
-    
-    card.appendChild(preview);
-    card.appendChild(name);
-    
-    if (skin.ability && owned) {
-        const ability = document.createElement('div');
-        ability.className = 'skin-ability';
-        if (skin.abilityType === 'lunar_shield') {
-            ability.textContent = '⚡ Lunar Shield';
-        } else if (skin.abilityType === 'eclipse_blast') {
-            ability.textContent = '⚡ Eclipse Blast';
-        } else if (skin.abilityType === 'sand_tornado') {
-            ability.textContent = '🌪️ Sand Tornado';
-        }
-        card.appendChild(ability);
-    }
-    
-    if (owned) {
-        card.onclick = () => {
-            playerData.equippedSkin = skin.id;
-            saveData();
-            renderSkinGrids();
-        };
-    }
-    
+    const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+        playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
+    });
+    drawSkinCanvas(preview, skin, owned);
     nightGrid.appendChild(card);
 });
 
 const snowGrid = document.getElementById('snowSkinGrid');
 snowGrid.innerHTML = '';
+const hasSnowSkin = playerData.skins.snow && playerData.skins.snow.length > 0;
+const snowSecWrap = document.getElementById('ssec-snow');
+if (snowSecWrap) snowSecWrap.style.display = hasSnowSkin ? '' : 'none';
+const stabSnow = document.getElementById('stab-snow');
+if (stabSnow) stabSnow.style.display = hasSnowSkin ? '' : 'none';
+updateOwnedChip('snowOwnedChip', playerData.skins.snow.length, snowSkins.length);
+if (hasSnowSkin) {
+    snowSkins.forEach(skin => {
+        const owned = playerData.skins.snow.includes(skin.id);
+        const equipped = playerData.equippedSkin === skin.id;
+        const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+            playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
+        });
+        drawSkinCanvas(preview, skin, owned);
+        snowGrid.appendChild(card);
+    });
+}
 
-snowSkins.forEach(skin => {
-    const owned = playerData.skins.snow.includes(skin.id);
-    const equipped = playerData.equippedSkin === skin.id;
-    
-    const card = document.createElement('div');
-    card.className = 'skin-card ' + skin.rarity + (equipped ? ' equipped' : '') + (!owned ? ' locked' : '');
-    
-    const preview = document.createElement('canvas');
-    preview.className = 'skin-preview ' + skin.rarity;
-    preview.width = 50;
-    preview.height = 50;
-    const ctx = preview.getContext('2d');
-    
-    if (owned) {
-        // Draw skin with gradient
-        if (skin.gradient) {
-            const colors = skin.gradient.match(/#[0-9A-F]{6}/gi);
-            if (colors && colors.length >= 2) {
-                const grad = ctx.createLinearGradient(9, 9, 41, 41);
-                grad.addColorStop(0, colors[0]);
-                grad.addColorStop(1, colors[1]);
-                ctx.fillStyle = grad;
-            } else {
-                ctx.fillStyle = skin.color;
-            }
-        } else {
-            ctx.fillStyle = skin.color;
-        }
-        
-        // Glow effect for ice skins
-        if (skin.glow) {
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = 'rgba(135, 206, 235, 0.8)';
-        }
-        
-        ctx.fillRect(9, 9, 32, 32);
-        ctx.shadowBlur = 0;
-        
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 9, 32, 32);
-        
-        // Snowflake crown for legendary
-        if (skin.snowflakeCrown) {
-            ctx.fillStyle = '#87CEEB';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('❄️', 25, 25);
-        }
-    } else {
-        ctx.fillStyle = '#999';
-        ctx.fillRect(9, 9, 32, 32);
-        ctx.strokeStyle = '#666';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 9, 32, 32);
-    }
-    
-    const name = document.createElement('div');
-    name.className = 'skin-name';
-    name.textContent = owned ? skin.name : '???';
-    
-    card.appendChild(preview);
-    card.appendChild(name);
-    
-    if (owned) {
-        card.onclick = () => {
-            playerData.equippedSkin = skin.id;
-            saveData();
-            renderSkinGrids();
-        };
-    }
-    
-    snowGrid.appendChild(card);
-});
-
-// Ocean Skins Grid
 const oceanSkinGrid = document.getElementById('oceanSkinGrid');
 oceanSkinGrid.innerHTML = '';
-
+updateOwnedChip('oceanOwnedChip', playerData.skins.ocean.length, oceanSkins.length);
 oceanSkins.forEach(skin => {
     const owned = playerData.skins.ocean.includes(skin.id);
     const equipped = playerData.equippedSkin === skin.id;
-    
-    const card = document.createElement('div');
-    card.className = 'skin-card ' + skin.rarity + (equipped ? ' equipped' : '') + (!owned ? ' locked' : '');
-    
-    const preview = document.createElement('canvas');
-    preview.className = 'skin-preview ' + skin.rarity;
-    preview.width = 50;
-    preview.height = 50;
-    const pctx = preview.getContext('2d');
-    
-    if (owned) {
-        if (skin.gradient) {
-            const colors = skin.gradient.match(/#[0-9A-F]{6}/gi);
-            if (colors && colors.length >= 2) {
-                const grad = pctx.createLinearGradient(9, 9, 41, 41);
-                grad.addColorStop(0, colors[0]);
-                grad.addColorStop(1, colors[colors.length-1]);
-                pctx.fillStyle = grad;
-            } else { pctx.fillStyle = skin.color; }
-        } else { pctx.fillStyle = skin.color; }
-        
-        if (skin.glow) {
-            pctx.shadowBlur = 10;
-            pctx.shadowColor = 'rgba(0, 180, 216, 0.8)';
-        }
-        pctx.fillRect(9, 9, 32, 32);
-        pctx.shadowBlur = 0;
-        pctx.strokeStyle = '#000';
-        pctx.lineWidth = 2;
-        pctx.strokeRect(9, 9, 32, 32);
-        
-        if (skin.crown) {
-            pctx.font = '16px Arial';
-            pctx.textAlign = 'center';
-            pctx.fillText('🌊', 25, 28);
-        }
-    } else {
-        pctx.fillStyle = '#999';
-        pctx.fillRect(9, 9, 32, 32);
-        pctx.strokeStyle = '#666';
-        pctx.lineWidth = 2;
-        pctx.strokeRect(9, 9, 32, 32);
-    }
-    
-    const name = document.createElement('div');
-    name.className = 'skin-name';
-    name.textContent = owned ? skin.name : '???';
-    
-    const abil = document.createElement('div');
-    abil.className = 'skin-ability';
-    abil.textContent = skin.rarity.toUpperCase();
-    
-    card.appendChild(preview);
-    card.appendChild(name);
-    card.appendChild(abil);
-    
-    if (owned) {
-        card.onclick = () => {
-            playerData.equippedSkin = skin.id;
-            saveData();
-            renderSkinGrids();
-        };
-    }
+    const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+        playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
+    });
+    drawSkinCanvas(preview, skin, owned);
     oceanSkinGrid.appendChild(card);
 });
 
-// Sakura Skins Grid
 const sakuraSkinGrid = document.getElementById('sakuraSkinGrid');
 sakuraSkinGrid.innerHTML = '';
-
+updateOwnedChip('sakuraOwnedChip', playerData.skins.sakura.length, sakuraSkins.length);
 sakuraSkins.forEach(skin => {
     const owned = (playerData.skins.sakura || []).includes(skin.id);
     const equipped = playerData.equippedSkin === skin.id;
-
-    const card = document.createElement('div');
-    card.className = 'skin-card ' + skin.rarity + (equipped ? ' equipped' : '') + (!owned ? ' locked' : '');
-
-    const preview = document.createElement('canvas');
-    preview.className = 'skin-preview ' + skin.rarity;
-    preview.width = 50;
-    preview.height = 50;
-    const pc = preview.getContext('2d');
-
-    if (owned) {
-        // Draw body gradient
-        const colors = skin.gradient ? skin.gradient.match(/#[0-9A-Fa-f]{6}/g) : null;
-        if (colors && colors.length >= 2) {
-            const g = pc.createLinearGradient(9, 9, 41, 41);
-            colors.forEach((c, i) => g.addColorStop(i / (colors.length - 1), c));
-            pc.fillStyle = g;
-        } else {
-            pc.fillStyle = skin.color;
-        }
-        pc.fillRect(9, 9, 32, 32);
-        pc.strokeStyle = '#000'; pc.lineWidth = 2;
-        pc.strokeRect(9, 9, 32, 32);
-
-        // Eyes
-        if (skin.whiteEyes) {
-            pc.fillStyle = '#FFF'; pc.fillRect(14,20,6,6); pc.fillRect(30,20,6,6);
-            pc.fillStyle = '#000'; pc.fillRect(15,21,4,4); pc.fillRect(31,21,4,4);
-        } else {
-            pc.fillStyle = '#000'; pc.fillRect(14,20,6,6); pc.fillRect(30,20,6,6);
-            pc.fillStyle = '#FFF'; pc.fillRect(15,21,3,3); pc.fillRect(31,21,3,3);
-        }
-
-        // Unique ornament per skin
-        if (skin.id === 'sakura_common') {
-            // Kelopak sakura mengambang di sudut
-            pc.fillStyle = '#FF8FAB';
-            [[6,6],[42,9],[7,40],[41,38]].forEach(([x,y]) => {
-                pc.beginPath(); pc.ellipse(x, y, 4, 2.5, Math.PI/4, 0, Math.PI*2); pc.fill();
-                pc.beginPath(); pc.ellipse(x, y, 2.5, 4, Math.PI/4, 0, Math.PI*2); pc.fill();
-            });
-            pc.fillStyle = '#FFD6E0';
-            [[6,6],[42,9],[7,40],[41,38]].forEach(([x,y]) => {
-                pc.beginPath(); pc.ellipse(x, y, 2, 1.5, Math.PI/4, 0, Math.PI*2); pc.fill();
-            });
-        } else if (skin.id === 'sakura_rare') {
-            // Ninja mask — kain penutup bawah muka + mata hijau
-            pc.fillStyle = '#0a0f0a';
-            pc.fillRect(10, 28, 30, 13);
-            pc.fillStyle = '#1a2a1a';
-            pc.fillRect(10, 30, 30, 2); pc.fillRect(10, 34, 30, 2);
-            pc.fillStyle = '#2d5a2d';
-            pc.fillRect(10, 28, 30, 2);
-            // Tali samping
-            pc.fillStyle = '#0f1f0f';
-            pc.fillRect(7, 28, 4, 7); pc.fillRect(39, 28, 4, 7);
-            // Mata ninja sempit hijau menyala
-            pc.fillStyle = '#000';
-            pc.fillRect(12, 20, 10, 5); pc.fillRect(28, 20, 10, 5);
-            pc.fillStyle = '#00CC44';
-            pc.fillRect(15, 21, 4, 3); pc.fillRect(31, 21, 4, 3);
-            pc.fillStyle = 'rgba(0,200,60,0.3)';
-            pc.fillRect(11, 19, 12, 7); pc.fillRect(27, 19, 12, 7);
-        } else if (skin.id === 'sakura_epic') {
-            // Topeng Oni overlay di muka
-            pc.fillStyle = 'rgba(200,0,0,0.90)';
-            pc.fillRect(11, 14, 28, 18);
-            pc.fillStyle = '#000';
-            pc.fillRect(13,17,8,6); pc.fillRect(29,17,8,6); // eye holes
-            pc.fillStyle = '#FF3300';
-            pc.fillRect(15,18,4,4); pc.fillRect(31,18,4,4); // pupils
-            pc.fillStyle = '#FFF';
-            for (let t=0;t<4;t++) pc.fillRect(14+t*5,28,4,4); // teeth
-            pc.fillStyle = '#AA0000';
-            pc.fillRect(11,27,28,3); // gigi bar
-            // Tanduk
-            pc.fillStyle = '#880000';
-            pc.fillRect(14,9,5,8); pc.fillRect(31,9,5,8);
-            pc.fillRect(12,7,5,5); pc.fillRect(33,7,5,5);
-        } else if (skin.id === 'sakura_legendary') {
-            // Kabuto helm preview
-            const shimmer2 = 0.8;
-            // Helm body
-            pc.fillStyle = '#1a0a0a';
-            pc.fillRect(10, 14, 30, 10); pc.fillRect(12, 12, 26, 4);
-            // Visor merah
-            pc.fillStyle = '#8B0000';
-            pc.fillRect(10, 22, 30, 3);
-            // Kuwagata emas (tanduk)
-            pc.fillStyle = 'rgba(200,160,80,0.9)';
-            pc.fillRect(12, 7, 3, 7); pc.fillRect(10, 5, 3, 5);
-            pc.fillRect(35, 7, 3, 7); pc.fillRect(37, 5, 3, 5);
-            // Maedate sakura tengah
-            pc.fillStyle = 'rgba(200,160,80,0.9)';
-            pc.fillRect(23, 8, 4, 6);
-            pc.fillStyle = '#FFB7C5';
-            pc.fillRect(21, 5, 8, 4); pc.fillRect(18, 7, 5, 4); pc.fillRect(27, 7, 5, 4);
-            pc.fillStyle = 'rgba(255,220,100,0.9)';
-            pc.fillRect(23, 7, 4, 4);
-            // Gold trim
-            pc.fillStyle = 'rgba(200,160,80,0.7)';
-            pc.fillRect(10, 14, 2, 10); pc.fillRect(38, 14, 2, 10);
-        }
-
-        if (skin.ability) {
-            const ab = document.createElement('div');
-            ab.className = 'skin-ability';
-            const labels = { oni_rage: '👹 Rage — 2x Score + Kebal', spirit_veil: '⛩️ Katana Slash' };
-            ab.textContent = labels[skin.abilityType] || '✨ Ability';
-            card.appendChild(ab);
-        }
-    } else {
-        pc.fillStyle = '#333'; pc.fillRect(9,9,32,32);
-        pc.strokeStyle = '#666'; pc.lineWidth = 2; pc.strokeRect(9,9,32,32);
-        pc.fillStyle = '#666'; pc.font = 'bold 20px Arial';
-        pc.textAlign = 'center'; pc.textBaseline = 'middle';
-        pc.fillText('🔒', 25, 25);
-    }
-
-    const name = document.createElement('div');
-    name.className = 'skin-name';
-    name.textContent = owned ? skin.name : '???';
-    card.appendChild(preview);
-    card.appendChild(name);
-
-    if (owned) {
-        card.onclick = () => {
-            playerData.equippedSkin = skin.id;
-            saveData();
-            renderSkinGrids();
-        };
-    }
+    const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+        playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
+    });
+    drawSkinCanvas(preview, skin, owned);
     sakuraSkinGrid.appendChild(card);
 });
 
-// Valentine Skins Grid
 const valentineGrid = document.getElementById('valentineSkinGrid');
 valentineGrid.innerHTML = '';
-
-valentineSkins.forEach(skin => {
-    const owned = playerData.skins.valentine.includes(skin.id);
-    const equipped = playerData.equippedSkin === skin.id;
-    
-    const card = document.createElement('div');
-    card.className = 'skin-card ' + skin.rarity + (equipped ? ' equipped' : '') + (!owned ? ' locked' : '');
-    
-    const preview = document.createElement('canvas');
-    preview.className = 'skin-preview ' + skin.rarity;
-    preview.width = 50;
-    preview.height = 50;
-    const ctx = preview.getContext('2d');
-    
-    if (owned) {
-        // Draw Valentine heart shape (pink)
-        ctx.fillStyle = skin.color;
-        
-        // Draw pixel heart
-        const heartPixels = [
-            [0,1,1,0,1,1,0],
-            [1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1],
-            [0,1,1,1,1,1,0],
-            [0,0,1,1,1,0,0],
-            [0,0,0,1,0,0,0]
-        ];
-        
-        const pixelSize = 5;
-        const offsetX = 12;
-        const offsetY = 15;
-        
-        heartPixels.forEach((row, y) => {
-            row.forEach((pixel, x) => {
-                if (pixel === 1) {
-                    ctx.fillRect(offsetX + x * pixelSize, offsetY + y * pixelSize, pixelSize, pixelSize);
-                }
-            });
+const hasValentineSkin = playerData.skins.valentine && playerData.skins.valentine.length > 0;
+const valSecWrap = document.getElementById('ssec-valentine');
+if (valSecWrap) valSecWrap.style.display = hasValentineSkin ? '' : 'none';
+const stabVal = document.getElementById('stab-valentine');
+if (stabVal) stabVal.style.display = hasValentineSkin ? '' : 'none';
+updateOwnedChip('valentineOwnedChip', playerData.skins.valentine.length, valentineSkins.length);
+if (hasValentineSkin) {
+    valentineSkins.forEach(skin => {
+        const owned = playerData.skins.valentine.includes(skin.id);
+        const equipped = playerData.equippedSkin === skin.id;
+        const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+            playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
         });
-        
-        // Draw eyes (white outer, black inner - smaller)
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(19, 26, 4, 4); // Left eye white
-        ctx.fillRect(27, 26, 4, 4); // Right eye white
-        
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(20, 27, 2, 2); // Left eye black (smaller)
-        ctx.fillRect(28, 27, 2, 2); // Right eye black (smaller)
-        
-        // Border
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        heartPixels.forEach((row, y) => {
-            row.forEach((pixel, x) => {
-                if (pixel === 1) {
-                    ctx.strokeRect(offsetX + x * pixelSize, offsetY + y * pixelSize, pixelSize, pixelSize);
-                }
-            });
-        });
-    } else {
-        // Locked - don't show
-        ctx.fillStyle = '#333';
-        ctx.fillRect(9, 9, 32, 32);
-        ctx.strokeStyle = '#666';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 9, 32, 32);
-        
-        ctx.fillStyle = '#666';
-        ctx.font = 'bold 20px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🔒', 25, 25);
-    }
-    
-    const name = document.createElement('div');
-    name.className = 'skin-name';
-    name.textContent = owned ? skin.name : '???';
-    
-    card.appendChild(preview);
-    card.appendChild(name);
-    
-    if (skin.ability && owned) {
-        const ability = document.createElement('div');
-        ability.className = 'skin-ability';
-        ability.textContent = '💕 Valentine Powers';
-        card.appendChild(ability);
-    }
-    
-    if (owned) {
-        card.onclick = () => {
-            playerData.equippedSkin = skin.id;
-            saveData();
-            renderSkinGrids();
-        };
-    }
-    
-    valentineGrid.appendChild(card);
-});
+        drawSkinCanvas(preview, skin, owned);
+        valentineGrid.appendChild(card);
+    });
+}
 
         }
 
