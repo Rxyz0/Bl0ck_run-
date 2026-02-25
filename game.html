@@ -871,12 +871,13 @@
             margin: 0 auto;
             padding: clamp(60px,12vh,80px) 0 40px;
         }
-        /* Filter tabs */
+
+        /* ── FILTER TABS ── */
         .skin-filter-tabs {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             padding: 0 14px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
@@ -884,113 +885,135 @@
         .skin-filter-tabs::-webkit-scrollbar { display: none; }
         .skin-filter-tab {
             flex-shrink: 0;
-            padding: 6px 12px;
+            padding: 8px 12px;
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(5px, 1.1vw, 7px);
-            border: 2px solid #333;
-            background: #111;
-            color: #555;
+            border: 3px solid #2a2a2a;
+            box-shadow: 3px 3px 0 #000;
+            background: #0d0d0d;
+            color: #444;
             cursor: pointer;
-            transition: .15s;
             white-space: nowrap;
+            letter-spacing: 1px;
+            transition: none;
         }
+        .skin-filter-tab:active { transform: translate(3px,3px); box-shadow: 0px 0px 0 #000; }
         .skin-filter-tab.active {
             border-color: #00ff88;
             color: #00ff88;
-            background: rgba(0,255,136,.08);
-            box-shadow: 0 0 8px rgba(0,255,136,.2);
+            background: #001a0d;
+            box-shadow: 3px 3px 0 #006644;
         }
-        /* Section header */
+
+        /* ── SECTION HEADER ── */
         .skin-section-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0;
             padding: 0 14px;
-            margin: 24px 0 14px;
+            margin: 22px 0 12px;
+            border-left: 4px solid #00ff88;
+            background: #050505;
         }
         .skin-section-title {
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(8px, 1.8vw, 11px);
             color: #00ff88;
-            text-shadow: 0 0 10px rgba(0,255,136,.4);
-            letter-spacing: 1px;
+            text-shadow: 2px 2px 0 #006644;
+            letter-spacing: 2px;
+            padding: 6px 10px;
         }
-        .skin-section-line {
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, #00ff88 0%, transparent 100%);
-            opacity: .3;
-        }
+        .skin-section-line { display: none; }
         .skin-section-badge {
             font-family: 'Press Start 2P', monospace;
-            font-size: clamp(4px, .8vw, 5px);
-            padding: 3px 7px;
-            border-radius: 2px;
+            font-size: clamp(4px, .8vw, 6px);
+            padding: 4px 8px;
             letter-spacing: 1px;
+            border: 3px solid #000;
+            box-shadow: 2px 2px 0 #000;
+            margin-left: 4px;
         }
-        .badge-limited { background: linear-gradient(135deg, #FF6B6B, #FF1493); color: #fff; }
-        .badge-new     { background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; }
-        /* Skin grid */
+        .badge-limited { background: #cc0033; color: #fff; }
+        .badge-new     { background: #00ff88; color: #000; }
+
+        /* ── SKIN GRID ── */
         .skin-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(clamp(80px, 22vw, 105px), 1fr));
-            gap: clamp(8px, 2vw, 12px);
+            gap: clamp(6px, 1.5vw, 10px);
             padding: 0 14px;
             margin-bottom: 8px;
         }
-        /* ===== SKIN CARD — konsisten semua rarity ===== */
+
+        /* ── SKIN CARD — PIXEL TEBAL ── */
         .skin-card {
-            /* layout flex column agar urutan elemen selalu sama */
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #0e0e0e;
-            border: 2px solid #2a2a2a;
+            background: #0a0a0a;
+            border: 4px solid #222;
+            box-shadow: 5px 5px 0 #000;
             padding: 10px 6px 8px;
             cursor: pointer;
-            transition: transform .12s, box-shadow .12s, border-color .12s, background .12s;
             text-align: center;
             position: relative;
             overflow: hidden;
             min-height: clamp(120px, 28vw, 148px);
+            transition: none;
         }
-        /* rarity border colors */
-        .skin-card.common    { border-color: #3a3a3a; }
-        .skin-card.rare      { border-color: #1e3d8a; }
-        .skin-card.epic      { border-color: #4a1a7a; }
-        .skin-card.legendary { border-color: #7a5e0a; background: linear-gradient(180deg,#0e0e0e 55%,#130f00 100%); }
-        .skin-card.limited   { border-color: #7a1a4a; }
-        /* hover glow per rarity */
-        .skin-card.common:hover:not(.locked)    { border-color: #999; box-shadow: 0 0 10px rgba(180,180,180,.2); }
-        .skin-card.rare:hover:not(.locked)      { border-color: #4169E1; box-shadow: 0 0 12px rgba(65,105,225,.35); }
-        .skin-card.epic:hover:not(.locked)      { border-color: #9370DB; box-shadow: 0 0 14px rgba(147,112,219,.4); }
-        .skin-card.legendary:hover:not(.locked) { border-color: #FFD700; box-shadow: 0 0 18px rgba(255,215,0,.45); }
-        .skin-card.limited:hover:not(.locked)   { border-color: #FF69B4; box-shadow: 0 0 14px rgba(255,105,180,.4); }
-        /* equipped */
+
+        /* rarity — border tebal warna jelas */
+        .skin-card.common    { border-color: #555;    box-shadow: 5px 5px 0 #111; }
+        .skin-card.rare      { border-color: #2255dd; box-shadow: 5px 5px 0 #0a1a66; }
+        .skin-card.epic      { border-color: #8833ee; box-shadow: 5px 5px 0 #33007a; }
+        .skin-card.legendary { border-color: #ddaa00; box-shadow: 5px 5px 0 #664400; background: #070500; }
+        .skin-card.limited   { border-color: #ee1166; box-shadow: 5px 5px 0 #660022; }
+
+        /* hover — geser pixel bukan glow */
+        .skin-card:hover:not(.locked) { transform: translate(-3px,-3px); }
+        .skin-card.common:hover:not(.locked)    { border-color: #aaa;    box-shadow: 8px 8px 0 #111; }
+        .skin-card.rare:hover:not(.locked)      { border-color: #4488ff; box-shadow: 8px 8px 0 #0a1a66; }
+        .skin-card.epic:hover:not(.locked)      { border-color: #bb55ff; box-shadow: 8px 8px 0 #33007a; }
+        .skin-card.legendary:hover:not(.locked) { border-color: #ffcc00; box-shadow: 8px 8px 0 #664400; }
+        .skin-card.limited:hover:not(.locked)   { border-color: #ff44aa; box-shadow: 8px 8px 0 #660022; }
+
+        /* klik — press pixel */
+        .skin-card:active:not(.locked) {
+            transform: translate(4px,4px) !important;
+            box-shadow: 1px 1px 0 #000 !important;
+        }
+
+        /* equipped — border emas + strip atas */
         .skin-card.equipped {
-            border-color: #FFD700 !important;
-            background: linear-gradient(180deg,#131100 0%,#0a0a00 100%) !important;
-            box-shadow: 0 0 16px rgba(255,215,0,.45), inset 0 0 16px rgba(255,215,0,.04) !important;
+            border-color: #ffcc00 !important;
+            background: #060400 !important;
+            box-shadow: 5px 5px 0 #664400 !important;
         }
-        /* equipped checkmark top-right */
+        .skin-card.equipped::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: #ffcc00;
+        }
         .skin-card.equipped::after {
             content: '✓ EQUIPPED';
             position: absolute;
-            top: 4px; right: 5px;
+            top: 6px; right: 4px;
             font-size: clamp(3.5px,.7vw,5px);
-            color: #FFD700;
+            color: #ffcc00;
             font-family: 'Press Start 2P', monospace;
             letter-spacing: .5px;
         }
+
         /* locked */
         .skin-card.locked {
-            opacity: .35;
+            opacity: .3;
             cursor: not-allowed;
-            filter: grayscale(.7);
+            filter: grayscale(1);
         }
-        .skin-card:active:not(.locked) { transform: scale(.94); }
 
-        /* preview canvas — sama ukurannya untuk semua */
+        /* preview canvas */
         .skin-preview {
             width: clamp(42px, 11vw, 52px);
             height: clamp(42px, 11vw, 52px);
@@ -998,75 +1021,71 @@
             image-rendering: pixelated;
             flex-shrink: 0;
             margin-bottom: 7px;
+            border: 2px solid #111;
         }
 
-        /* nama skin — baris 2 */
+        /* nama */
         .skin-name {
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(5.5px, 1.3vw, 7.5px);
-            color: #e8e8e8;
+            color: #ddd;
             line-height: 1.4;
             margin-bottom: 5px;
             word-break: break-word;
             width: 100%;
         }
 
-        /* tier badge — baris 3, selalu ada */
+        /* tier badge — solid tebal */
         .skin-tier-badge {
             display: inline-block;
             font-family: 'Press Start 2P', monospace;
-            font-size: clamp(3.5px, .75vw, 5px);
-            letter-spacing: .8px;
-            padding: 2px 6px;
-            border-radius: 1px;
+            font-size: clamp(4px, .85vw, 5.5px);
+            letter-spacing: 1px;
+            padding: 3px 7px;
             margin-bottom: 5px;
+            border: 3px solid;
+            box-shadow: 3px 3px 0 #000;
         }
-        .skin-tier-badge.common    { background: rgba(140,140,140,.15); border: 1px solid #555; color: #999; }
-        .skin-tier-badge.rare      { background: rgba(65,105,225,.15);  border: 1px solid #3358b8; color: #7090FF; }
-        .skin-tier-badge.epic      { background: rgba(147,112,219,.15); border: 1px solid #6a40bb; color: #b080f0; }
-        .skin-tier-badge.legendary { background: rgba(255,215,0,.12);   border: 1px solid #aa8800; color: #FFD700; }
-        .skin-tier-badge.limited   { background: rgba(255,105,180,.15); border: 1px solid #cc3377; color: #FF80C0; }
+        .skin-tier-badge.common    { background: #111;    border-color: #555; color: #aaa; }
+        .skin-tier-badge.rare      { background: #050c2a; border-color: #2255dd; color: #88aaff; box-shadow: 3px 3px 0 #0a1a66; }
+        .skin-tier-badge.epic      { background: #0d0019; border-color: #8833ee; color: #cc77ff; box-shadow: 3px 3px 0 #33007a; }
+        .skin-tier-badge.legendary { background: #0f0800; border-color: #ddaa00; color: #ffcc00; box-shadow: 3px 3px 0 #664400; }
+        .skin-tier-badge.limited   { background: #0f0008; border-color: #ee1166; color: #ff77aa; box-shadow: 3px 3px 0 #660022; }
 
-        /* ability line — push ke paling bawah card */
+        /* ability line */
         .skin-ability-line {
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(3px, .65vw, 4.5px);
-            color: #00cc66;
+            color: #00ff88;
             letter-spacing: .4px;
             margin-top: auto;
-            padding-top: 6px;
-            border-top: 1px solid rgba(0,204,102,.15);
+            padding-top: 5px;
+            border-top: 3px solid #003322;
             width: 100%;
         }
 
-        /* lock icon overlay */
-        .skin-lock-icon {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -65%);
-            font-size: 18px;
-            pointer-events: none;
-            opacity: .55;
-        }
-        /* Lock overlay icon */
+        /* lock icon */
         .skin-lock-icon {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%,-60%);
-            font-size: 20px;
+            font-size: 22px;
             pointer-events: none;
-            opacity: .6;
+            opacity: .7;
         }
-        /* Owned count chip */
+
+        /* owned chip */
         .skin-owned-chip {
             font-family: 'Press Start 2P', monospace;
             font-size: clamp(4px, .8vw, 5px);
             color: #00ff88;
-            background: rgba(0,255,136,.1);
-            border: 1px solid rgba(0,255,136,.25);
-            padding: 2px 8px;
-            margin: 0 14px 4px;
+            background: #001a0d;
+            border: 3px solid #00ff88;
+            box-shadow: 3px 3px 0 #003322;
+            padding: 3px 10px;
+            margin: 0 14px 6px;
             display: inline-block;
+            letter-spacing: 1px;
         }
         .skin-ability {
             font-size: clamp(6px, 1.5vw, 8px);
@@ -1458,130 +1477,180 @@
 .settings-container {
     width: 90%;
     max-width: 500px;
-    margin: 20px auto;
+    margin: clamp(10px, 2vh, 20px) auto;
     padding-bottom: 80px;
-    max-height: calc(100vh - 160px);
-    overflow-y: auto;
 }
 
+/* ── SETTINGS SECTION — pixel tebal, kotak, retro ── */
 .settings-section {
-    background: #1a1a1a;
-    border: 3px solid #00ff88;
+    background: #0d0d0d;
+    border: 4px solid #00ff88;
     box-shadow: 6px 6px 0 #006644;
-    padding: clamp(15px, 4vw, 25px);
-    margin-bottom: clamp(15px, 3vh, 20px);
+    padding: clamp(15px, 4vw, 24px);
+    margin-bottom: clamp(16px, 3.5vh, 24px);
 }
 
 .settings-section h3 {
     color: #00ff88;
-    font-size: clamp(12px, 3.5vw, 18px);
+    font-size: clamp(12px, 3.2vw, 16px);
     margin-bottom: clamp(15px, 3vh, 20px);
     text-align: center;
     border-bottom: 3px solid #00ff88;
-    padding-bottom: clamp(8px, 2vh, 10px);
-    letter-spacing: 1px;
+    padding-bottom: clamp(10px, 2.2vh, 13px);
+    letter-spacing: 2px;
     font-family: 'Press Start 2P', monospace;
     text-shadow: 2px 2px 0 #006644;
 }
 
+/* ── SETTING ROW ── */
 .setting-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(12px, 3vh, 15px) 0;
+    padding: clamp(12px, 3vh, 16px) 0;
     border-bottom: 2px solid rgba(0, 255, 136, 0.2);
     color: #fff;
-    font-size: clamp(9px, 2.5vw, 14px);
+    font-size: clamp(9px, 2.5vw, 13px);
     font-family: 'Press Start 2P', monospace;
 }
 
-.setting-row:last-child {
-    border-bottom: none;
-}
+.setting-row:last-child { border-bottom: none; }
 
 .setting-label {
     display: flex;
     align-items: center;
-    gap: clamp(6px, 2vw, 10px);
+    gap: clamp(8px, 2.5vw, 14px);
 }
 
-.setting-icon {
-    font-size: clamp(18px, 5vw, 24px);
-}
+.setting-icon { font-size: clamp(20px, 5.5vw, 26px); }
 
+/* ── TOGGLE — kotak, solid, tidak ada radius ── */
 .toggle-btn {
-    width: clamp(56px, 14vw, 70px);
-    height: clamp(28px, 7vw, 36px);
-    background: #666;
+    width: clamp(58px, 14vw, 72px);
+    height: clamp(30px, 7.5vw, 38px);
+    background: #444;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 #000;
     position: relative;
     cursor: pointer;
-    transition: background 0.3s;
-    border: 3px solid #000;
-    box-shadow: 3px 3px 0 #444;
+    transition: background 0.15s;
+    flex-shrink: 0;
 }
 
 .toggle-btn.active {
     background: #4CAF50;
-    box-shadow: 3px 3px 0 #388E3C;
+    box-shadow: 4px 4px 0 #388E3C;
 }
 
 .toggle-slider {
     width: clamp(22px, 5.5vw, 28px);
     height: clamp(22px, 5.5vw, 28px);
     background: #fff;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
     position: absolute;
     top: 1px;
     left: 2px;
-    transition: left 0.3s;
-    border: 2px solid #000;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    transition: left 0.15s;
 }
 
 .toggle-btn.active .toggle-slider {
     left: calc(100% - clamp(22px, 5.5vw, 28px) - 5px);
 }
 
-/* Stats Section */
+/* ── QUALITY SELECTOR — kotak pixel, no border-radius ── */
+.quality-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.quality-option {
+    flex: 1;
+    min-width: 0;
+    padding: clamp(13px, 3.2vw, 18px) 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    color: #888;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    transition: all 0.1s;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+}
+
+.quality-option:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+.quality-option.active {
+    background: #00ff88;
+    color: #000;
+    border-color: #00ff88;
+    box-shadow: 4px 4px 0 #006644;
+}
+
+.quality-label {
+    font-size: clamp(9px, 2.3vw, 12px);
+    font-weight: bold;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.quality-desc {
+    font-size: clamp(6px, 1.5vw, 8px);
+    opacity: 0.85;
+    line-height: 1.5;
+}
+
+/* ── LANDSCAPE COMPACT ── */
+@media (max-height: 600px) {
+    #settings { padding: 0; }
+    .settings-container { padding-bottom: 60px; }
+    .settings-section { padding: 12px; margin-bottom: 12px; }
+    .setting-row { padding: 10px 0; font-size: 11px; }
+}
+
+/* === STATS SECTION === */
 .stats-grid {
     display: grid;
-    gap: clamp(10px, 2vh, 12px);
+    gap: 0;
     color: #fff;
-    font-size: clamp(9px, 2.5vw, 14px);
 }
 
 .stat-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(10px, 2vh, 12px) 0;
-    border-bottom: 2px solid rgba(0, 255, 136, 0.2);
+    padding: clamp(9px, 2.2vh, 12px) clamp(6px, 1.5vw, 10px);
+    border-bottom: 1px solid #1a1a1a;
     font-family: 'Press Start 2P', monospace;
 }
 
-.stat-item:last-child {
-    border-bottom: none;
-}
+.stat-item:last-child { border-bottom: none; }
 
 .stat-label {
     display: flex;
     align-items: center;
     gap: clamp(6px, 2vw, 8px);
     color: #00ff88;
+    font-size: clamp(8px, 2.2vw, 11px);
 }
 
 .stat-value {
-    font-weight: bold;
-    font-size: clamp(10px, 3vw, 16px);
+    font-size: clamp(9px, 2.5vw, 13px);
     font-family: 'Press Start 2P', monospace;
+    color: #fff;
 }
 
-.stat-value.gold { color: #DAA520; }
+.stat-value.gold   { color: #DAA520; }
 .stat-value.yellow { color: #FFD700; }
 .stat-value.purple { color: #8B5CF6; }
-.stat-value.blue { color: #87CEEB; }
-.stat-value.cyan { color: #4682B4; }
+.stat-value.blue   { color: #87CEEB; }
+.stat-value.cyan   { color: #4682B4; }
 
-/* Mode Status Section */
+/* Mode Status */
 .mode-status-grid {
     display: grid;
     gap: clamp(10px, 2vh, 12px);
@@ -1589,12 +1658,10 @@
 
 .mode-status-item {
     padding: clamp(10px, 2vh, 12px) 0;
-    border-bottom: 2px solid rgba(0, 255, 136, 0.2);
+    border-bottom: 2px solid rgba(0,255,136,0.2);
 }
 
-.mode-status-item:last-child {
-    border-bottom: none;
-}
+.mode-status-item:last-child { border-bottom: none; }
 
 .mode-status-header {
     display: flex;
@@ -1608,94 +1675,27 @@
     align-items: center;
     gap: clamp(6px, 2vw, 8px);
     color: #fff;
-    font-size: clamp(9px, 2.5vw, 14px);
+    font-size: clamp(9px, 2.5vw, 13px);
     font-family: 'Press Start 2P', monospace;
 }
 
 .mode-status {
-    font-weight: bold;
-    font-size: clamp(8px, 2vw, 12px);
+    font-size: clamp(8px, 2vw, 11px);
     font-family: 'Press Start 2P', monospace;
+    font-weight: bold;
 }
 
-.mode-status.unlocked {
-    color: #4CAF50;
-}
-
-.mode-status.locked {
-    color: #999;
-}
+.mode-status.unlocked { color: #4CAF50; }
+.mode-status.locked   { color: #999; }
 
 .mode-requirement {
-    font-size: clamp(7px, 1.8vw, 11px);
+    font-size: clamp(7px, 1.8vw, 10px);
     color: #FFD700;
     margin-top: 5px;
     padding-left: clamp(20px, 5vw, 28px);
     line-height: 1.6;
     font-family: 'Press Start 2P', monospace;
 }
-
-/* Landscape/Mobile Adjustments */
-@media (max-height: 600px) {
-    #settings {
-        padding: 10px 0;
-    }
-    
-    .page-title {
-        margin-bottom: 10px !important;
-    }
-    
-    .settings-container {
-        max-height: calc(100vh - 100px);
-        padding-bottom: 60px;
-    }
-    
-    .settings-section {
-        padding: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .settings-section h3 {
-        font-size: 16px;
-        margin-bottom: 15px;
-    }
-    
-    .setting-row {
-        padding: 10px 0;
-        font-size: 12px;
-    }
-    
-    .stat-item {
-        padding: 10px 0;
-        font-size: 12px;
-    }
-}
-
-@media (max-height: 500px) {
-    #settings {
-        padding: 5px 0;
-    }
-    
-    .settings-container {
-        max-height: calc(100vh - 80px);
-        padding-bottom: 40px;
-    }
-    
-    .settings-section {
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .settings-section h3 {
-        font-size: 14px;
-        margin-bottom: 10px;
-        padding-bottom: 8px;
-    }
-    
-    .setting-row {
-        padding: 8px 0;
-        font-size: 11px;
-    }
     
     /* Stats screen landscape */
     #statsScreen .settings-container {
@@ -2523,51 +2523,7 @@
 }
 
 /* === GRAPHICS QUALITY SELECTOR === */
-.quality-selector {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-.quality-option {
-    flex: 1;
-    min-width: 90px;
-    padding: 15px 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    color: #fff;
-    font-size: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Press Start 2P', monospace;
-}
-
-.quality-option:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.quality-option.active {
-    background: #00ff88;
-    color: #000;
-    border-color: #00ff88;
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
-}
-
-.quality-label {
-    font-weight: bold;
-    margin-bottom: 8px;
-    font-size: 11px;
-}
-
-.quality-desc {
-    font-size: 7px;
-    opacity: 0.9;
-    line-height: 1.4;
-}
+/* quality selector — see settings CSS above */
 
 /* Responsive untuk landscape mode */
 @media (orientation: landscape) and (max-height: 600px) {
@@ -3773,129 +3729,143 @@
         <div class="page-title">SETTINGS</div>
         
         <div class="settings-container">
-        
-        <!-- === CONTROLS SECTION === -->
+
+        <!-- === CONTROLS === -->
         <div class="settings-section">
-            <h3>🎛️ CONTROLS</h3>
-            
-            <!-- Audio Toggle -->
+            <h3>🎛️ KONTROL</h3>
+
             <div class="setting-row">
                 <div class="setting-label">
                     <span class="setting-icon">🔊</span>
-                    <span>Sound Effects</span>
+                    <span>Efek Suara</span>
                 </div>
                 <div class="toggle-btn active" id="audioToggle" onclick="toggleAudio()">
                     <div class="toggle-slider"></div>
                 </div>
             </div>
-            
-            <!-- Vibration Toggle -->
+
             <div class="setting-row">
                 <div class="setting-label">
                     <span class="setting-icon">📳</span>
-                    <span>Vibration</span>
+                    <span>Getaran</span>
                 </div>
                 <div class="toggle-btn active" id="vibrationToggle" onclick="toggleVibration()">
                     <div class="toggle-slider"></div>
                 </div>
             </div>
 
-              <!-- FPS Display Toggle -->
-<div class="setting-row">
-    <div class="setting-label">
-        <span class="setting-icon">📊</span>
-        <span>FPS Display</span>
-    </div>
-    <div class="toggle-btn" id="fpsToggle" onclick="toggleFPS()">
-        <div class="toggle-slider"></div>
-    </div>
-</div>
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span class="setting-icon">📊</span>
+                    <span>Tampilan FPS</span>
+                </div>
+                <div class="toggle-btn" id="fpsToggle" onclick="toggleFPS()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
 
-            <!-- Graphics Quality Selector (NEW) -->
-            <div class="setting-row" style="flex-direction: column; align-items: stretch; padding: 20px 10px;">
-                <div class="setting-label" style="margin-bottom: 15px;">
+            <div class="setting-row" style="flex-direction: column; align-items: stretch; padding: 18px 0 10px;">
+                <div class="setting-label" style="margin-bottom: 14px;">
                     <span class="setting-icon">🎨</span>
-                    <span>Graphics Quality</span>
+                    <span>Kualitas Grafis</span>
                 </div>
                 <div class="quality-selector">
                     <div class="quality-option" id="qualityLow" onclick="setGraphicsQuality('low')">
                         <div class="quality-label">LOW</div>
-                        <div class="quality-desc">Performa Terbaik<br>Sedikit Efek</div>
+                        <div class="quality-desc">Performa<br>Terbaik</div>
                     </div>
                     <div class="quality-option active" id="qualityMedium" onclick="setGraphicsQuality('medium')">
                         <div class="quality-label">MEDIUM</div>
-                        <div class="quality-desc">Seimbang<br>Rekomendasi</div>
+                        <div class="quality-desc">Seimbang<br>★ Saran</div>
                     </div>
                     <div class="quality-option" id="qualityHigh" onclick="setGraphicsQuality('high')">
                         <div class="quality-label">HIGH</div>
-                        <div class="quality-desc">Kualitas Terbaik<br>Banyak Efek</div>
+                        <div class="quality-desc">Kualitas<br>Terbaik</div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- === REDEEM CODE SECTION === -->
+
+        <!-- === REDEEM CODE === -->
         <div class="settings-section">
             <h3>🎁 REDEEM CODE</h3>
-            
-            <div style="padding: 10px 0;">
-                <input 
-                    type="text" 
-                    id="redeemInput" 
-                    placeholder="Enter code here..." 
+            <div style="padding: 8px 0;">
+                <input
+                    type="text"
+                    id="redeemInput"
+                    placeholder="Masukkan kode..."
                     style="
                         width: 100%;
-                        padding: 15px;
-                        font-size: clamp(10px, 2.5vw, 14px);
+                        padding: clamp(12px,3vw,15px);
+                        font-size: clamp(9px, 2.2vw, 12px);
                         font-family: 'Press Start 2P', monospace;
                         background: #1a1a1a;
                         border: 3px solid #00ff88;
                         color: #fff;
                         text-align: center;
                         box-shadow: 4px 4px 0 #006644;
-                        margin-bottom: 15px;
+                        margin-bottom: 12px;
+                        letter-spacing: 2px;
+                        outline: none;
                     "
                 >
                 <button class="btn" onclick="redeemCode()" style="width: 100%; margin: 0;">
-                    REDEEM
+                    🎁 REDEEM
                 </button>
                 <div id="redeemMessage" style="
-                    margin-top: 15px;
+                    margin-top: 12px;
                     padding: 10px;
-                    font-size: clamp(8px, 2vw, 11px);
+                    font-size: clamp(7px, 1.8vw, 10px);
                     text-align: center;
                     display: none;
+                    font-family: 'Press Start 2P', monospace;
+                    border: 2px solid transparent;
                 "></div>
             </div>
         </div>
-        
-        <!-- === ACCOUNT SECTION === -->
+
+        <!-- === AKUN === -->
         <div class="settings-section">
             <h3>👤 AKUN</h3>
-            <div style="padding:8px 0;">
-                <div id="accountInfoRow" style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.3vw,8px);color:#00ff88;margin-bottom:14px;"></div>
+            <div style="padding: 6px 0;">
 
-                <!-- Change Password -->
-                <div id="changePwSection" style="margin-bottom:14px;">
-                    <input id="cpOld" type="password" maxlength="32" placeholder="Password lama" class="name-field" style="margin-bottom:8px;font-size:clamp(9px,2vw,11px);">
-                    <input id="cpNew" type="password" maxlength="32" placeholder="Password baru (min 6)" class="name-field" style="margin-bottom:8px;font-size:clamp(9px,2vw,11px);">
-                    <input id="cpNew2" type="password" maxlength="32" placeholder="Ulangi password baru" class="name-field" style="margin-bottom:10px;font-size:clamp(9px,2vw,11px);">
-                    <button class="btn" onclick="doChangePassword()" style="width:100%;margin:0;font-size:clamp(8px,1.8vw,10px);">🔑 GANTI PASSWORD</button>
-                    <div id="cpMsg" style="display:none;margin-top:8px;font-size:clamp(6px,1.3vw,8px);text-align:center;font-family:'Press Start 2P',monospace;"></div>
+                <!-- Info login -->
+                <div id="accountInfoRow" style="
+                    font-family: 'Press Start 2P', monospace;
+                    font-size: clamp(7px, 1.8vw, 9px);
+                    color: #00ff88;
+                    margin-bottom: 16px;
+                    padding: clamp(10px,2.5vw,14px);
+                    background: #1a1a1a;
+                    border: 3px solid #00ff88;
+                    box-shadow: 4px 4px 0 #006644;
+                    text-align: center;
+                    letter-spacing: 1px;
+                "></div>
+
+                <!-- Ganti password -->
+                <div id="changePwSection" style="margin-bottom: 12px;">
+                    <input id="cpOld"  type="password" maxlength="32" placeholder="Password lama" class="name-field" style="margin-bottom:8px;">
+                    <input id="cpNew"  type="password" maxlength="32" placeholder="Password baru (min 6)" class="name-field" style="margin-bottom:8px;">
+                    <input id="cpNew2" type="password" maxlength="32" placeholder="Ulangi password baru" class="name-field" style="margin-bottom:12px;">
+                    <button class="btn" onclick="doChangePassword()" style="width:100%;margin:0;">🔑 GANTI PASSWORD</button>
+                    <div id="cpMsg" style="display:none;margin-top:10px;font-size:clamp(6px,1.5vw,8px);text-align:center;font-family:'Press Start 2P',monospace;"></div>
                 </div>
 
-                <button class="btn" onclick="confirmLogout()" style="width:100%;margin:0;background:#cc2222;border-color:#ff4444;box-shadow:4px 4px 0 #660000;font-size:clamp(8px,1.8vw,10px);">🚪 LOGOUT</button>
+                <button class="btn" onclick="confirmLogout()" style="width:100%;margin:0;background:#cc2222;border-color:#ff4444;box-shadow:4px 4px 0 #660000;">
+                    🚪 LOGOUT
+                </button>
             </div>
         </div>
 
-        <!-- === ADMIN PANEL BUTTON === -->
-        <div style="text-align: center; margin: 20px 0;">
+        <!-- === ADMIN === -->
+        <div style="text-align: center; margin: 20px 0 10px;">
             <button class="btn tertiary" id="adminPanelBtn" onclick="showAdminPanel()" style="display: none;">
                 🔐 ADMIN PANEL
             </button>
         </div>
-        
-    </div>
+
+        </div>
     </div>
 </div>
 
@@ -4457,41 +4427,30 @@ async function checkServerReachable() {
 
 // Cek token tersimpan saat halaman dibuka
 async function tryAutoLogin() {
-  // ── DETEKSI: Buka lewat file:// (tidak ada server sama sekali) ──
-  // Ini artinya pure offline HTML, bukan server dengan jaringan mati
-  // → Langsung masuk offline admin mode, tidak perlu cek server
+  // ── OFFLINE MURNI: buka via file:// ──
+  // Langsung masuk tanpa layar apapun, admin auto unlock
   const isPureOffline = window.location.protocol === 'file:';
   if (isPureOffline) {
-    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
-    const hasToken = !!getAuthToken();
-    // Kalau pernah login online dari browser lain / tidak ada bukti online → izinkan admin
-    if (!everOnline && !hasToken) {
-      // Pure fresh install via file:// → admin diizinkan
-      localStorage.setItem('adminUnlocked', 'true');
-    }
-    enterGuestMode();
+    localStorage.setItem('adminUnlocked', 'true');
+    startOfflineDirectly();
     return;
   }
 
   const token = getAuthToken();
-  
-  // Cek server dulu
   await checkServerReachable();
   
   if (!serverReachable) {
-    // Server tidak bisa dijangkau
     if (token) {
-      // Ada token tapi server mati — JANGAN masuk guest, tampilkan error + retry
       showServerDownScreen();
       return;
     } else {
-      // Tidak ada token DAN tidak ada server — boleh guest
-      enterGuestMode();
+      // Tidak ada token DAN server mati — langsung offline
+      localStorage.setItem('adminUnlocked', 'true');
+      startOfflineDirectly();
       return;
     }
   }
   
-  // Server online
   if (!token) { showAuthScreen(); return; }
   
   try {
@@ -4503,10 +4462,33 @@ async function tryAutoLogin() {
     const data = await res.json();
     await onAuthSuccess(data.username, data.saveData);
   } catch(e) {
-    // Token check gagal padahal server reachable — token invalid
     clearAuth();
     showAuthScreen();
   }
+}
+
+function startOfflineDirectly() {
+  isGuestMode = true;
+  playerData = {
+    name: 'OFFLINE',
+    coins: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScores: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScoresRun: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScoresJump: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    totalCoins:0, totalJumpScore:0,
+    unlockedModes:['egypt','snow','ocean','sakura','ramadan'],
+    skins:{default:['white','blue','red','pink'],egypt:[],day:[],night:[],snow:[],ocean:[],sakura:[],valentine:[],ramadan:[]},
+    equippedSkin:'white',
+    dailyMissions:{lastReset:null,missions:[],claimedToday:[]},
+    achievements:{},
+    dailyCheckin:{lastCheckin:null,streak:0,checkedDays:[]}
+  };
+  // Muat save lokal kalau ada
+  const saved = localStorage.getItem('bl0ckrun_guest_save');
+  if (saved) {
+    try { Object.assign(playerData, JSON.parse(saved)); } catch(e) {}
+  }
+  startLoadingAndGame();
 }
 
 function showServerDownScreen() {
@@ -5780,6 +5762,7 @@ function submitName() {
                     setTimeout(() => {
                         document.getElementById('loading').classList.remove('active');
                         if (typeof updateMenuPlayerBar === 'function') updateMenuPlayerBar();
+                        if (typeof checkShowAdminBtn === 'function') checkShowAdminBtn();
                         drawRdmPreview();
                         document.getElementById('ramadanNewMapPopup').classList.add('active');
                     }, 900);
@@ -6761,7 +6744,14 @@ if (!playerData.unlockedModes.includes('ocean')) {
     
     // Update account info
     const accountInfoRow = document.getElementById('accountInfoRow');
-    if (accountInfoRow) accountInfoRow.textContent = playerData.name ? `Logged in sebagai: ${playerData.name}` : 'Belum login';
+    if (accountInfoRow) {
+        const name = playerData.name || '';
+        if (name) {
+            accountInfoRow.innerHTML = `👤 ${name.toUpperCase()}`;
+        } else {
+            accountInfoRow.innerHTML = `<span style="color:#ff6b6b;">— Belum Login —</span>`;
+        }
+    }
     // Reset change password form
     ['cpOld','cpNew','cpNew2'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
     const cpMsg = document.getElementById('cpMsg');
@@ -7051,19 +7041,10 @@ const adminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
 function checkShowAdminBtn() {
     const name = (playerData.name || '').trim().toLowerCase();
     const isOnlineRex = (name === 'rex') && !isGuestMode;
+    const isOfflineAdmin = localStorage.getItem('adminUnlocked') === 'true' && isGuestMode;
 
-    // Offline admin: adminUnlocked=true DAN tidak pernah ada akun online
-    const offlineAdminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
-    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
-    const hasToken = !!localStorage.getItem('bl0ckrun_token');
-    // Tolak jika ada bukti pernah online (token atau flag)
-    const isOfflineAdmin = isGuestMode && offlineAdminUnlocked && !everOnline && !hasToken;
-
-    if (isOnlineRex || isOfflineAdmin) {
-        document.getElementById('adminPanelBtn').style.display = 'block';
-    } else {
-        document.getElementById('adminPanelBtn').style.display = 'none';
-    }
+    const btn = document.getElementById('adminPanelBtn');
+    if (btn) btn.style.display = (isOnlineRex || isOfflineAdmin) ? 'block' : 'none';
 }
 checkShowAdminBtn();
 
@@ -7216,10 +7197,7 @@ function showAdminPanel() { playSound('open');
     
     const currentName = (playerData.name || '').trim().toLowerCase();
     const isOnlineRex = (currentName === 'rex') && !isGuestMode;
-    const offlineAdminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
-    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
-    const hasToken = !!localStorage.getItem('bl0ckrun_token');
-    const isOfflineAdmin = isGuestMode && offlineAdminUnlocked && !everOnline && !hasToken;
+    const isOfflineAdmin = isGuestMode && localStorage.getItem('adminUnlocked') === 'true';
 
     // Skip password kalau: Rex online ATAU offline admin yang sah
     if (isOnlineRex || isOfflineAdmin) {
