@@ -4,6 +4,22 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { Pool } = require('pg');
 const path = require('path');
+const crypto = require('crypto');
+
+// Simple password hashing using built-in crypto (no extra deps needed)
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
+function verifyPassword(password, stored) {
+  const [salt, hash] = stored.split(':');
+  const hashVerify = crypto.scryptSync(password, salt, 64).toString('hex');
+  return hash === hashVerify;
+}
+function generateToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -49,8 +65,32 @@ if (process.env.DATABASE_URL) {
           UNIQUE (player_id, mode, score_type)
         );
 
+        CREATE TABLE IF NOT EXISTS accounts (
+          id            SERIAL PRIMARY KEY,
+          username      VARCHAR(16) UNIQUE NOT NULL,
+          username_lower VARCHAR(16) UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          player_id     VARCHAR(64) UNIQUE NOT NULL,
+          created_at    TIMESTAMP DEFAULT NOW(),
+          updated_at    TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS auth_tokens (
+          token       VARCHAR(128) PRIMARY KEY,
+          player_id   VARCHAR(64) NOT NULL,
+          created_at  TIMESTAMP DEFAULT NOW(),
+          expires_at  TIMESTAMP DEFAULT NOW() + INTERVAL '30 days'
+        );
+
+        CREATE TABLE IF NOT EXISTS player_saves (
+          player_id   VARCHAR(64) PRIMARY KEY,
+          save_data   JSONB NOT NULL DEFAULT '{}',
+          updated_at  TIMESTAMP DEFAULT NOW()
+        );
+
         CREATE INDEX IF NOT EXISTS idx_scores_mode_type ON scores(mode, score_type);
         CREATE INDEX IF NOT EXISTS idx_scores_player    ON scores(player_id);
+        CREATE INDEX IF NOT EXISTS idx_tokens_player    ON auth_tokens(player_id);
       `);
       console.log('✅ Database ready');
     } catch (err) {
@@ -68,8 +108,174 @@ const VALID_MODES = ['egypt','day','night','snow','ocean','sakura','ramadan'];
 const VALID_TYPES = ['jump','run'];
 
 // ============================================================
-// LEADERBOARD API ROUTES
+// AUTH MIDDLEWARE
 // ============================================================
+async function requireAuth(req, res, next) {
+  if (!pool) { req.player_id = 'offline'; return next(); }
+  const token = req.headers['x-auth-token'] || req.body?.token;
+  if (!token) return res.status(401).json({ error: 'Token tidak ada', code: 'NO_TOKEN' });
+  try {
+    const r = await pool.query(
+      'SELECT player_id FROM auth_tokens WHERE token=$1 AND expires_at > NOW()',
+      [token]
+    );
+    if (r.rows.length === 0) return res.status(401).json({ error: 'Token expired/invalid', code: 'INVALID_TOKEN' });
+    req.player_id = r.rows[0].player_id;
+    next();
+  } catch (e) { res.status(500).json({ error: e.message }); }
+}
+
+// ============================================================
+// ACCOUNT API ROUTES
+// ============================================================
+
+// Register account baru
+app.post('/api/auth/register', async (req, res) => {
+  if (!pool) return res.json({ success: true, offline: true });
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).json({ error: 'Username dan password wajib' });
+  const u = username.trim();
+  if (u.length < 3 || u.length > 16)
+    return res.status(400).json({ error: 'Username harus 3-16 karakter' });
+  if (!/^[a-zA-Z0-9_]+$/.test(u))
+    return res.status(400).json({ error: 'Hanya huruf, angka, underscore' });
+  if (password.length < 6)
+    return res.status(400).json({ error: 'Password minimal 6 karakter' });
+
+  const client = await pool.connect();
+  try {
+    // Cek username sudah ada
+    const check = await client.query('SELECT id FROM accounts WHERE username_lower=$1', [u.toLowerCase()]);
+    if (check.rows.length > 0)
+      return res.status(409).json({ error: 'Username sudah dipakai', code: 'USERNAME_TAKEN' });
+
+    const player_id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+    const password_hash = hashPassword(password);
+
+    // Buat account
+    await client.query(
+      'INSERT INTO accounts (username, username_lower, password_hash, player_id) VALUES ($1,$2,$3,$4)',
+      [u, u.toLowerCase(), password_hash, player_id]
+    );
+    // Buat player record
+    await client.query(
+      'INSERT INTO players (name, name_lower, player_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING',
+      [u, u.toLowerCase(), player_id]
+    );
+    // Buat save kosong
+    await client.query(
+      'INSERT INTO player_saves (player_id, save_data) VALUES ($1,$2) ON CONFLICT DO NOTHING',
+      [player_id, JSON.stringify({})]
+    );
+
+    // Generate token
+    const token = generateToken();
+    await client.query(
+      'INSERT INTO auth_tokens (token, player_id) VALUES ($1,$2)',
+      [token, player_id]
+    );
+
+    res.json({ success: true, token, player_id, username: u });
+  } catch (e) {
+    if (e.code === '23505') return res.status(409).json({ error: 'Username sudah dipakai', code: 'USERNAME_TAKEN' });
+    res.status(500).json({ error: e.message });
+  } finally { client.release(); }
+});
+
+// Login
+app.post('/api/auth/login', async (req, res) => {
+  if (!pool) return res.json({ success: true, offline: true });
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).json({ error: 'Username dan password wajib' });
+
+  try {
+    const r = await pool.query('SELECT * FROM accounts WHERE username_lower=$1', [username.toLowerCase().trim()]);
+    if (r.rows.length === 0)
+      return res.status(401).json({ error: 'Username atau password salah', code: 'WRONG_CREDENTIALS' });
+
+    const acc = r.rows[0];
+    if (!verifyPassword(password, acc.password_hash))
+      return res.status(401).json({ error: 'Username atau password salah', code: 'WRONG_CREDENTIALS' });
+
+    // Hapus token lama, buat yang baru
+    await pool.query('DELETE FROM auth_tokens WHERE player_id=$1', [acc.player_id]);
+    const token = generateToken();
+    await pool.query('INSERT INTO auth_tokens (token, player_id) VALUES ($1,$2)', [token, acc.player_id]);
+
+    // Ambil save data
+    const saveR = await pool.query('SELECT save_data FROM player_saves WHERE player_id=$1', [acc.player_id]);
+    const saveData = saveR.rows.length > 0 ? saveR.rows[0].save_data : {};
+
+    res.json({ success: true, token, player_id: acc.player_id, username: acc.username, saveData });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Logout
+app.post('/api/auth/logout', requireAuth, async (req, res) => {
+  if (!pool) return res.json({ success: true });
+  try {
+    await pool.query('DELETE FROM auth_tokens WHERE player_id=$1', [req.player_id]);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Verify token (cek apakah masih valid + ambil save data)
+app.get('/api/auth/me', requireAuth, async (req, res) => {
+  if (!pool) return res.json({ success: true, offline: true });
+  try {
+    const accR = await pool.query('SELECT username FROM accounts WHERE player_id=$1', [req.player_id]);
+    const saveR = await pool.query('SELECT save_data FROM player_saves WHERE player_id=$1', [req.player_id]);
+    const saveData = saveR.rows.length > 0 ? saveR.rows[0].save_data : {};
+    const username = accR.rows.length > 0 ? accR.rows[0].username : null;
+    res.json({ success: true, player_id: req.player_id, username, saveData });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Ganti password
+app.post('/api/auth/change-password', requireAuth, async (req, res) => {
+  if (!pool) return res.json({ success: true, offline: true });
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword)
+    return res.status(400).json({ error: 'Password lama dan baru wajib diisi' });
+  if (newPassword.length < 6)
+    return res.status(400).json({ error: 'Password baru minimal 6 karakter' });
+  try {
+    const r = await pool.query('SELECT password_hash FROM accounts WHERE player_id=$1', [req.player_id]);
+    if (r.rows.length === 0) return res.status(404).json({ error: 'Account tidak ditemukan' });
+    if (!verifyPassword(oldPassword, r.rows[0].password_hash))
+      return res.status(401).json({ error: 'Password lama salah', code: 'WRONG_PASSWORD' });
+    const newHash = hashPassword(newPassword);
+    await pool.query('UPDATE accounts SET password_hash=$1, updated_at=NOW() WHERE player_id=$2', [newHash, req.player_id]);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Save game data ke server
+app.post('/api/save', requireAuth, async (req, res) => {
+  if (!pool) return res.json({ success: true, offline: true });
+  const { saveData } = req.body;
+  if (!saveData) return res.status(400).json({ error: 'saveData wajib' });
+  try {
+    await pool.query(`
+      INSERT INTO player_saves (player_id, save_data, updated_at)
+      VALUES ($1,$2,NOW())
+      ON CONFLICT (player_id) DO UPDATE
+        SET save_data=$2, updated_at=NOW()
+    `, [req.player_id, JSON.stringify(saveData)]);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Load game data dari server
+app.get('/api/save', requireAuth, async (req, res) => {
+  if (!pool) return res.json({ success: true, saveData: {}, offline: true });
+  try {
+    const r = await pool.query('SELECT save_data FROM player_saves WHERE player_id=$1', [req.player_id]);
+    res.json({ success: true, saveData: r.rows.length > 0 ? r.rows[0].save_data : {} });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', db: !!pool });
@@ -124,10 +330,20 @@ app.post('/api/player/register', async (req, res) => {
   } finally { client.release(); }
 });
 
-// Submit score (only update if higher)
+// Submit score (only update if higher) — support both old player_id and new auth token
 app.post('/api/scores', async (req, res) => {
   if (!pool) return res.json({ success: true, offline: true });
-  const { player_id, mode, score_type, score } = req.body;
+  let { player_id, mode, score_type, score } = req.body;
+
+  // Support new auth token
+  const token = req.headers['x-auth-token'] || req.body?.token;
+  if (token && !player_id) {
+    try {
+      const tr = await pool.query('SELECT player_id FROM auth_tokens WHERE token=$1 AND expires_at > NOW()', [token]);
+      if (tr.rows.length > 0) player_id = tr.rows[0].player_id;
+    } catch(e) {}
+  }
+
   if (!player_id || !mode || !score_type || score === undefined)
     return res.status(400).json({ error: 'Field tidak lengkap' });
   if (!VALID_MODES.includes(mode)) return res.status(400).json({ error: 'Mode tidak valid' });
@@ -170,7 +386,8 @@ app.get('/api/leaderboard/:mode/:type', async (req, res) => {
 });
 
 // ============================================================
-// ROOM MANAGEMENT (Multiplayer - tidak diubah)
+// LEADERBOARD API ROUTES
+// ============================================================
 // ============================================================
 const rooms = new Map();
 

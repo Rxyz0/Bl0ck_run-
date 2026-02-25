@@ -2856,7 +2856,7 @@
     <div id="startOverlayMode" style="font-size:10px; color:#00ff88; letter-spacing:2px; opacity:0.7;"></div>
 </div>
 
-    <div id="loading" class="screen active">
+    <div id="loading" class="screen">
     <div class="loading-container">
         <div class="loading-text">LOADING GAME...</div>
         
@@ -2943,6 +2943,39 @@
 </div>
 
 <!-- ===== PLAYER NAME SCREEN ===== -->
+<div id="authScreen" class="screen active">
+  <div class="name-box" style="max-width:400px;">
+    <span class="name-pixel-icon">🎮</span>
+    <div class="name-title">BL0CK RUN</div>
+    <div class="name-sub" id="authSubtitle">Login untuk data tersimpan permanen di server</div>
+
+    <!-- Tab -->
+    <div style="display:flex;gap:0;margin-bottom:18px;border:3px solid #00ff88;">
+      <button id="tabLoginBtn" onclick="switchAuthTab('login')" style="flex:1;padding:9px 4px;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.6vw,9px);cursor:pointer;border:none;background:#00ff88;color:#000;letter-spacing:1px;">LOGIN</button>
+      <button id="tabRegisterBtn" onclick="switchAuthTab('register')" style="flex:1;padding:9px 4px;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.6vw,9px);cursor:pointer;border:none;background:#0a0a0a;color:#555;letter-spacing:1px;border-left:2px solid #00ff88;">DAFTAR</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <input class="name-field" id="loginUser" type="text" maxlength="16" placeholder="USERNAME" autocomplete="username" spellcheck="false" style="margin-bottom:10px;">
+      <input class="name-field" id="loginPass" type="password" maxlength="32" placeholder="PASSWORD" autocomplete="current-password" spellcheck="false">
+      <div class="name-err" id="loginErr"></div>
+      <button class="name-submit" onclick="doLogin()">LOGIN →</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerForm" style="display:none;">
+      <input class="name-field" id="regUser" type="text" maxlength="16" placeholder="USERNAME (3-16 karakter)" autocomplete="username" spellcheck="false" style="margin-bottom:10px;">
+      <input class="name-field" id="regPass" type="password" maxlength="32" placeholder="PASSWORD (min 6 karakter)" autocomplete="new-password" spellcheck="false" style="margin-bottom:10px;">
+      <input class="name-field" id="regPass2" type="password" maxlength="32" placeholder="ULANGI PASSWORD" autocomplete="new-password" spellcheck="false">
+      <div class="name-err" id="registerErr"></div>
+      <button class="name-submit" onclick="doRegister()">DAFTAR →</button>
+    </div>
+
+    <div id="authLoading" style="display:none;color:#00ff88;font-size:clamp(7px,1.5vw,9px);margin-top:12px;text-align:center;">Memuat...</div>
+  </div>
+</div>
+
 <div id="nameScreen" class="screen">
   <div class="name-box">
     <span class="name-pixel-icon">🎮</span>
@@ -3495,6 +3528,25 @@
             </div>
         </div>
         
+        <!-- === ACCOUNT SECTION === -->
+        <div class="settings-section">
+            <h3>👤 AKUN</h3>
+            <div style="padding:8px 0;">
+                <div id="accountInfoRow" style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.3vw,8px);color:#00ff88;margin-bottom:14px;"></div>
+
+                <!-- Change Password -->
+                <div id="changePwSection" style="margin-bottom:14px;">
+                    <input id="cpOld" type="password" maxlength="32" placeholder="Password lama" class="name-field" style="margin-bottom:8px;font-size:clamp(9px,2vw,11px);">
+                    <input id="cpNew" type="password" maxlength="32" placeholder="Password baru (min 6)" class="name-field" style="margin-bottom:8px;font-size:clamp(9px,2vw,11px);">
+                    <input id="cpNew2" type="password" maxlength="32" placeholder="Ulangi password baru" class="name-field" style="margin-bottom:10px;font-size:clamp(9px,2vw,11px);">
+                    <button class="btn" onclick="doChangePassword()" style="width:100%;margin:0;font-size:clamp(8px,1.8vw,10px);">🔑 GANTI PASSWORD</button>
+                    <div id="cpMsg" style="display:none;margin-top:8px;font-size:clamp(6px,1.3vw,8px);text-align:center;font-family:'Press Start 2P',monospace;"></div>
+                </div>
+
+                <button class="btn" onclick="confirmLogout()" style="width:100%;margin:0;background:#cc2222;border-color:#ff4444;box-shadow:4px 4px 0 #660000;font-size:clamp(8px,1.8vw,10px);">🚪 LOGOUT</button>
+            </div>
+        </div>
+
         <!-- === ADMIN PANEL BUTTON === -->
         <div style="text-align: center; margin: 20px 0;">
             <button class="btn tertiary" id="adminPanelBtn" onclick="showAdminPanel()" style="display: none;">
@@ -4415,75 +4467,7 @@ const sakuraSkins = [
             if (saved) {
                 const data = JSON.parse(saved);
                 playerData = {...playerData, ...data};
-                
-                // Fix untuk data lama
-                if (!Array.isArray(playerData.skins.default)) {
-                    playerData.skins.default = ['white', 'blue', 'red', 'pink'];
-                }
-                if (!Array.isArray(playerData.skins.egypt)) {
-                    playerData.skins.egypt = [];
-                }
-                if (!Array.isArray(playerData.skins.day)) {
-                    playerData.skins.day = [];
-                }
-                if (!Array.isArray(playerData.skins.night)) {
-                    playerData.skins.night = [];
-                }
-if (!Array.isArray(playerData.skins.snow)) {
-    playerData.skins.snow = [];
-}
-if (!Array.isArray(playerData.skins.ocean)) {
-    playerData.skins.ocean = [];
-}
-if (!Array.isArray(playerData.skins.sakura)) {
-    playerData.skins.sakura = [];
-}
-if (!Array.isArray(playerData.skins.valentine)) {
-    playerData.skins.valentine = [];
-}
-if (!Array.isArray(playerData.skins.ramadan)) {
-    playerData.skins.ramadan = [];
-}
-if (!playerData.coins.ramadan) {
-    playerData.coins.ramadan = 0;
-}
-if (!playerData.coins.snow) {
-    playerData.coins.snow = 0;
-}
-if (!playerData.coins.ocean) {
-    playerData.coins.ocean = 0;
-}
-if (!playerData.highScores.ocean) {
-    playerData.highScores.ocean = 0;
-}
-if (!playerData.highScoresRun) {
-    playerData.highScoresRun = { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 };
-}
-if (!playerData.highScoresJump) {
-    playerData.highScoresJump = { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 };
-}
-if (!playerData.totalCoins) {
-    // Calculate total coins from existing data
-    playerData.totalCoins = Object.values(playerData.coins).reduce((a, b) => a + b, 0);
-}
-if (!playerData.totalJumpScore) {
-    // Calculate total jump score from existing data
-    playerData.totalJumpScore = Object.values(playerData.highScoresJump || {}).reduce((a, b) => a + b, 0);
-}
-if (!playerData.unlockedModes.includes('ocean') && playerData.highScores.day >= 300 && playerData.coins.day >= 150) {
-    playerData.unlockedModes.push('ocean');
-}
-if (!playerData.highScores) {
-    playerData.highScores = { egypt: 0, day: 0, night: 0, snow: 0 };
-}
-if (!playerData.unlockedModes) {
-    playerData.unlockedModes = ['egypt', 'snow'];
-}
-                
-                // Load high scores
-                highScores = playerData.highScores;
-                highScoresRun = playerData.highScoresRun || { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 };
-                highScoresJump = playerData.highScoresJump || { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 };
+                fixPlayerDataCompat();
             }
         } catch(e) {
             // Reset jika error
@@ -4653,24 +4637,10 @@ const progressBar = document.getElementById('progressBar');
 const progressPercent = document.getElementById('progressPercent');
 
 // Random tip
-tipElement.textContent = tips[Math.floor(Math.random() * tips.length)];
+if (tipElement) tipElement.textContent = tips[Math.floor(Math.random() * tips.length)];
 
-const loadingInterval = setInterval(() => {
-    progress += Math.random() * 5 + 2;   // slower: was 15+5
-    if (progress > 100) progress = 100;
-    progressBar.style.width = progress + '%';
-    progressPercent.textContent = Math.floor(progress);
-    if (progress >= 100) {
-        clearInterval(loadingInterval);
-        setTimeout(() => {
-            document.getElementById('loading').classList.remove('active');
-            // Draw ramadan preview canvas
-            drawRdmPreview();
-            // Show Ramadan new map popup
-            document.getElementById('ramadanNewMapPopup').classList.add('active');
-        }, 900);
-    }
-}, 200);  // was 150ms
+// Auth check — auto-login jika ada token tersimpan, tampilkan auth screen jika tidak
+tryAutoLogin();
 
 function drawRdmPreview() {
     const c = document.getElementById('rdmPreviewCanvas');
@@ -4921,7 +4891,61 @@ function submitName() {
         function saveData() {
             try {
                 localStorage.setItem('bl0ckRunData', JSON.stringify(playerData));
+                scheduleSaveToServer(); // sync ke server
             } catch(e) {}
+        }
+
+        // Fix kompatibilitas data lama
+        function fixPlayerDataCompat() {
+            if (!Array.isArray(playerData.skins.default)) playerData.skins.default = ['white','blue','red','pink'];
+            if (!Array.isArray(playerData.skins.egypt))   playerData.skins.egypt = [];
+            if (!Array.isArray(playerData.skins.day))     playerData.skins.day = [];
+            if (!Array.isArray(playerData.skins.night))   playerData.skins.night = [];
+            if (!Array.isArray(playerData.skins.snow))    playerData.skins.snow = [];
+            if (!Array.isArray(playerData.skins.ocean))   playerData.skins.ocean = [];
+            if (!Array.isArray(playerData.skins.sakura))  playerData.skins.sakura = [];
+            if (!Array.isArray(playerData.skins.valentine)) playerData.skins.valentine = [];
+            if (!Array.isArray(playerData.skins.ramadan)) playerData.skins.ramadan = [];
+            if (!playerData.coins.ramadan)  playerData.coins.ramadan = 0;
+            if (!playerData.coins.snow)     playerData.coins.snow = 0;
+            if (!playerData.coins.ocean)    playerData.coins.ocean = 0;
+            if (!playerData.highScores.ocean) playerData.highScores.ocean = 0;
+            if (!playerData.highScoresRun)  playerData.highScoresRun = { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 };
+            if (!playerData.highScoresJump) playerData.highScoresJump = { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 };
+            if (!playerData.totalCoins)     playerData.totalCoins = Object.values(playerData.coins).reduce((a,b)=>a+b,0);
+            if (!playerData.totalJumpScore) playerData.totalJumpScore = Object.values(playerData.highScoresJump||{}).reduce((a,b)=>a+b,0);
+            if (!playerData.highScores)     playerData.highScores = { egypt:0,day:0,night:0,snow:0 };
+            if (!playerData.unlockedModes)  playerData.unlockedModes = ['egypt','snow'];
+            if (!playerData.dailyMissions)  playerData.dailyMissions = { lastReset:null, missions:[], claimedToday:[] };
+            if (!playerData.achievements)   playerData.achievements = {};
+            if (!playerData.dailyCheckin)   playerData.dailyCheckin = { lastCheckin:null, streak:0, checkedDays:[] };
+            highScores     = playerData.highScores;
+            highScoresRun  = playerData.highScoresRun  || { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 };
+            highScoresJump = playerData.highScoresJump || { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 };
+        }
+
+        // Mulai loading screen + game setelah auth sukses
+        function startLoadingAndGame() {
+            document.getElementById('loading').classList.add('active');
+            let progress = 0;
+            const tipElement2 = document.getElementById('loadingTip');
+            const progressBar2 = document.getElementById('progressBar');
+            const progressPercent2 = document.getElementById('progressPercent');
+            if (tipElement2) tipElement2.textContent = tips[Math.floor(Math.random() * tips.length)];
+            const li2 = setInterval(() => {
+                progress += Math.random() * 5 + 2;
+                if (progress > 100) progress = 100;
+                if (progressBar2) progressBar2.style.width = progress + '%';
+                if (progressPercent2) progressPercent2.textContent = Math.floor(progress);
+                if (progress >= 100) {
+                    clearInterval(li2);
+                    setTimeout(() => {
+                        document.getElementById('loading').classList.remove('active');
+                        drawRdmPreview();
+                        document.getElementById('ramadanNewMapPopup').classList.add('active');
+                    }, 900);
+                }
+            }, 200);
         }
 
 // === DAILY MISSION SYSTEM ===
@@ -5836,8 +5860,77 @@ if (!playerData.unlockedModes.includes('ocean')) {
     setMenuIconsVisibility(false);
     updateStatsDisplay();
     
+    // Update account info
+    const accountInfoRow = document.getElementById('accountInfoRow');
+    if (accountInfoRow) accountInfoRow.textContent = playerData.name ? `Logged in sebagai: ${playerData.name}` : 'Belum login';
+    // Reset change password form
+    ['cpOld','cpNew','cpNew2'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    const cpMsg = document.getElementById('cpMsg');
+    if (cpMsg) cpMsg.style.display='none';
+    
     // Update toggle states
     const audioToggle = document.getElementById('audioToggle');
+    const vibrationToggle = document.getElementById('vibrationToggle');
+    const fpsToggle = document.getElementById('fpsToggle');
+    
+    if (audioEnabled) {
+        audioToggle.classList.add('active');
+    } else {
+        audioToggle.classList.remove('active');
+    }
+    
+    if (vibrationEnabled) {
+        vibrationToggle.classList.add('active');
+    } else {
+        vibrationToggle.classList.remove('active');
+    }
+
+    if (fpsEnabled) {
+        fpsToggle.classList.add('active');
+    } else {
+        fpsToggle.classList.remove('active');
+    }
+    
+    // Update graphics quality selector
+    document.querySelectorAll('.quality-option').forEach(opt => {
+        opt.classList.remove('active');
+    });
+    const qualityId = 'quality' + graphicsQuality.charAt(0).toUpperCase() + graphicsQuality.slice(1);
+    const qualityElement = document.getElementById(qualityId);
+    if (qualityElement) {
+        qualityElement.classList.add('active');
+    }
+    
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('settings').classList.add('active');
+}
+
+async function doChangePassword() {
+    const oldPw = document.getElementById('cpOld').value;
+    const newPw = document.getElementById('cpNew').value;
+    const newPw2 = document.getElementById('cpNew2').value;
+    const msg = document.getElementById('cpMsg');
+    msg.style.display='none';
+    if (!oldPw || !newPw || !newPw2) { msg.textContent='Isi semua field!'; msg.style.color='#ff6b6b'; msg.style.display='block'; return; }
+    if (newPw.length < 6) { msg.textContent='Password baru min 6 karakter!'; msg.style.color='#ff6b6b'; msg.style.display='block'; return; }
+    if (newPw !== newPw2) { msg.textContent='Password baru tidak cocok!'; msg.style.color='#ff6b6b'; msg.style.display='block'; return; }
+    msg.textContent='Memproses...'; msg.style.color='#00ff88'; msg.style.display='block';
+    try {
+        const res = await fetch(`${SERVER_URL}/api/auth/change-password`, {
+            method:'POST', headers: authHeaders(),
+            body: JSON.stringify({ oldPassword: oldPw, newPassword: newPw })
+        });
+        const data = await res.json();
+        if (!res.ok) { msg.textContent = data.error || 'Gagal ganti password'; msg.style.color='#ff6b6b'; }
+        else { msg.textContent = '✓ Password berhasil diganti!'; msg.style.color='#00ff88'; ['cpOld','cpNew','cpNew2'].forEach(id=>{document.getElementById(id).value='';}); }
+    } catch(e) { msg.textContent='Tidak bisa terhubung ke server'; msg.style.color='#ff6b6b'; }
+}
+
+function confirmLogout() {
+    if (confirm('Yakin mau logout? Semua data sudah tersimpan di server.')) {
+        doLogout();
+    }
+}
     const vibrationToggle = document.getElementById('vibrationToggle');
     const fpsToggle = document.getElementById('fpsToggle');
     
@@ -5954,56 +6047,200 @@ if (!playerData.unlockedModes.includes('ocean')) {
 }
 
 // ============================================================
-// SERVER & LEADERBOARD SYSTEM
+// SERVER & AUTH SYSTEM
 // ============================================================
-const SERVER_URL = window.location.origin; // auto-detect Railway URL
+const SERVER_URL = window.location.origin;
 
-// Generate or load persistent player_id
-function getPlayerId() {
-    let pid = localStorage.getItem('bl0ckrun_pid');
-    if (!pid) {
-        pid = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
-        localStorage.setItem('bl0ckrun_pid', pid);
-    }
-    return pid;
+// ---- Token management ----
+function getAuthToken() { return localStorage.getItem('bl0ckrun_token'); }
+function getPlayerId()   { return localStorage.getItem('bl0ckrun_pid'); }
+function setAuth(token, player_id) {
+  localStorage.setItem('bl0ckrun_token', token);
+  localStorage.setItem('bl0ckrun_pid', player_id);
+}
+function clearAuth() {
+  localStorage.removeItem('bl0ckrun_token');
+  localStorage.removeItem('bl0ckrun_pid');
 }
 
-// Register player name to server (called on name save)
+function authHeaders() {
+  const token = getAuthToken();
+  return token ? { 'Content-Type': 'application/json', 'x-auth-token': token }
+               : { 'Content-Type': 'application/json' };
+}
+
+// ---- Auth UI helpers ----
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display    = isLogin ? '' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none' : '';
+  document.getElementById('tabLoginBtn').style.background    = isLogin ? '#00ff88' : '#0a0a0a';
+  document.getElementById('tabLoginBtn').style.color         = isLogin ? '#000' : '#555';
+  document.getElementById('tabRegisterBtn').style.background = isLogin ? '#0a0a0a' : '#00ff88';
+  document.getElementById('tabRegisterBtn').style.color      = isLogin ? '#555' : '#000';
+  document.getElementById('loginErr').style.display    = 'none';
+  document.getElementById('registerErr').style.display = 'none';
+}
+
+function setAuthLoading(v) {
+  document.getElementById('authLoading').style.display = v ? '' : 'none';
+  document.querySelectorAll('#authScreen .name-submit').forEach(b => b.disabled = v);
+}
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if (!username || !password) { err.textContent='Isi username & password!'; err.style.display='block'; return; }
+  setAuthLoading(true);
+  try {
+    const res = await fetch(`${SERVER_URL}/api/auth/login`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { err.textContent = data.error || 'Login gagal'; err.style.display='block'; setAuthLoading(false); return; }
+    setAuth(data.token, data.player_id);
+    await onAuthSuccess(data.username, data.saveData);
+  } catch(e) { err.textContent='Tidak bisa terhubung ke server'; err.style.display='block'; setAuthLoading(false); }
+}
+
+async function doRegister() {
+  const username = document.getElementById('regUser').value.trim();
+  const password = document.getElementById('regPass').value;
+  const pass2    = document.getElementById('regPass2').value;
+  const err = document.getElementById('registerErr');
+  err.style.display = 'none';
+  if (!username || !password) { err.textContent='Isi semua field!'; err.style.display='block'; return; }
+  if (username.length < 3) { err.textContent='Username min 3 karakter!'; err.style.display='block'; return; }
+  if (password.length < 6) { err.textContent='Password min 6 karakter!'; err.style.display='block'; return; }
+  if (password !== pass2)  { err.textContent='Password tidak cocok!'; err.style.display='block'; return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) { err.textContent='Hanya huruf, angka, underscore!'; err.style.display='block'; return; }
+  setAuthLoading(true);
+  try {
+    const res = await fetch(`${SERVER_URL}/api/auth/register`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { err.textContent = data.error || 'Registrasi gagal'; err.style.display='block'; setAuthLoading(false); return; }
+    setAuth(data.token, data.player_id);
+    await onAuthSuccess(data.username, {});
+  } catch(e) { err.textContent='Tidak bisa terhubung ke server'; err.style.display='block'; setAuthLoading(false); }
+}
+
+async function onAuthSuccess(username, serverSaveData) {
+  // Merge server data ke playerData
+  if (serverSaveData && Object.keys(serverSaveData).length > 0) {
+    playerData = { ...playerData, ...serverSaveData };
+    fixPlayerDataCompat();
+  }
+  playerData.name = username;
+  // Sync nama ke tabel players di server
+  await registerPlayerName(username).catch(()=>{});
+  saveData(); // simpan lokal juga
+  setAuthLoading(false);
+  document.getElementById('authScreen').classList.remove('active');
+  startLoadingAndGame();
+}
+
+// Cek token tersimpan saat halaman dibuka
+async function tryAutoLogin() {
+  const token = getAuthToken();
+  if (!token) { showAuthScreen(); return; }
+  try {
+    const res = await fetch(`${SERVER_URL}/api/auth/me`, { headers: authHeaders() });
+    if (!res.ok) { clearAuth(); showAuthScreen(); return; }
+    const data = await res.json();
+    await onAuthSuccess(data.username, data.saveData);
+  } catch(e) { 
+    // Offline mode — pakai data lokal
+    const savedLocal = localStorage.getItem('bl0ckRunData');
+    if (savedLocal) {
+      try { playerData = { ...playerData, ...JSON.parse(savedLocal) }; fixPlayerDataCompat(); } catch(e2){}
+    }
+    const name = playerData.name || '';
+    if (name) {
+      document.getElementById('authScreen').classList.remove('active');
+      startLoadingAndGame();
+    } else {
+      showAuthScreen();
+    }
+  }
+}
+
+function showAuthScreen() {
+  document.getElementById('authScreen').classList.add('active');
+}
+
+// Logout
+async function doLogout() {
+  try {
+    await fetch(`${SERVER_URL}/api/auth/logout`, { method:'POST', headers: authHeaders() });
+  } catch(e) {}
+  clearAuth();
+  // Reset playerData
+  playerData = {
+    name: '', coins: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScores: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScoresRun: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    highScoresJump: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
+    totalCoins:0, totalJumpScore:0,
+    unlockedModes:['egypt','snow','ocean','sakura','ramadan'],
+    skins:{default:['white','blue','red','pink'],egypt:[],day:[],night:[],snow:[],ocean:[],sakura:[],valentine:[],ramadan:[]},
+    equippedSkin:'white',
+    dailyMissions:{lastReset:null,missions:[],claimedToday:[]},
+    achievements:{},
+    dailyCheckin:{lastCheckin:null,streak:0,checkedDays:[]}
+  };
+  localStorage.removeItem('bl0ckRunData');
+  // Reload halaman untuk reset state
+  location.reload();
+}
+
+// Save data ke server (dipanggil setelah saveData lokal)
+let _saveServerTimeout = null;
+function scheduleSaveToServer() {
+  if (_saveServerTimeout) clearTimeout(_saveServerTimeout);
+  _saveServerTimeout = setTimeout(async () => {
+    const token = getAuthToken();
+    if (!token) return;
+    try {
+      await fetch(`${SERVER_URL}/api/save`, {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ saveData: playerData })
+      });
+    } catch(e) {} // silently fail
+  }, 3000); // debounce 3 detik
+}
+
+// ---- Existing helpers (register name, submit score) ----
 async function registerPlayerName(name) {
-    try {
-        const res = await fetch(`${SERVER_URL}/api/player/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ player_id: getPlayerId(), name })
-        });
-        return await res.json();
-    } catch (e) {
-        return { error: 'Tidak bisa terhubung ke server' };
-    }
+  try {
+    const res = await fetch(`${SERVER_URL}/api/player/register`, {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ player_id: getPlayerId(), name })
+    });
+    return await res.json();
+  } catch(e) { return { error: 'Tidak bisa terhubung ke server' }; }
 }
 
-// Check name availability
 async function checkNameAvailable(name) {
-    try {
-        const res = await fetch(`${SERVER_URL}/api/player/check/${encodeURIComponent(name)}`);
-        return await res.json();
-    } catch (e) {
-        return { available: true }; // offline fallback
-    }
+  try {
+    const res = await fetch(`${SERVER_URL}/api/player/check/${encodeURIComponent(name)}`);
+    return await res.json();
+  } catch(e) { return { available: true }; }
 }
 
-// Submit score to server
 async function submitScoreToServer(mode, scoreType, score) {
-    if (!playerData.name) return;
-    try {
-        await fetch(`${SERVER_URL}/api/scores`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ player_id: getPlayerId(), mode, score_type: scoreType, score })
-        });
-    } catch (e) {
-        // Silently fail — local score still saved
-    }
+  if (!playerData.name) return;
+  try {
+    await fetch(`${SERVER_URL}/api/scores`, {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ player_id: getPlayerId(), mode, score_type: scoreType, score })
+    });
+  } catch(e) {}
 }
 
 // Load leaderboard data
