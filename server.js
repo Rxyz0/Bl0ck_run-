@@ -59,11 +59,26 @@ if (process.env.DATABASE_URL) {
           player_id   VARCHAR(64) NOT NULL REFERENCES players(player_id) ON DELETE CASCADE,
           player_name VARCHAR(16) NOT NULL,
           mode        VARCHAR(16) NOT NULL,
-          score_type  VARCHAR(8)  NOT NULL CHECK (score_type IN ('jump','run')),
+          score_type  VARCHAR(8)  NOT NULL CHECK (score_type IN ('jump','run','coin')),
           score       INTEGER     NOT NULL DEFAULT 0,
           created_at  TIMESTAMP DEFAULT NOW(),
           UNIQUE (player_id, mode, score_type)
         );
+
+        -- Daily scores: reset setiap hari — menyimpan score terbaik per hari
+        CREATE TABLE IF NOT EXISTS daily_scores (
+          id          SERIAL PRIMARY KEY,
+          player_id   VARCHAR(64) NOT NULL,
+          player_name VARCHAR(16) NOT NULL,
+          mode        VARCHAR(16) NOT NULL,
+          score_type  VARCHAR(8)  NOT NULL,
+          score       INTEGER     NOT NULL DEFAULT 0,
+          score_date  DATE        NOT NULL DEFAULT CURRENT_DATE,
+          created_at  TIMESTAMP DEFAULT NOW(),
+          UNIQUE (player_id, mode, score_type, score_date)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_daily_date ON daily_scores(score_date, mode, score_type);
 
         CREATE TABLE IF NOT EXISTS accounts (
           id            SERIAL PRIMARY KEY,
@@ -91,6 +106,19 @@ if (process.env.DATABASE_URL) {
         CREATE INDEX IF NOT EXISTS idx_scores_mode_type ON scores(mode, score_type);
         CREATE INDEX IF NOT EXISTS idx_scores_player    ON scores(player_id);
         CREATE INDEX IF NOT EXISTS idx_tokens_player    ON auth_tokens(player_id);
+        CREATE INDEX IF NOT EXISTS idx_daily_date ON daily_scores(score_date, mode, score_type);
+
+        -- Update constraint to allow 'coin' type (safe: drops old if exists, adds new)
+        DO $$ BEGIN
+          BEGIN
+            ALTER TABLE scores DROP CONSTRAINT IF EXISTS scores_score_type_check;
+          EXCEPTION WHEN undefined_object THEN NULL;
+          END;
+          BEGIN
+            ALTER TABLE scores ADD CONSTRAINT scores_score_type_check CHECK (score_type IN ('jump','run','coin'));
+          EXCEPTION WHEN duplicate_object THEN NULL;
+          END;
+        END $$;
       `);
       console.log('✅ Database ready');
     } catch (err) {
@@ -105,7 +133,7 @@ if (process.env.DATABASE_URL) {
 }
 
 const VALID_MODES = ['egypt','day','night','snow','ocean','sakura','ramadan'];
-const VALID_TYPES = ['jump','run'];
+const VALID_TYPES = ['jump','run','coin'];
 
 // ============================================================
 // AUTH MIDDLEWARE
@@ -363,25 +391,60 @@ app.post('/api/scores', async (req, res) => {
             created_at = CASE WHEN EXCLUDED.score > scores.score THEN NOW() ELSE scores.created_at END
     `, [player_id, pr.rows[0].name, mode, score_type, score]);
 
+    // Also save to daily_scores (best of today)
+    await pool.query(`
+      INSERT INTO daily_scores (player_id, player_name, mode, score_type, score, score_date)
+      VALUES ($1,$2,$3,$4,$5,CURRENT_DATE)
+      ON CONFLICT (player_id, mode, score_type, score_date) DO UPDATE
+        SET score = GREATEST(daily_scores.score, EXCLUDED.score),
+            player_name = EXCLUDED.player_name
+    `, [player_id, pr.rows[0].name, mode, score_type, score]);
+
     res.json({ success: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Get leaderboard top 10
+// Get leaderboard top 10 with optional period filter
 app.get('/api/leaderboard/:mode/:type', async (req, res) => {
   if (!pool) return res.json({ mode: req.params.mode, type: req.params.type, entries: [] });
   const { mode, type } = req.params;
+  const period = req.query.period || 'all'; // all, daily, weekly
+
   if (!VALID_MODES.includes(mode)) return res.status(400).json({ error: 'Mode tidak valid' });
   if (!VALID_TYPES.includes(type)) return res.status(400).json({ error: 'Type tidak valid' });
 
   try {
-    const r = await pool.query(`
-      SELECT ROW_NUMBER() OVER (ORDER BY score DESC, created_at ASC) AS rank,
-             player_name AS name, score
-      FROM scores WHERE mode=$1 AND score_type=$2
-      ORDER BY score DESC, created_at ASC LIMIT 10
-    `, [mode, type]);
-    res.json({ mode, type, entries: r.rows });
+    let r;
+    if (period === 'daily') {
+      // Best score today per player
+      r = await pool.query(`
+        SELECT ROW_NUMBER() OVER (ORDER BY score DESC, created_at ASC) AS rank,
+               player_name AS name, score
+        FROM daily_scores
+        WHERE mode=$1 AND score_type=$2 AND score_date = CURRENT_DATE
+        ORDER BY score DESC, created_at ASC LIMIT 10
+      `, [mode, type]);
+    } else if (period === 'weekly') {
+      // Best score this week per player
+      r = await pool.query(`
+        SELECT ROW_NUMBER() OVER (ORDER BY MAX(score) DESC) AS rank,
+               player_name AS name, MAX(score) AS score
+        FROM daily_scores
+        WHERE mode=$1 AND score_type=$2
+          AND score_date >= CURRENT_DATE - INTERVAL '7 days'
+        GROUP BY player_id, player_name
+        ORDER BY score DESC LIMIT 10
+      `, [mode, type]);
+    } else {
+      // All time
+      r = await pool.query(`
+        SELECT ROW_NUMBER() OVER (ORDER BY score DESC, created_at ASC) AS rank,
+               player_name AS name, score
+        FROM scores WHERE mode=$1 AND score_type=$2
+        ORDER BY score DESC, created_at ASC LIMIT 10
+      `, [mode, type]);
+    }
+    res.json({ mode, type, period, entries: r.rows });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

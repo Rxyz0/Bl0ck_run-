@@ -1803,132 +1803,120 @@
 
 /* Achievement Card */
 .achievement-card {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-    border: 3px solid #000;
-    padding: 15px;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+    border: 3px solid #222;
+    box-shadow: 5px 5px 0 #111;
+    padding: clamp(14px, 3.5vw, 18px);
     position: relative;
 }
 
 .achievement-card.locked {
-    opacity: 0.6;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    opacity: 0.5;
 }
 
 .achievement-card.unlocked {
     border-color: #FFD700;
-    box-shadow: 4px 4px 0 rgba(255,215,0,0.3), 0 0 20px rgba(255,215,0,0.2);
+    box-shadow: 5px 5px 0 #4a3800;
 }
 
 .achievement-icon {
-    font-size: 32px;
-    text-align: center;
-    margin-bottom: 10px;
+    font-size: clamp(24px, 6vw, 32px);
     filter: grayscale(100%);
+    flex-shrink: 0;
 }
 
 .achievement-card.unlocked .achievement-icon {
     filter: grayscale(0%);
-    animation: unlockPulse 2s ease-in-out infinite;
 }
 
 @keyframes unlockPulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    50% { transform: scale(1.08); }
 }
 
 .achievement-title {
-    font-size: 12px;
-    color: #fff;
-    margin-bottom: 8px;
+    font-size: clamp(9px, 2.3vw, 12px);
+    color: #00ff88;
     font-family: 'Press Start 2P', monospace;
-    text-align: center;
 }
 
 .achievement-desc {
-    font-size: 9px;
-    color: #aaa;
-    margin-bottom: 10px;
-    text-align: center;
-    line-height: 1.4;
-}
-
-.achievement-progress {
-    font-size: 10px;
-    color: #00ff88;
-    text-align: center;
+    font-size: clamp(6px, 1.5vw, 8px);
+    color: #555;
+    line-height: 1.8;
     font-family: 'Press Start 2P', monospace;
 }
 
-/* NEW: Tier Navigation */
+.achievement-progress {
+    font-size: clamp(7px, 1.8vw, 9px);
+    color: #888;
+    font-family: 'Press Start 2P', monospace;
+}
+
+/* Tier Navigation */
 .tier-navigation {
     text-align: center;
-    margin: 20px auto;
-    padding: 15px;
-    background: #1a1a1a;
+    margin: 16px auto;
+    padding: clamp(12px,3vw,16px);
+    background: linear-gradient(135deg, #111, #1a1a1a);
     border: 3px solid #FFD700;
-    box-shadow: 4px 4px 0 rgba(255,215,0,0.3);
+    box-shadow: 5px 5px 0 #4a3800;
     max-width: 400px;
 }
 
 .tier-title {
-    font-size: 14px;
+    font-size: clamp(9px, 2.3vw, 12px);
     color: #FFD700;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-family: 'Press Start 2P', monospace;
 }
 
 .tier-requirement {
-    font-size: 9px;
-    color: #aaa;
+    font-size: clamp(6px, 1.5vw, 8px);
+    color: #555;
     margin-bottom: 12px;
-    line-height: 1.5;
+    line-height: 1.8;
+    font-family: 'Press Start 2P', monospace;
 }
 
 .tier-nav-btn {
-    padding: 10px 20px;
-    background: #FFD700;
+    padding: clamp(8px,2vh,10px) clamp(14px,3.5vw,18px);
+    background: linear-gradient(135deg, #FFD700, #FFA500);
     border: 3px solid #000;
     color: #000;
-    font-size: 10px;
+    font-size: clamp(7px, 1.8vw, 9px);
     font-family: 'Press Start 2P', monospace;
     cursor: pointer;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+    box-shadow: 3px 3px 0 #8B6914;
     transition: all 0.1s;
+    letter-spacing: 1px;
 }
 
 .tier-nav-btn:active {
     transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    box-shadow: 1px 1px 0 #8B6914;
 }
 
 .tier-nav-btn:disabled {
-    background: #666;
-    color: #aaa;
+    background: #222;
+    border-color: #333;
+    color: #444;
+    box-shadow: 3px 3px 0 #111;
     cursor: not-allowed;
-    opacity: 0.5;
 }
 
 .tier-locked-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.8);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: clamp(24px, 6vw, 32px);
 }
 
-.tier-section {
-    display: none;
-}
-
-.tier-section.active {
-    display: block;
-}
+.tier-section { display: none; }
+.tier-section.active { display: block; }
 
 /* Daily Check-in */
 .checkin-container {
@@ -1939,120 +1927,169 @@
 }
 
 .checkin-card {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-    border: 3px solid #000;
-    padding: 20px;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
-    text-align: center;
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+    border: 3px solid #222;
+    box-shadow: 5px 5px 0 #111;
+    padding: clamp(14px, 3.5vw, 20px);
+    position: relative;
+}
+
+/* Left accent stripe */
+.checkin-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+    background: #FFD700;
 }
 
 .checkin-title {
-    font-size: 14px;
+    font-size: clamp(9px, 2.3vw, 12px);
     color: #FFD700;
-    margin-bottom: 15px;
+    margin-bottom: clamp(12px, 3vh, 16px);
     font-family: 'Press Start 2P', monospace;
+    padding-left: 10px;
+    letter-spacing: 1px;
 }
 
-.checkin-days {
+.checkin-mode-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px, 1.5vw, 8px);
+    color: #555;
+    margin-bottom: clamp(8px, 2vh, 10px);
+    padding-left: 10px;
+    letter-spacing: 1px;
+}
+
+.checkin-mode-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-    gap: 10px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: clamp(14px, 3vh, 18px);
 }
 
-@media (orientation: landscape) and (min-width: 768px) {
-    .checkin-days {
-        grid-template-columns: repeat(7, 1fr);
-    }
-}
-
-.checkin-day {
-    background: #333;
-    border: 2px solid #000;
-    padding: 10px;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-}
-
-.checkin-day.claimed {
-    background: linear-gradient(135deg, #00ff88 0%, #00cc70 100%);
-    border-color: #006644;
-}
-
-.checkin-day.current {
-    border-color: #FFD700;
-    box-shadow: 2px 2px 0 rgba(255,215,0,0.3), 0 0 10px rgba(255,215,0,0.5);
-}
-
-.checkin-day-num {
-    font-size: 10px;
-    color: #fff;
-    margin-bottom: 5px;
-    font-family: 'Press Start 2P', monospace;
-}
-
-.checkin-reward {
-    font-size: 18px;
-}
-
-.checkin-btn {
-    width: 100%;
-    max-width: 200px;
-    padding: 12px;
-    background: #FFD700;
-    border: 3px solid #000;
-    color: #000;
-    font-size: 12px;
-    font-family: 'Press Start 2P', monospace;
-    cursor: pointer;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
-    transition: all 0.1s;
-    margin: 0 auto;
-    display: block;
-}
-
-.checkin-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-}
-
-.checkin-btn:disabled {
-    background: #666;
-    color: #aaa;
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-.checkin-streak {
-    font-size: 10px;
-    color: #00ff88;
-    margin-top: 15px;
-    font-family: 'Press Start 2P', monospace;
+@media (max-width: 360px) {
+    .checkin-mode-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 .mode-selector-btn {
-    padding: 8px 12px;
-    border: 2px solid #000;
-    color: #fff;
-    font-size: 8px;
+    padding: clamp(6px, 1.5vh, 8px) 4px;
+    border: 2px solid #222;
+    color: #555;
+    font-size: clamp(5px, 1.2vw, 7px);
     font-family: 'Press Start 2P', monospace;
     cursor: pointer;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
     transition: all 0.1s;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 5px;
-    opacity: 0.6;
+    gap: 4px;
+    background: #0a0a0a;
+    letter-spacing: 0.5px;
 }
 
 .mode-selector-btn.active {
-    opacity: 1;
     border-color: #FFD700;
-    box-shadow: 2px 2px 0 rgba(255,215,0,0.5), 0 0 10px rgba(255,215,0,0.3);
+    color: #FFD700;
+    background: #1a1500;
+    box-shadow: 2px 2px 0 #4a3800;
 }
 
 .mode-selector-btn:active {
     transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+.checkin-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: clamp(5px, 1.5vw, 8px);
+    margin-bottom: clamp(14px, 3vh, 18px);
+}
+
+@media (max-width: 480px) {
+    .checkin-days { grid-template-columns: repeat(4, 1fr); }
+}
+
+.checkin-day {
+    background: #0a0a0a;
+    border: 2px solid #1a1a1a;
+    padding: clamp(7px, 2vw, 10px) 4px;
+    text-align: center;
+    position: relative;
+}
+
+.checkin-day.claimed {
+    background: linear-gradient(135deg, #0d2d0d, #162016);
+    border-color: #4CAF50;
+}
+
+.checkin-day.current {
+    border-color: #FFD700;
+    background: #1a1500;
+    box-shadow: 0 0 8px rgba(255,215,0,0.3);
+}
+
+.checkin-day-num {
+    font-size: clamp(5px, 1.2vw, 7px);
+    color: #444;
+    margin-bottom: 4px;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.checkin-day.current .checkin-day-num { color: #FFD700; }
+.checkin-day.claimed .checkin-day-num { color: #4CAF50; }
+
+.checkin-reward {
+    font-size: clamp(14px, 3.5vw, 18px);
+    line-height: 1;
+    margin-bottom: 3px;
+}
+
+.checkin-day-coins {
+    font-size: clamp(5px, 1.2vw, 7px);
+    color: #666;
+    font-family: 'Press Start 2P', monospace;
+}
+
+.checkin-day.current .checkin-day-coins { color: #FFD700; }
+.checkin-day.claimed .checkin-day-coins { color: #4CAF50; }
+
+.checkin-btn {
+    width: 100%;
+    padding: clamp(10px, 2.5vh, 13px);
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border: 3px solid #000;
+    color: #000;
+    font-size: clamp(8px, 2vw, 10px);
+    font-family: 'Press Start 2P', monospace;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #8B6914;
+    transition: all 0.1s;
+    letter-spacing: 1px;
+    margin-bottom: clamp(10px, 2.5vh, 14px);
+}
+
+.checkin-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #8B6914;
+}
+
+.checkin-btn:disabled {
+    background: #1a1a1a;
+    border-color: #222;
+    box-shadow: 3px 3px 0 #111;
+    color: #333;
+    cursor: not-allowed;
+}
+
+.checkin-streak {
+    font-size: clamp(7px, 1.8vw, 9px);
+    color: #888;
+    font-family: 'Press Start 2P', monospace;
+    padding-left: 10px;
+    padding-top: clamp(10px, 2.5vh, 14px);
+    border-top: 1px solid #1a1a1a;
+    letter-spacing: 1px;
 }
 
 /* Fix untuk landscape mode */
@@ -2202,94 +2239,112 @@
 }
 
 .mission-card {
-    background: #1a1a1a;
-    border: 4px solid #00ff88;
-    box-shadow: 6px 6px 0 #006644;
-    padding: clamp(15px, 4vw, 20px);
-    margin-bottom: clamp(15px, 3vh, 20px);
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+    border: 3px solid #00ff88;
+    box-shadow: 5px 5px 0 #003322;
+    padding: clamp(14px, 3.5vw, 18px);
+    margin-bottom: clamp(12px, 2.5vh, 16px);
     position: relative;
-    transition: transform 0.1s;
+    transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .mission-card:active {
     transform: translate(3px, 3px);
-    box-shadow: 3px 3px 0 #006644;
+    box-shadow: 2px 2px 0 #003322;
 }
 
 .mission-card.completed {
-    background: #2a2a2a;
+    background: linear-gradient(135deg, #0d1f0d 0%, #162016 100%);
     border-color: #4CAF50;
-    box-shadow: 6px 6px 0 #388E3C;
+    box-shadow: 5px 5px 0 #1a3d1a;
+}
+
+.mission-card.claimed-card {
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+    border-color: #333;
+    box-shadow: 5px 5px 0 #222;
+    opacity: 0.6;
+}
+
+/* Mode accent stripe on left */
+.mission-card::before {
+    content:'';
+    position:absolute;
+    top:0;left:0;bottom:0;
+    width:4px;
+    background: var(--mode-color, #00ff88);
 }
 
 .mission-title {
-    font-size: clamp(12px, 3.5vw, 16px);
-    font-weight: bold;
+    font-size: clamp(9px, 2.5vw, 12px);
     color: #00ff88;
-    margin-bottom: clamp(10px, 2vh, 12px);
+    margin-bottom: clamp(6px, 1.5vh, 9px);
     display: flex;
     align-items: center;
     gap: clamp(8px, 2vw, 10px);
     font-family: 'Press Start 2P', monospace;
-    text-shadow: 2px 2px 0 #006644;
+    padding-left: 8px;
 }
 
 .mission-icon {
-    font-size: clamp(20px, 5vw, 24px);
+    font-size: clamp(18px, 4.5vw, 22px);
+    flex-shrink:0;
 }
 
 .mission-desc {
-    font-size: clamp(9px, 2.5vw, 12px);
-    color: #888;
-    margin-bottom: clamp(12px, 3vh, 15px);
-    line-height: 1.6;
+    font-size: clamp(7px, 1.8vw, 9px);
+    color: #666;
+    margin-bottom: clamp(10px, 2.5vh, 13px);
+    line-height: 1.8;
     font-family: 'Press Start 2P', monospace;
+    padding-left: 8px;
 }
 
 .mission-progress {
-    margin-bottom: clamp(12px, 3vh, 15px);
+    margin-bottom: clamp(10px, 2.5vh, 13px);
 }
 
 .progress-label {
-    font-size: clamp(8px, 2vw, 11px);
-    color: #00ff88;
-    margin-bottom: clamp(5px, 1vh, 6px);
+    font-size: clamp(7px, 1.8vw, 9px);
+    color: #888;
+    margin-bottom: clamp(4px, 1vh, 5px);
     display: flex;
     justify-content: space-between;
     font-family: 'Press Start 2P', monospace;
 }
 
+.progress-label strong {
+    color: #00ff88;
+}
+
 .progress-bar-bg {
     width: 100%;
-    height: clamp(16px, 4vw, 20px);
-    background: #333;
-    border: 3px solid #00ff88;
+    height: clamp(12px, 3vw, 16px);
+    background: #0a0a0a;
+    border: 2px solid #333;
     overflow: hidden;
     position: relative;
-    box-shadow: 3px 3px 0 #006644;
 }
 
 .progress-bar-fill-mission {
     height: 100%;
-    background: #4CAF50;
-    transition: width 0.3s ease;
+    background: linear-gradient(90deg, #00cc55, #00ff88);
+    transition: width 0.4s ease;
     position: relative;
-    box-shadow: inset -2px -2px 0 rgba(0,0,0,0.3);
+}
+
+.progress-bar-fill-mission.full {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
 }
 
 .progress-bar-fill-mission::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: repeating-linear-gradient(
         90deg,
-        transparent,
-        transparent 8px,
-        rgba(255,255,255,0.2) 8px,
-        rgba(255,255,255,0.2) 12px
+        transparent, transparent 6px,
+        rgba(255,255,255,0.15) 6px, rgba(255,255,255,0.15) 8px
     );
 }
 
@@ -2297,58 +2352,72 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: clamp(10px, 2vh, 12px);
-    border-top: 2px solid rgba(0, 255, 136, 0.3);
+    padding-top: clamp(8px, 2vh, 10px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-left: 8px;
 }
 
 .reward-info {
     display: flex;
     align-items: center;
-    gap: clamp(6px, 2vw, 8px);
-    font-size: clamp(10px, 3vw, 14px);
-    font-weight: bold;
-    color: #ffd93d;
+    gap: clamp(5px, 1.5vw, 7px);
+    font-size: clamp(8px, 2vw, 10px);
+    color: #FFD700;
     font-family: 'Press Start 2P', monospace;
 }
 
 .claim-btn {
-    padding: clamp(8px, 2vh, 10px) clamp(14px, 4vw, 20px);
-    font-size: clamp(9px, 2.5vw, 12px);
-    font-weight: bold;
+    padding: clamp(7px, 1.8vh, 9px) clamp(12px, 3vw, 16px);
+    font-size: clamp(7px, 2vw, 9px);
     font-family: 'Press Start 2P', monospace;
     border: 3px solid #000;
-    background: #FFD700;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
     color: #000;
     cursor: pointer;
-    box-shadow: 4px 4px 0 #ccae31;
+    box-shadow: 3px 3px 0 #8B6914;
     transition: all 0.1s;
     white-space: nowrap;
+    letter-spacing: 1px;
 }
 
 .claim-btn:active {
     transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #ccae31;
+    box-shadow: 1px 1px 0 #8B6914;
 }
 
 .claim-btn:disabled {
-    background: #666;
-    box-shadow: 4px 4px 0 #444;
+    background: #222;
+    border-color: #333;
+    box-shadow: 3px 3px 0 #111;
+    color: #444;
     cursor: not-allowed;
-    opacity: 0.5;
 }
 
 .completed-badge {
     position: absolute;
-    top: clamp(10px, 2vh, 15px);
-    right: clamp(10px, 3vw, 15px);
-    background: #4CAF50;
+    top: clamp(8px, 2vh, 12px);
+    right: clamp(8px, 2.5vw, 12px);
+    background: linear-gradient(135deg, #22c55e, #16a34a);
     color: #fff;
-    padding: clamp(4px, 1vh, 6px) clamp(8px, 2vw, 12px);
-    font-size: clamp(7px, 2vw, 10px);
-    font-weight: bold;
+    padding: clamp(3px, 0.8vh, 5px) clamp(6px, 1.5vw, 9px);
+    font-size: clamp(6px, 1.5vw, 8px);
     font-family: 'Press Start 2P', monospace;
-    box-shadow: 2px 2px 0 #388E3C;
-    border: 2px solid #000;
+    box-shadow: 2px 2px 0 #166534;
+    border: 2px solid rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+}
+
+.claimed-badge-label {
+    position: absolute;
+    top: clamp(8px, 2vh, 12px);
+    right: clamp(8px, 2.5vw, 12px);
+    background: #2a2a2a;
+    color: #555;
+    padding: clamp(3px, 0.8vh, 5px) clamp(6px, 1.5vw, 9px);
+    font-size: clamp(6px, 1.5vw, 8px);
+    font-family: 'Press Start 2P', monospace;
+    border: 2px solid #333;
+    letter-spacing: 1px;
 }
 
 .mission-btn:hover {
@@ -3003,7 +3072,8 @@
 
     <div id="loading" class="screen">
     <div class="loading-container">
-        <div class="loading-text">LOADING GAME...</div>
+        <div class="loading-text">bL0CK RUN</div>
+        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.2vw,7px);color:rgba(0,255,136,0.4);letter-spacing:2px;margin-bottom:18px;margin-top:-10px;">v5.6 [BETA]</div>
         
         <div class="loading-spinner">
             <canvas id="skinSpinnerCanvas" width="96" height="96"></canvas>
@@ -3017,7 +3087,7 @@
         
         <div class="loading-tips">
             <div class="tip-label">💡 TIP:</div>
-            <div id="loadingTip">Press SPACE or ↑ to jump, ↓ to duck</div>
+            <div id="loadingTip">Tekan SPACE atau ↑ untuk lompat</div>
         </div>
     </div>
 </div>
@@ -3147,6 +3217,42 @@
                 📊
             </div>
             <div class="title">bL0CK RUN</div>
+
+            <!-- Player name + account bar -->
+            <div id="menuPlayerBar" style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: clamp(10px,2.5vh,18px);
+                margin-top: -8px;
+            ">
+                <div id="menuPlayerName" style="
+                    font-family:'Press Start 2P',monospace;
+                    font-size:clamp(6px,1.5vw,9px);
+                    color:rgba(0,255,136,0.7);
+                    letter-spacing:1px;
+                    max-width:160px;
+                    overflow:hidden;
+                    text-overflow:ellipsis;
+                    white-space:nowrap;
+                ">—</div>
+                <button onclick="showAccountMenu()" style="
+                    font-family:'Press Start 2P',monospace;
+                    font-size:clamp(5px,1.2vw,7px);
+                    background:transparent;
+                    border:2px solid rgba(0,255,136,0.3);
+                    color:rgba(0,255,136,0.5);
+                    padding:4px 8px;
+                    cursor:pointer;
+                    letter-spacing:1px;
+                    transition:all 0.1s;
+                " onmouseover="this.style.borderColor='rgba(0,255,136,0.7)';this.style.color='rgba(0,255,136,0.9)'"
+                   onmouseout="this.style.borderColor='rgba(0,255,136,0.3)';this.style.color='rgba(0,255,136,0.5)'">
+                    👤 AKUN
+                </button>
+            </div>
+
 <div class="pixel-line"></div>
 <button class="btn" onclick="showGameTypeSelect()">PLAY</button>
 <div class="btn-row">
@@ -3165,7 +3271,7 @@
             letter-spacing: 1px;
             pointer-events: none;
             white-space: nowrap;
-        ">v5.5 [BETA]</div>
+        ">v5.6 [BETA]</div>
     </div>
 
 <div id="dailyMission" class="screen">
@@ -3892,8 +3998,15 @@
                     </div>
                     <!-- Type tabs -->
                     <div class="lb-type-tabs">
-                        <button class="lb-type-tab active" id="lbTypeJump" onclick="selectLbType('jump')">🏆 JUMP SCORE</button>
-                        <button class="lb-type-tab" id="lbTypeRun" onclick="selectLbType('run')">🏃 RUN SCORE</button>
+                        <button class="lb-type-tab active" id="lbTypeJump" onclick="selectLbType('jump')">🏆 JUMP</button>
+                        <button class="lb-type-tab" id="lbTypeRun" onclick="selectLbType('run')">🏃 RUN</button>
+                        <button class="lb-type-tab" id="lbTypeCoin" onclick="selectLbType('coin')">🪙 KOIN</button>
+                    </div>
+                    <!-- Period tabs -->
+                    <div class="lb-type-tabs" style="margin-top:6px;">
+                        <button class="lb-type-tab active" id="lbPeriodAll" onclick="selectLbPeriod('all')">🏅 SELAMANYA</button>
+                        <button class="lb-type-tab" id="lbPeriodWeek" onclick="selectLbPeriod('weekly')">📅 MINGGUAN</button>
+                        <button class="lb-type-tab" id="lbPeriodDay" onclick="selectLbPeriod('daily')">🌅 HARIAN</button>
                     </div>
                     <!-- Table -->
                     <div id="lbContent">
@@ -3913,203 +4026,160 @@
         <button class="close-btn" onclick="showSettings()">×</button>
         
         <div style="width: 100%; padding: clamp(15px, 3vh, 25px) 0; overflow-y: auto; flex: 1;">
-            <div class="page-title">🔐 ADMIN PANEL</div>
+            <div class="page-title">👑 ADMIN PANEL</div>
             
             <!-- Password Check -->
             <div id="adminPasswordCheck" style="text-align: center; padding: 40px 20px;">
-                <div style="font-size: clamp(10px, 2.5vw, 14px); color: #00ff88; margin-bottom: 20px; font-family: 'Press Start 2P', monospace;">
-                    ENTER ADMIN PASSWORD
-                </div>
-                <input 
-                    type="password" 
-                    id="adminPasswordInput" 
-                    placeholder="Password..." 
-                    style="
-                        width: 100%;
-                        max-width: 300px;
-                        padding: 15px;
-                        font-size: clamp(10px, 2.5vw, 14px);
+                <div style="
+                    background: linear-gradient(135deg, #1a1a2e, #16213e);
+                    border: 3px solid #00ff88;
+                    box-shadow: 0 0 30px rgba(0,255,136,0.2), 6px 6px 0 #003322;
+                    padding: 30px 20px;
+                    max-width: 320px;
+                    margin: 0 auto;
+                ">
+                    <div style="font-size: 40px; margin-bottom: 15px;">🔐</div>
+                    <div style="font-size: clamp(10px, 2.5vw, 13px); color: #00ff88; margin-bottom: 20px; font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
+                        ADMIN LOGIN
+                    </div>
+                    <input 
+                        type="password" 
+                        id="adminPasswordInput" 
+                        placeholder="Password..." 
+                        style="
+                            width: 100%;
+                            padding: 14px;
+                            font-size: clamp(10px, 2.5vw, 13px);
+                            font-family: 'Press Start 2P', monospace;
+                            background: #0a0a1a;
+                            border: 3px solid #00ff88;
+                            color: #00ff88;
+                            text-align: center;
+                            box-shadow: inset 0 0 10px rgba(0,255,136,0.1), 4px 4px 0 #003322;
+                            margin-bottom: 15px;
+                            display: block;
+                        "
+                    >
+                    <button class="btn" onclick="checkAdminPassword()" style="width: 100%; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; letter-spacing: 2px;">
+                        ▶ MASUK
+                    </button>
+                    <div id="adminPasswordError" style="
+                        margin-top: 15px;
+                        color: #ff6b6b;
+                        font-size: clamp(8px, 2vw, 10px);
                         font-family: 'Press Start 2P', monospace;
-                        background: #1a1a1a;
-                        border: 3px solid #00ff88;
-                        color: #fff;
-                        text-align: center;
-                        box-shadow: 4px 4px 0 #006644;
-                        margin-bottom: 15px;
-                    "
-                >
-                <button class="btn" onclick="checkAdminPassword()" style="width: 100%; max-width: 300px;">
-                    LOGIN
-                </button>
-                <div id="adminPasswordError" style="
-                    margin-top: 15px;
-                    color: #ff6b6b;
-                    font-size: clamp(8px, 2vw, 11px);
-                    font-family: 'Press Start 2P', monospace;
-                    display: none;
-                ">WRONG PASSWORD!</div>
+                        display: none;
+                        background: rgba(255,107,107,0.1);
+                        border: 2px solid #ff6b6b;
+                        padding: 8px;
+                    ">WRONG PASSWORD!</div>
+                </div>
             </div>
             
             <!-- Admin Content (Hidden until password correct) -->
             <div id="adminContent" style="display: none;">
                 <div class="settings-container">
-                    
+
+                    <!-- Owner Info -->
+                    <div class="settings-section" style="background: linear-gradient(135deg, #1a2a1a, #0a1a0a); border-color: #00ff88; text-align: center; padding: 15px;">
+                        <div style="font-size: 30px; margin-bottom: 8px;">👑</div>
+                        <div style="font-family:'Press Start 2P',monospace; font-size: clamp(8px,2vw,11px); color: #00ff88; margin-bottom: 5px;">OWNER: REX</div>
+                        <div style="font-family:'Press Start 2P',monospace; font-size: clamp(6px,1.5vw,8px); color: #555;">bl0ck run admin panel v2</div>
+                    </div>
+
                     <!-- Coin Editor -->
                     <div class="settings-section">
                         <h3>💰 COIN EDITOR</h3>
-                        
-                        <div style="padding: 10px 0;">
-                            <!-- Egypt Coins -->
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-size: clamp(9px, 2.5vw, 12px); color: #FFD700; margin-bottom: 10px; font-family: 'Press Start 2P', monospace;">
-                                    🏜️ MESIR COINS
-                                </div>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input 
-                                        type="number" 
-                                        id="adminEgyptCoins" 
-                                        placeholder="0"
-                                        style="
-                                            flex: 1;
-                                            padding: 12px;
-                                            font-size: clamp(10px, 2.5vw, 14px);
-                                            font-family: 'Press Start 2P', monospace;
-                                            background: #1a1a1a;
-                                            border: 3px solid #C19A6B;
-                                            color: #fff;
-                                            text-align: center;
-                                            box-shadow: 4px 4px 0 #8B6914;
-                                        "
-                                    >
-                                    <button class="btn tertiary" onclick="setCoins('egypt')" style="margin: 0; padding: 12px 20px; white-space: nowrap;">
-                                        SET
-                                    </button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 5px 0;">
+                            
+                            <!-- Egypt -->
+                            <div style="background:#1a1a1a; border: 2px solid #C19A6B; padding: 12px; box-shadow: 3px 3px 0 #8B6914;">
+                                <div style="font-size: clamp(8px,2vw,10px); color: #C19A6B; margin-bottom: 8px; font-family: 'Press Start 2P', monospace;">🏜️ MESIR</div>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="adminEgyptCoins" placeholder="0" min="0" style="flex:1; padding:8px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #C19A6B; color:#fff; text-align:center;">
+                                    <button onclick="setCoins('egypt')" style="padding:8px 10px; background:#C19A6B; border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:2px 2px 0 #8B6914; white-space:nowrap;">SET</button>
                                 </div>
                             </div>
-                            
-                            <!-- Day Coins -->
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-size: clamp(9px, 2.5vw, 12px); color: #FFD700; margin-bottom: 10px; font-family: 'Press Start 2P', monospace;">
-                                    ☀️ SIANG COINS
-                                </div>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input 
-                                        type="number" 
-                                        id="adminDayCoins" 
-                                        placeholder="0"
-                                        style="
-                                            flex: 1;
-                                            padding: 12px;
-                                            font-size: clamp(10px, 2.5vw, 14px);
-                                            font-family: 'Press Start 2P', monospace;
-                                            background: #1a1a1a;
-                                            border: 3px solid #FFA500;
-                                            color: #fff;
-                                            text-align: center;
-                                            box-shadow: 4px 4px 0 #cc8400;
-                                        "
-                                    >
-                                    <button class="btn tertiary" onclick="setCoins('day')" style="margin: 0; padding: 12px 20px; white-space: nowrap;">
-                                        SET
-                                    </button>
+
+                            <!-- Day -->
+                            <div style="background:#1a1a1a; border: 2px solid #FFA500; padding: 12px; box-shadow: 3px 3px 0 #cc8400;">
+                                <div style="font-size: clamp(8px,2vw,10px); color: #FFA500; margin-bottom: 8px; font-family: 'Press Start 2P', monospace;">☀️ SIANG</div>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="adminDayCoins" placeholder="0" min="0" style="flex:1; padding:8px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #FFA500; color:#fff; text-align:center;">
+                                    <button onclick="setCoins('day')" style="padding:8px 10px; background:#FFA500; border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:2px 2px 0 #cc8400; white-space:nowrap;">SET</button>
                                 </div>
                             </div>
-                            
-                            <!-- Night Coins -->
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-size: clamp(9px, 2.5vw, 12px); color: #FFD700; margin-bottom: 10px; font-family: 'Press Start 2P', monospace;">
-                                    🌙 MALAM COINS
-                                </div>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input 
-                                        type="number" 
-                                        id="adminNightCoins" 
-                                        placeholder="0"
-                                        style="
-                                            flex: 1;
-                                            padding: 12px;
-                                            font-size: clamp(10px, 2.5vw, 14px);
-                                            font-family: 'Press Start 2P', monospace;
-                                            background: #1a1a1a;
-                                            border: 3px solid #8B5CF6;
-                                            color: #fff;
-                                            text-align: center;
-                                            box-shadow: 4px 4px 0 #6B46C1;
-                                        "
-                                    >
-                                    <button class="btn tertiary" onclick="setCoins('night')" style="margin: 0; padding: 12px 20px; white-space: nowrap;">
-                                        SET
-                                    </button>
+
+                            <!-- Night -->
+                            <div style="background:#1a1a1a; border: 2px solid #8B5CF6; padding: 12px; box-shadow: 3px 3px 0 #6B46C1;">
+                                <div style="font-size: clamp(8px,2vw,10px); color: #8B5CF6; margin-bottom: 8px; font-family: 'Press Start 2P', monospace;">🌙 MALAM</div>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="adminNightCoins" placeholder="0" min="0" style="flex:1; padding:8px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #8B5CF6; color:#fff; text-align:center;">
+                                    <button onclick="setCoins('night')" style="padding:8px 10px; background:#8B5CF6; border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:2px 2px 0 #6B46C1; white-space:nowrap;">SET</button>
                                 </div>
                             </div>
-                            
-                            <!-- Snow Coins -->
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-size: clamp(9px, 2.5vw, 12px); color: #FFD700; margin-bottom: 10px; font-family: 'Press Start 2P', monospace;">
-                                    ❄️ SALJU COINS
-                                </div>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input 
-                                        type="number" 
-                                        id="adminSnowCoins" 
-                                        placeholder="0"
-                                        style="
-                                            flex: 1;
-                                            padding: 12px;
-                                            font-size: clamp(10px, 2.5vw, 14px);
-                                            font-family: 'Press Start 2P', monospace;
-                                            background: #1a1a1a;
-                                            border: 3px solid #87CEEB;
-                                            color: #fff;
-                                            text-align: center;
-                                            box-shadow: 4px 4px 0 #6B9AC4;
-                                        "
-                                    >
-                                    <button class="btn tertiary" onclick="setCoins('snow')" style="margin: 0; padding: 12px 20px; white-space: nowrap;">
-                                        SET
-                                    </button>
+
+                            <!-- Snow -->
+                            <div style="background:#1a1a1a; border: 2px solid #87CEEB; padding: 12px; box-shadow: 3px 3px 0 #6B9AC4;">
+                                <div style="font-size: clamp(8px,2vw,10px); color: #87CEEB; margin-bottom: 8px; font-family: 'Press Start 2P', monospace;">❄️ SALJU</div>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="adminSnowCoins" placeholder="0" min="0" style="flex:1; padding:8px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #87CEEB; color:#fff; text-align:center;">
+                                    <button onclick="setCoins('snow')" style="padding:8px 10px; background:#87CEEB; border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:2px 2px 0 #6B9AC4; white-space:nowrap;">SET</button>
                                 </div>
                             </div>
-                            
-                            <!-- Ocean Coins -->
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-size: clamp(9px, 2.5vw, 12px); color: #FFD700; margin-bottom: 10px; font-family: 'Press Start 2P', monospace;">
-                                    🏖️ PANTAI COINS
+
+                            <!-- Ocean -->
+                            <div style="background:#1a1a1a; border: 2px solid #4682B4; padding: 12px; box-shadow: 3px 3px 0 #36648B;">
+                                <div style="font-size: clamp(8px,2vw,10px); color: #4682B4; margin-bottom: 8px; font-family: 'Press Start 2P', monospace;">🏖️ PANTAI</div>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="adminOceanCoins" placeholder="0" min="0" style="flex:1; padding:8px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #4682B4; color:#fff; text-align:center;">
+                                    <button onclick="setCoins('ocean')" style="padding:8px 10px; background:#4682B4; border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:2px 2px 0 #36648B; white-space:nowrap;">SET</button>
                                 </div>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input 
-                                        type="number" 
-                                        id="adminOceanCoins" 
-                                        placeholder="0"
-                                        style="
-                                            flex: 1;
-                                            padding: 12px;
-                                            font-size: clamp(10px, 2.5vw, 14px);
-                                            font-family: 'Press Start 2P', monospace;
-                                            background: #1a1a1a;
-                                            border: 3px solid #4682B4;
-                                            color: #fff;
-                                            text-align: center;
-                                            box-shadow: 4px 4px 0 #36648B;
-                                        "
-                                    >
-                                    <button class="btn tertiary" onclick="setCoins('ocean')" style="margin: 0; padding: 12px 20px; white-space: nowrap;">
-                                        SET
-                                    </button>
+                            </div>
+
+                            <!-- Sakura -->
+                            <div style="background:#1a1a1a; border: 2px solid #FF5588; padding: 12px; box-shadow: 3px 3px 0 #cc3366;">
+                                <div style="font-size: clamp(8px,2vw,10px); color: #FF5588; margin-bottom: 8px; font-family: 'Press Start 2P', monospace;">🌸 SAKURA</div>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="adminSakuraCoins" placeholder="0" min="0" style="flex:1; padding:8px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #FF5588; color:#fff; text-align:center;">
+                                    <button onclick="setCoins('sakura')" style="padding:8px 10px; background:#FF5588; border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:2px 2px 0 #cc3366; white-space:nowrap;">SET</button>
                                 </div>
+                            </div>
+
+                            <!-- Ramadan -->
+                            <div style="background:#1a1a1a; border: 2px solid #FFE033; padding: 12px; box-shadow: 3px 3px 0 #cc9900; grid-column: 1 / -1;">
+                                <div style="font-size: clamp(8px,2vw,10px); color: #FFE033; margin-bottom: 8px; font-family: 'Press Start 2P', monospace;">☪️ RAMADAN</div>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" id="adminRamadanCoins" placeholder="0" min="0" style="flex:1; padding:8px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #FFE033; color:#fff; text-align:center;">
+                                    <button onclick="setCoins('ramadan')" style="padding:8px 10px; background:#FFE033; border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:2px 2px 0 #cc9900; white-space:nowrap;">SET</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Set All -->
+                        <div style="margin-top: 15px; background: #111; border: 2px solid #333; padding: 12px;">
+                            <div style="font-size: clamp(7px,1.8vw,9px); color: #888; margin-bottom: 10px; font-family: 'Press Start 2P', monospace;">SET SEMUA SEKALIGUS</div>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="number" id="adminAllCoins" placeholder="Jumlah..." min="0" style="flex:1; padding:10px; font-size:clamp(9px,2vw,12px); font-family:'Press Start 2P',monospace; background:#0a0a0a; border:2px solid #555; color:#fff; text-align:center;">
+                                <button onclick="setAllCoins()" style="padding:10px 14px; background:linear-gradient(135deg,#00ff88,#00cc66); border:2px solid #000; font-family:'Press Start 2P',monospace; font-size:8px; color:#000; cursor:pointer; box-shadow:3px 3px 0 #004433; white-space:nowrap;">SET ALL</button>
                             </div>
                         </div>
+
+                        <div id="coinSetMsg" style="margin-top:10px; font-family:'Press Start 2P',monospace; font-size:clamp(7px,1.5vw,9px); color:#00ff88; display:none; text-align:center;"></div>
                     </div>
                     
                     <!-- Mode Unlocker -->
                     <div class="settings-section">
                         <h3>🔓 MODE UNLOCKER</h3>
-                        <button class="btn" onclick="unlockAllModes()" style="width: 100%; margin: 0; margin-bottom: 15px;">
-                            UNLOCK ALL MODES
-                        </button>
-                        <button class="btn secondary" onclick="unlockAllSkins()" style="width: 100%; margin: 0;">
-                            UNLOCK ALL SKINS
-                        </button>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <button class="btn" onclick="unlockAllModes()" style="width:100%; margin:0; font-size:clamp(7px,1.8vw,9px); padding:12px 8px;">
+                                🗺️ UNLOCK ALL MODES
+                            </button>
+                            <button class="btn secondary" onclick="unlockAllSkins()" style="width:100%; margin:0; font-size:clamp(7px,1.8vw,9px); padding:12px 8px;">
+                                🎨 UNLOCK ALL SKINS
+                            </button>
+                        </div>
                         <div id="unlockMessage" style="
                             margin-top: 15px;
                             padding: 10px;
@@ -4343,6 +4413,9 @@ async function doRegister() {
 }
 
 async function onAuthSuccess(username, serverSaveData) {
+  // Tandai bahwa device ini pernah login online — untuk keamanan admin offline
+  localStorage.setItem('bl0ckrun_ever_online', '1');
+
   // Merge server data ke playerData
   if (serverSaveData && Object.keys(serverSaveData).length > 0) {
     playerData = { ...playerData, ...serverSaveData };
@@ -4384,6 +4457,22 @@ async function checkServerReachable() {
 
 // Cek token tersimpan saat halaman dibuka
 async function tryAutoLogin() {
+  // ── DETEKSI: Buka lewat file:// (tidak ada server sama sekali) ──
+  // Ini artinya pure offline HTML, bukan server dengan jaringan mati
+  // → Langsung masuk offline admin mode, tidak perlu cek server
+  const isPureOffline = window.location.protocol === 'file:';
+  if (isPureOffline) {
+    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
+    const hasToken = !!getAuthToken();
+    // Kalau pernah login online dari browser lain / tidak ada bukti online → izinkan admin
+    if (!everOnline && !hasToken) {
+      // Pure fresh install via file:// → admin diizinkan
+      localStorage.setItem('adminUnlocked', 'true');
+    }
+    enterGuestMode();
+    return;
+  }
+
   const token = getAuthToken();
   
   // Cek server dulu
@@ -4442,11 +4531,29 @@ function showServerDownScreen() {
   }
 }
 
+// ============================================================
+// SECURITY: Offline/Guest admin access control
+// Aturan:
+//   1. Pernah login online (ada token tersimpan) → TIDAK PERNAH dapat admin offline
+//      (mencegah orang sengaja matiin internet untuk bypass)
+//   2. Benar-benar tidak punya akun (tidak ada token) → boleh admin offline
+//      (ini untuk kasus deploy tanpa server / development)
+//   3. Online login sebagai Rex → admin langsung aktif (normal flow)
+// ============================================================
+function _isOfflineAdminAllowed() {
+  // Cek apakah pernah punya token (pernah login online)
+  const hadToken = !!localStorage.getItem('bl0ckrun_token');
+  // Cek apakah ada tanda pernah login online sebelumnya (extra flag)
+  const hadOnlineLogin = localStorage.getItem('bl0ckrun_ever_online') === '1';
+  // Jika salah satu true → pasti pernah online → TOLAK admin offline
+  if (hadToken || hadOnlineLogin) return false;
+  return true;
+}
+
 function enterGuestMode() {
   isGuestMode = true;
-  // Reset ke data kosong
   playerData = {
-    name: 'Rex',
+    name: '',
     coins: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
     highScores: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
     highScoresRun: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
@@ -4459,7 +4566,10 @@ function enterGuestMode() {
     achievements:{},
     dailyCheckin:{lastCheckin:null,streak:0,checkedDays:[]}
   };
-  // Tampilkan auth screen tapi dengan info guest
+
+  // Baca ulang setelah tryAutoLogin mungkin sudah set adminUnlocked
+  const offlineAdminOk = localStorage.getItem('adminUnlocked') === 'true';
+
   const authScreen = document.getElementById('authScreen');
   authScreen.classList.add('active');
   const box = authScreen.querySelector('.name-box');
@@ -4469,10 +4579,10 @@ function enterGuestMode() {
       <div class="name-title">OFFLINE MODE</div>
       <div class="name-sub">
         Server tidak tersedia.<br>
-        Main sebagai Rex (offline) — data tersimpan lokal.<br>
-        Admin panel tersedia.
+        Data tersimpan lokal saja.<br>
+        Score tidak masuk leaderboard.
       </div>
-      <button class="name-submit" onclick="startAsGuest()">
+      <button class="name-submit" onclick="startAsGuest(${offlineAdminOk})">
         MAIN OFFLINE →
       </button>
       <div style="margin-top:10px;">
@@ -4484,10 +4594,12 @@ function enterGuestMode() {
   }
 }
 
-function startAsGuest() {
+function startAsGuest(allowAdmin = false) {
   document.getElementById('authScreen').classList.remove('active');
-  // Aktifkan admin panel untuk guest (offline testing)
-  localStorage.setItem('adminUnlocked', 'true');
+  // Hanya unlock admin offline jika benar-benar tidak pernah punya akun online
+  if (allowAdmin) {
+    localStorage.setItem('adminUnlocked', 'true');
+  }
   startLoadingAndGame();
 }
 
@@ -5205,15 +5317,40 @@ const sakuraSkins = [
 
         // Loading animation
 const tips = [
-    "Press SPACE or ↑ to jump, ↓ to duck",
-    "Collect coins to unlock new skins!",
-    "Each skin has unique abilities",
-    "Press E to use special ability",
-    "Unlock Day mode by reaching 240 score in Egypt",
-    "Night mode unlocks at 250 score in Day mode",
-    "Epic and Legendary skins have special powers!",
-    "Avoid obstacles to survive longer"
+    // Kontrol dasar
+    "Tekan SPACE atau ↑ untuk lompat, ↓ untuk jongkok",
+    "Di HP/tablet? Tekan tombol ↑ dan ↓ di layar untuk bermain",
+    "Tekan E untuk menggunakan ability skin kamu!",
+    "Tekan Q untuk ability ke-2 (khusus beberapa skin)",
+    // Mode-mode
+    "Mode Mesir 🏜️ — hindari quicksand dan piramida!",
+    "Mode Siang ☀️ — hati-hati gelombang panas dan hujan badai",
+    "Mode Malam 🌙 — saat meteor shower, geser kiri-kanan untuk menghindar!",
+    "Mode Salju ❄️ — lantai es licin, perhatikan timing lompatmu",
+    "Mode Pantai 🏖️ — tekan S untuk surfing di atas ombak!",
+    "Mode Sakura 🌸 — daun sakura bisa membantumu melompat lebih tinggi",
+    "Mode Ramadan ☪️ — kumpulkan lentera untuk bonus score",
+    // Unlock
+    "Mode Siang terbuka setelah score 240 di Mesir + 100 koin Mesir",
+    "Mode Malam terbuka setelah score 250 di Siang + 125 koin Siang",
+    "Mode Pantai terbuka setelah score 300 di Siang + 150 koin Siang",
+    // Skin & shop
+    "Kumpulkan koin untuk buka skin baru di SHOP!",
+    "Skin Legendary punya ability paling kuat dan unik",
+    "Setiap skin punya warna koin berbeda sesuai mode-nya",
+    "Skin Rare dan Epic punya ability khusus saat bermain",
+    // Score
+    "Ada dua score: RUN (jarak) dan JUMP (lompatan) — dua-duanya masuk leaderboard!",
+    "Leaderboard punya kategori Harian, Mingguan, dan Selamanya",
+    "Score koin kamu juga masuk leaderboard tersendiri!",
+    // Mission & fitur
+    "Cek Daily Mission setiap hari untuk dapat koin bonus",
+    "Daily Check-in setiap hari untuk streak reward!",
+    "Achievement terbuka bertahap — makin susah makin besar rewardnya",
+    "Mode Multiplayer: main berdua dalam satu room!",
+    "Kode redeem tersembunyi di update-update game — stay tuned!",
 ];
+
 
 // ===== SKIN-AWARE LOADING SPINNER =====
 (function() {
@@ -5642,6 +5779,7 @@ function submitName() {
                     clearInterval(li2);
                     setTimeout(() => {
                         document.getElementById('loading').classList.remove('active');
+                        if (typeof updateMenuPlayerBar === 'function') updateMenuPlayerBar();
                         drawRdmPreview();
                         document.getElementById('ramadanNewMapPopup').classList.add('active');
                     }, 900);
@@ -5652,39 +5790,55 @@ function submitName() {
 // === DAILY MISSION SYSTEM ===
 
 const MISSION_TEMPLATES = [
-    // Egypt Missions
-    { id: 'egypt_score_100', mode: 'egypt', icon: '🏺', title: 'Desert Runner I', desc: 'Score 100 points in Egypt mode', target: 100, type: 'score', reward: 20 },
-    { id: 'egypt_score_250', mode: 'egypt', icon: '🏺', title: 'Desert Runner II', desc: 'Score 250 points in Egypt mode', target: 250, type: 'score', reward: 50 },
-    { id: 'egypt_coins_10', mode: 'egypt', icon: '🪙', title: 'Coin Collector', desc: 'Collect 10 coins in Egypt mode', target: 10, type: 'coins', reward: 15 },
-    { id: 'egypt_jump_20', mode: 'egypt', icon: '⬆️', title: 'High Jumper', desc: 'Jump 20 times in Egypt mode', target: 20, type: 'jumps', reward: 10 },
-    { id: 'egypt_quicksand_5', mode: 'egypt', icon: '🏜️', title: 'Desert Survivor', desc: 'Escape from 5 quicksands', target: 5, type: 'quicksand_escape', reward: 30 },
-    
-    // Day Missions
-    { id: 'day_score_100', mode: 'day', icon: '☀️', title: 'Sunny Runner I', desc: 'Score 100 points in Day mode', target: 100, type: 'score', reward: 20 },
-    { id: 'day_score_250', mode: 'day', icon: '☀️', title: 'Sunny Runner II', desc: 'Score 250 points in Day mode', target: 250, type: 'score', reward: 50 },
-    { id: 'day_coins_15', mode: 'day', icon: '🌟', title: 'Solar Collector', desc: 'Collect 15 coins in Day mode', target: 15, type: 'coins', reward: 25 },
-{ id: 'day_water_10', mode: 'day', icon: '💧', title: 'Hydration Master', desc: 'Collect 10 water drops', target: 10, type: 'water_drops', reward: 35 },
-    { id: 'day_survive_heatwave', mode: 'day', icon: '🔥', title: 'Heatwave Survivor', desc: 'Survive 3 heatwaves', target: 3, type: 'heatwave_survive', reward: 40 },
-    
-    // Night Missions
-    { id: 'night_score_100', mode: 'night', icon: '🌙', title: 'Night Runner I', desc: 'Score 100 points in Night mode', target: 100, type: 'score', reward: 20 },
-    { id: 'night_score_250', mode: 'night', icon: '🌙', title: 'Night Runner II', desc: 'Score 250 points in Night mode', target: 250, type: 'score', reward: 50 },
-    { id: 'night_coins_15', mode: 'night', icon: '⭐', title: 'Lunar Collector', desc: 'Collect 15 coins in Night mode', target: 15, type: 'coins', reward: 25 },
-    
-    // Snow Missions
-    { id: 'snow_score_100', mode: 'snow', icon: '❄️', title: 'Snow Runner I', desc: 'Score 100 points in Snow mode', target: 100, type: 'score', reward: 20 },
-    { id: 'snow_score_250', mode: 'snow', icon: '❄️', title: 'Snow Runner II', desc: 'Score 250 points in Snow mode', target: 250, type: 'score', reward: 50 },
-    { id: 'snow_coins_20', mode: 'snow', icon: '💎', title: 'Ice Collector', desc: 'Collect 20 coins in Snow mode', target: 20, type: 'coins', reward: 30 },
+    // ── MESIR ──
+    { id: 'egypt_score_150',   mode: 'egypt',  icon: '🏺', title: 'Desert Runner',    desc: 'Capai 150 score di mode Mesir',         target: 150, type: 'score',  reward: 75 },
+    { id: 'egypt_score_300',   mode: 'egypt',  icon: '⚱️', title: 'Pharaoh Runner',   desc: 'Capai 300 score di mode Mesir',         target: 300, type: 'score',  reward: 140 },
+    { id: 'egypt_coins_15',    mode: 'egypt',  icon: '🪙', title: 'Kolektor Mesir',   desc: 'Kumpulkan 15 koin di mode Mesir',       target: 15,  type: 'coins',  reward: 60 },
+    { id: 'egypt_coins_40',    mode: 'egypt',  icon: '💰', title: 'Harta Firaun',     desc: 'Kumpulkan 40 koin di mode Mesir',       target: 40,  type: 'coins',  reward: 120 },
+    { id: 'egypt_games_3',     mode: 'egypt',  icon: '🎮', title: 'Petualang Mesir',  desc: 'Main 3 kali di mode Mesir',             target: 3,   type: 'games',  reward: 50 },
 
-// Ocean Missions (REPLACE/UPDATE THIS SECTION)
-{ id: 'ocean_score_100', mode: 'ocean', icon: '🏖️', title: 'Beach Runner I', desc: 'Score 100 points in Ocean mode', target: 100, type: 'score', reward: 20 },
-{ id: 'ocean_score_250', mode: 'ocean', icon: '🏖️', title: 'Beach Runner II', desc: 'Score 250 points in Ocean mode', target: 250, type: 'score', reward: 50 },
-{ id: 'ocean_coins_20', mode: 'ocean', icon: '🐚', title: 'Shell Collector', desc: 'Collect 20 shells in Ocean mode', target: 20, type: 'coins', reward: 30 },
-{ id: 'ocean_surf_5', mode: 'ocean', icon: '🏄', title: 'Wave Surfer', desc: 'Surf 5 waves successfully', target: 5, type: 'surfs', reward: 40 },
-    
-    // General Missions
-    { id: 'any_play_3', mode: 'any', icon: '🎮', title: 'Dedicated Player', desc: 'Play 3 games in any mode', target: 3, type: 'games', reward: 15 },
-    { id: 'any_coins_30', mode: 'any', icon: '💰', title: 'Master Collector', desc: 'Collect 30 coins total', target: 30, type: 'coins', reward: 40 }
+    // ── SIANG ──
+    { id: 'day_score_150',     mode: 'day',    icon: '☀️', title: 'Sunny Runner',     desc: 'Capai 150 score di mode Siang',         target: 150, type: 'score',  reward: 75 },
+    { id: 'day_score_350',     mode: 'day',    icon: '🌤️', title: 'Solar Champion',   desc: 'Capai 350 score di mode Siang',         target: 350, type: 'score',  reward: 150 },
+    { id: 'day_coins_20',      mode: 'day',    icon: '🌟', title: 'Solar Collector',  desc: 'Kumpulkan 20 koin di mode Siang',       target: 20,  type: 'coins',  reward: 75 },
+    { id: 'day_games_3',       mode: 'day',    icon: '🎮', title: 'Penjelajah Siang', desc: 'Main 3 kali di mode Siang',             target: 3,   type: 'games',  reward: 50 },
+
+    // ── MALAM ──
+    { id: 'night_score_150',   mode: 'night',  icon: '🌙', title: 'Night Runner',     desc: 'Capai 150 score di mode Malam',         target: 150, type: 'score',  reward: 75 },
+    { id: 'night_score_350',   mode: 'night',  icon: '🌌', title: 'Lunar Champion',   desc: 'Capai 350 score di mode Malam',         target: 350, type: 'score',  reward: 150 },
+    { id: 'night_coins_20',    mode: 'night',  icon: '⭐', title: 'Lunar Collector',  desc: 'Kumpulkan 20 koin di mode Malam',       target: 20,  type: 'coins',  reward: 75 },
+    { id: 'night_games_3',     mode: 'night',  icon: '🎮', title: 'Penjelajah Malam', desc: 'Main 3 kali di mode Malam',             target: 3,   type: 'games',  reward: 50 },
+
+    // ── SALJU ──
+    { id: 'snow_score_150',    mode: 'snow',   icon: '❄️', title: 'Snow Runner',      desc: 'Capai 150 score di mode Salju',         target: 150, type: 'score',  reward: 75 },
+    { id: 'snow_score_350',    mode: 'snow',   icon: '🌨️', title: 'Blizzard Runner',  desc: 'Capai 350 score di mode Salju',         target: 350, type: 'score',  reward: 150 },
+    { id: 'snow_coins_20',     mode: 'snow',   icon: '💎', title: 'Ice Collector',    desc: 'Kumpulkan 20 koin di mode Salju',       target: 20,  type: 'coins',  reward: 75 },
+    { id: 'snow_games_3',      mode: 'snow',   icon: '🎮', title: 'Penjelajah Salju', desc: 'Main 3 kali di mode Salju',             target: 3,   type: 'games',  reward: 50 },
+
+    // ── PANTAI ──
+    { id: 'ocean_score_150',   mode: 'ocean',  icon: '🏖️', title: 'Beach Runner',     desc: 'Capai 150 score di mode Pantai',        target: 150, type: 'score',  reward: 75 },
+    { id: 'ocean_score_350',   mode: 'ocean',  icon: '🌊', title: 'Wave Champion',    desc: 'Capai 350 score di mode Pantai',        target: 350, type: 'score',  reward: 150 },
+    { id: 'ocean_coins_20',    mode: 'ocean',  icon: '🐚', title: 'Shell Collector',  desc: 'Kumpulkan 20 koin di mode Pantai',      target: 20,  type: 'coins',  reward: 75 },
+    { id: 'ocean_games_3',     mode: 'ocean',  icon: '🎮', title: 'Penjelajah Pantai',desc: 'Main 3 kali di mode Pantai',            target: 3,   type: 'games',  reward: 50 },
+
+    // ── SAKURA ──
+    { id: 'sakura_score_150',  mode: 'sakura', icon: '🌸', title: 'Sakura Runner',    desc: 'Capai 150 score di mode Sakura',        target: 150, type: 'score',  reward: 80 },
+    { id: 'sakura_score_350',  mode: 'sakura', icon: '🌺', title: 'Hanami Champion',  desc: 'Capai 350 score di mode Sakura',        target: 350, type: 'score',  reward: 150 },
+    { id: 'sakura_coins_20',   mode: 'sakura', icon: '🌸', title: 'Petal Collector',  desc: 'Kumpulkan 20 koin di mode Sakura',      target: 20,  type: 'coins',  reward: 80 },
+    { id: 'sakura_games_3',    mode: 'sakura', icon: '🎮', title: 'Penjelajah Sakura',desc: 'Main 3 kali di mode Sakura',            target: 3,   type: 'games',  reward: 55 },
+
+    // ── RAMADAN ──
+    { id: 'ramadan_score_150', mode: 'ramadan',icon: '☪️', title: 'Ramadan Runner',   desc: 'Capai 150 score di mode Ramadan',       target: 150, type: 'score',  reward: 80 },
+    { id: 'ramadan_score_350', mode: 'ramadan',icon: '🕌', title: 'Mubarak Champion', desc: 'Capai 350 score di mode Ramadan',       target: 350, type: 'score',  reward: 150 },
+    { id: 'ramadan_coins_20',  mode: 'ramadan',icon: '🏮', title: 'Lantern Collector',desc: 'Kumpulkan 20 koin di mode Ramadan',     target: 20,  type: 'coins',  reward: 80 },
+    { id: 'ramadan_games_3',   mode: 'ramadan',icon: '🎮', title: 'Penjelajah Ramadan',desc:'Main 3 kali di mode Ramadan',           target: 3,   type: 'games',  reward: 55 },
+
+    // ── UMUM ──
+    { id: 'any_play_5',        mode: 'any',    icon: '🎮', title: 'Pemain Setia',     desc: 'Main 5 kali di mode apapun',           target: 5,   type: 'games',  reward: 60 },
+    { id: 'any_play_10',       mode: 'any',    icon: '🏅', title: 'Veteran',          desc: 'Main 10 kali di mode apapun',          target: 10,  type: 'games',  reward: 100 },
+    { id: 'any_coins_50',      mode: 'any',    icon: '💰', title: 'Master Kolektor',  desc: 'Kumpulkan 50 koin di semua mode',      target: 50,  type: 'coins',  reward: 130 },
+    { id: 'any_score_200',     mode: 'any',    icon: '🏆', title: 'Score Master',     desc: 'Capai 200 score di mode apapun',       target: 200, type: 'score',  reward: 80 },
+    { id: 'any_score_500',     mode: 'any',    icon: '👑', title: 'Legenda',          desc: 'Capai 500 score di mode apapun',       target: 500, type: 'score',  reward: 200 },
 ];
 
 function checkMissionReset() {
@@ -5760,12 +5914,45 @@ function updateMissionProgress(mode, type, amount = 1) {
     }
 }
 
+// Toast notification — ringan, tidak block UI
+function showToast(msg, color = '#00ff88') {
+    const existing = document.getElementById('gameToast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'gameToast';
+    toast.style.cssText = `
+        position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+        background:#111;border:3px solid ${color};
+        color:${color};padding:10px 18px;z-index:9999;
+        font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);
+        box-shadow:4px 4px 0 rgba(0,0,0,0.5);letter-spacing:1px;
+        white-space:nowrap;pointer-events:none;
+        animation:toastIn 0.2s ease forwards;
+    `;
+    toast.textContent = msg;
+    // Tambah style animasi jika belum ada
+    if (!document.getElementById('toastStyle')) {
+        const s = document.createElement('style');
+        s.id = 'toastStyle';
+        s.textContent = '@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+        document.head.appendChild(s);
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2500);
+}
+
 function claimMissionReward(missionId) {
     const mission = playerData.dailyMissions.missions.find(m => m.id === missionId);
     if (!mission || !mission.completed || mission.claimed) return;
     
-    // Give reward
-    playerData.coins[mission.mode === 'any' ? 'egypt' : mission.mode] += mission.reward;
+    // Tentukan mode penerima koin
+    const rewardMode = (mission.mode === 'any') ? 'egypt' : mission.mode;
+    if (!playerData.coins[rewardMode]) playerData.coins[rewardMode] = 0;
+    playerData.coins[rewardMode] += mission.reward;
+    
+    // Update total coins
+    playerData.totalCoins = (playerData.totalCoins || 0) + mission.reward;
+    
     mission.claimed = true;
     playerData.dailyMissions.claimedToday.push(missionId);
     
@@ -5780,8 +5967,8 @@ function claimMissionReward(missionId) {
     renderAchievements();
     updateMissionNotification();
     
-    // Show reward animation
-    alert(`🎉 REWARD CLAIMED!\n\n+${mission.reward} ${mission.mode.toUpperCase()} COINS`);
+    // Show reward toast (tidak pakai alert)
+    showToast(`🎁 +${mission.reward} koin diklaim!`, '#FFD700');
 }
 
 function showDailyMission() { playSound('open');
@@ -5799,84 +5986,46 @@ function showDailyMission() { playSound('open');
 
 // Achievement Templates dengan Tier System
 const ACHIEVEMENT_LIST = [
-    // Achievement 1: Coin Collector
     {
         id: 'coin_collector',
         icon: '🪙',
-        title: 'Coin Collector',
+        title: 'Kolektor Koin',
         tiers: [
-            {
-                tier: 1,
-                target: 200,
-                reward: { type: 'coins', amount: 85, modes: ['egypt', 'day', 'night', 'snow', 'ocean'] },
-                desc: 'Collect 200 total coins'
-            },
-            {
-                tier: 2,
-                target: 800,
-                reward: { type: 'coins', amount: 300, modes: ['egypt', 'day', 'night', 'snow', 'ocean'] },
-                desc: 'Collect 800 total coins (600 more)'
-            },
-            {
-                tier: 3,
-                target: 1800,
-                reward: { type: 'skin', name: 'Special Skin (Coming Soon)' },
-                desc: 'Collect 1800 total coins (1000 more)'
-            }
+            { tier: 1, target: 200,  reward: { type: 'coins', amount: 200,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 200 koin di semua mode' },
+            { tier: 2, target: 800,  reward: { type: 'coins', amount: 600,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 800 koin di semua mode' },
+            { tier: 3, target: 2000, reward: { type: 'coins', amount: 1500, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 2.000 koin di semua mode' },
         ]
     },
-    // Achievement 2: Jump Master
     {
         id: 'jump_master',
         icon: '⬆️',
         title: 'Jump Master',
         tiers: [
-            {
-                tier: 1,
-                target: 950,
-                reward: { type: 'coming_soon' },
-                desc: 'Total high score jump: 950 (all modes combined)'
-            },
-            {
-                tier: 2,
-                target: 15950,
-                reward: { type: 'coming_soon' },
-                desc: 'Total high score jump: 15,950 (15k more)'
-            },
-            {
-                tier: 3,
-                target: 40950,
-                reward: { type: 'coming_soon' },
-                desc: 'Total high score jump: 40,950 (25k more)'
-            }
+            { tier: 1, target: 500,   reward: { type: 'coins', amount: 300,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 500 (gabungan semua mode)' },
+            { tier: 2, target: 3000,  reward: { type: 'coins', amount: 800,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 3.000' },
+            { tier: 3, target: 10000, reward: { type: 'coins', amount: 2000, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 10.000' },
         ]
     },
-    // Achievement 3: Score Master
     {
         id: 'score_master',
         icon: '👑',
         title: 'Score Master',
         tiers: [
-            {
-                tier: 1,
-                target: 1000,
-                reward: { type: 'coming_soon' },
-                desc: 'Reach score 1,000 in any mode'
-            },
-            {
-                tier: 2,
-                target: 5000,
-                reward: { type: 'coming_soon' },
-                desc: 'Reach score 5,000 in any mode'
-            },
-            {
-                tier: 3,
-                target: 10000,
-                reward: { type: 'coming_soon' },
-                desc: 'Reach score 10,000 in any mode'
-            }
+            { tier: 1, target: 500,  reward: { type: 'coins', amount: 300,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 500 di mode manapun' },
+            { tier: 2, target: 2000, reward: { type: 'coins', amount: 800,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 2.000 di mode manapun' },
+            { tier: 3, target: 5000, reward: { type: 'coins', amount: 2000, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 5.000 di mode manapun' },
         ]
-    }
+    },
+    {
+        id: 'mission_hunter',
+        icon: '🎯',
+        title: 'Mission Hunter',
+        tiers: [
+            { tier: 1, target: 5,  reward: { type: 'coins', amount: 250,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 5 daily mission' },
+            { tier: 2, target: 20, reward: { type: 'coins', amount: 700,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 20 daily mission' },
+            { tier: 3, target: 50, reward: { type: 'coins', amount: 1800, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 50 daily mission' },
+        ]
+    },
 ];
 
 function switchMissionTab(tab) { playSound('tab');
@@ -5903,205 +6052,150 @@ function switchMissionTab(tab) { playSound('tab');
 let currentViewingTier = 1;
 
 function unlockNextTier() {
-    // Check if all tier 1 achievements are completed
-    const tier1Complete = ACHIEVEMENT_LIST.every(achievement => {
-        const tier1 = achievement.tiers[0]; // First tier
-        let currentProgress = 0;
-        
-        if (achievement.id === 'coin_collector') {
-            currentProgress = playerData.totalCoins || 0;
-        } else if (achievement.id === 'jump_master') {
-            currentProgress = playerData.totalJumpScore || 0;
-        } else if (achievement.id === 'score_master') {
-            currentProgress = Math.max(...Object.values(playerData.highScoresRun || {}));
-        }
-        
-        return currentProgress >= tier1.target;
-    });
-    
-    if (tier1Complete) {
-        currentViewingTier = 2;
-        renderAchievements();
-    }
+    const tier1Complete = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[0].target);
+    if (tier1Complete) { currentViewingTier = 2; renderAchievements(); }
+}
+
+function getAchievementProgress(id) {
+    if (id === 'coin_collector')  return playerData.totalCoins || 0;
+    if (id === 'jump_master')     return playerData.totalJumpScore || 0;
+    if (id === 'score_master')    return Math.max(0, ...Object.values(playerData.highScoresRun || {egypt:0}));
+    if (id === 'mission_hunter')  return playerData.achievements?.missions_completed || 0;
+    return 0;
 }
 
 function renderAchievements() {
     const container = document.getElementById('achievementList');
     container.innerHTML = '';
-    
-    // Initialize achievements if not exists
-    if (!playerData.achievements) {
-        playerData.achievements = {};
-    }
-    
+    if (!playerData.achievements) playerData.achievements = {};
+
+    // Tier badge colors
+    const tierColors = ['', '#C19A6B', '#87CEEB', '#FFD700'];
+    const tierNames  = ['', '🥉 PERUNGGU', '🥈 PERAK', '🥇 EMAS'];
+
     ACHIEVEMENT_LIST.forEach(achievement => {
-        // Calculate progress based on achievement type
-        let currentProgress = 0;
-        if (achievement.id === 'coin_collector') {
-            currentProgress = playerData.totalCoins || 0;
-        } else if (achievement.id === 'jump_master') {
-            currentProgress = playerData.totalJumpScore || 0;
-        } else if (achievement.id === 'score_master') {
-            currentProgress = Math.max(...Object.values(playerData.highScoresRun || {}));
-        }
-        
-        // Create main card
+        const currentProgress = getAchievementProgress(achievement.id);
+
         const card = document.createElement('div');
         card.style.cssText = `
-            background: #1a1a1a;
-            border: 4px solid #00ff88;
-            box-shadow: 6px 6px 0 #006644;
-            padding: 20px;
-            margin: 15px auto;
-            max-width: 100%;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+            border: 3px solid #222;
+            box-shadow: 5px 5px 0 #111;
+            padding: clamp(14px,3.5vw,18px);
+            margin-bottom: clamp(12px,2.5vh,16px);
+            position: relative;
         `;
-        
-        // Header
+
+        // Header row
         const header = document.createElement('div');
-        header.style.cssText = 'text-align: center; margin-bottom: 20px;';
+        header.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #222;';
         header.innerHTML = `
-            <div style="font-size: 40px; margin-bottom: 10px;">${achievement.icon}</div>
-            <div style="font-size: 18px; color: #00ff88; font-family: 'Press Start 2P', monospace; text-shadow: 2px 2px 0 #006644;">
-                ${achievement.title}
+            <div style="font-size:clamp(28px,7vw,36px);flex-shrink:0;">${achievement.icon}</div>
+            <div>
+                <div style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.3vw,12px);color:#00ff88;margin-bottom:5px;">${achievement.title}</div>
+                <div style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);color:#555;">
+                    Progress: <span style="color:#aaa;">${currentProgress.toLocaleString()}</span>
+                </div>
             </div>
         `;
         card.appendChild(header);
-        
-        // Tier cards - filter by currentViewingTier
+
+        // Tier rows
         achievement.tiers.forEach((tier, index) => {
-            // Only show tiers up to currentViewingTier
             if (tier.tier > currentViewingTier) return;
-            
+
             const isUnlocked = currentProgress >= tier.target;
-            const prevTierTarget = index > 0 ? achievement.tiers[index - 1].target : 0;
-            const isClaimed = playerData.achievements[`${achievement.id}_tier${tier.tier}`] || false;
-            
-            const tierCard = document.createElement('div');
-            tierCard.style.cssText = `
-                background: ${isUnlocked ? '#2d5016' : '#2a2a2a'};
-                border: 3px solid ${isUnlocked ? '#4CAF50' : '#555'};
-                padding: 15px;
-                margin: 10px 0;
-                border-radius: 8px;
-                position: relative;
-            `;
-            
+            const isClaimed  = !!playerData.achievements[`${achievement.id}_tier${tier.tier}`];
+            const pct        = Math.min(100, (currentProgress / tier.target) * 100);
+            const tc         = tierColors[tier.tier];
+            const tn         = tierNames[tier.tier];
+
             let rewardText = '';
             if (tier.reward.type === 'coins') {
-                rewardText = `+${tier.reward.amount} coins (all modes)`;
-            } else if (tier.reward.type === 'skin') {
-                rewardText = tier.reward.name;
+                rewardText = `+${tier.reward.amount.toLocaleString()} koin semua mode`;
             } else {
                 rewardText = 'Coming Soon';
             }
-            
-            tierCard.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <div style="font-size: 16px; color: ${isUnlocked ? '#FFD700' : '#888'}; font-family: 'Press Start 2P', monospace;">
-                        TIER ${tier.tier}
-                    </div>
-                    <div style="font-size: 14px; color: ${isUnlocked ? '#4CAF50' : '#ff6b6b'}; font-family: 'Press Start 2P', monospace;">
+
+            const row = document.createElement('div');
+            row.style.cssText = `
+                background: ${isUnlocked ? 'linear-gradient(135deg,#0d1f0d,#162016)' : '#0a0a0a'};
+                border: 2px solid ${isUnlocked ? '#4CAF50' : '#222'};
+                border-left: 4px solid ${tc};
+                padding: clamp(10px,2.5vw,14px);
+                margin-bottom: 10px;
+                position: relative;
+            `;
+
+            row.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <div style="font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);color:${tc};">${tn}</div>
+                    <div style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);color:${isUnlocked ? '#4CAF50' : '#444'};">
                         ${isUnlocked ? '✓ UNLOCKED' : '🔒 LOCKED'}
                     </div>
                 </div>
-                <div style="font-size: 10px; color: #ddd; margin: 8px 0; line-height: 1.6;">
-                    ${tier.desc}
-                </div>
-                <div style="font-size: 11px; color: #FFD700; margin: 8px 0; font-family: 'Press Start 2P', monospace;">
-                    🎁 Reward: ${rewardText}
-                </div>
-                <div style="margin: 10px 0;">
-                    <div style="background: #000; border: 2px solid #555; height: 20px; border-radius: 10px; overflow: hidden;">
-                        <div style="
-                            background: linear-gradient(90deg, #00ff88, #00cc70);
-                            height: 100%;
-                            width: ${Math.min(100, (currentProgress / tier.target) * 100)}%;
-                            transition: width 0.3s;
-                        "></div>
+                <div style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);color:#555;margin-bottom:10px;line-height:1.8;">${tier.desc}</div>
+                <div style="margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,7px);color:#555;margin-bottom:4px;">
+                        <span>Progress</span>
+                        <span style="color:${isUnlocked?'#4CAF50':'#888'};">${Math.min(currentProgress,tier.target).toLocaleString()} / ${tier.target.toLocaleString()}</span>
                     </div>
-                    <div style="text-align: center; font-size: 9px; color: #aaa; margin-top: 5px;">
-                        ${currentProgress.toLocaleString()} / ${tier.target.toLocaleString()}
+                    <div style="background:#0a0a0a;border:2px solid #222;height:clamp(10px,2.5vw,14px);overflow:hidden;">
+                        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${isUnlocked?'#22c55e,#4ade80':'#333,#555'});transition:width 0.4s;"></div>
                     </div>
                 </div>
-                ${isUnlocked && !isClaimed && tier.reward.type === 'coins' ? `
-                    <button onclick="claimAchievementReward('${achievement.id}', ${tier.tier})" style="
-                        width: 100%;
-                        padding: 10px;
-                        background: #4CAF50;
-                        border: 3px solid #388E3C;
-                        color: #fff;
-                        font-family: 'Press Start 2P', monospace;
-                        font-size: 10px;
-                        cursor: pointer;
-                        border-radius: 5px;
-                        margin-top: 10px;
-                        box-shadow: 3px 3px 0 #2E7D32;
-                    " onmousedown="this.style.transform='translate(2px, 2px)'; this.style.boxShadow='1px 1px 0 #2E7D32';" 
-                       onmouseup="this.style.transform=''; this.style.boxShadow='3px 3px 0 #2E7D32';">
-                        CLAIM REWARD
-                    </button>
-                ` : ''}
-                ${isClaimed ? `
-                    <div style="text-align: center; padding: 10px; background: #1a5c1a; border: 2px solid #4CAF50; border-radius: 5px; margin-top: 10px; font-size: 10px; color: #4CAF50;">
-                        ✓ REWARD CLAIMED
-                    </div>
-                ` : ''}
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #1a1a1a;">
+                    <div style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);color:#FFD700;">🎁 ${rewardText}</div>
+                    ${isUnlocked && !isClaimed && tier.reward.type === 'coins' ? `
+                        <button onclick="claimAchievementReward('${achievement.id}',${tier.tier})"
+                            style="padding:clamp(6px,1.5vh,8px) clamp(10px,2.5vw,14px);font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);
+                            background:linear-gradient(135deg,#FFD700,#FFA500);border:3px solid #000;color:#000;cursor:pointer;
+                            box-shadow:3px 3px 0 #8B6914;letter-spacing:1px;white-space:nowrap;"
+                            onmousedown="this.style.transform='translate(2px,2px)';this.style.boxShadow='1px 1px 0 #8B6914'"
+                            onmouseup="this.style.transform='';this.style.boxShadow='3px 3px 0 #8B6914'">
+                            🎁 KLAIM
+                        </button>
+                    ` : isClaimed ? `
+                        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);color:#4CAF50;">✓ CLAIMED</div>
+                    ` : ''}
+                </div>
             `;
-            
-            card.appendChild(tierCard);
+            card.appendChild(row);
         });
-        
+
         container.appendChild(card);
     });
-    
-    // Show/hide tier navigation based on tier 1 completion
+
+    // Tier nav
     const tierNav = document.getElementById('tierNavigation');
-    if (tierNav && currentViewingTier === 1) {
-        const tier1Complete = ACHIEVEMENT_LIST.every(achievement => {
-            let currentProgress = 0;
-            if (achievement.id === 'coin_collector') {
-                currentProgress = playerData.totalCoins || 0;
-            } else if (achievement.id === 'jump_master') {
-                currentProgress = playerData.totalJumpScore || 0;
-            } else if (achievement.id === 'score_master') {
-                currentProgress = Math.max(...Object.values(playerData.highScoresRun || {}));
-            }
-            const tier1 = achievement.tiers[0];
-            return currentProgress >= tier1.target;
-        });
-        
-        tierNav.style.display = tier1Complete ? 'block' : 'none';
-    } else if (tierNav) {
-        tierNav.style.display = 'none';
+    if (tierNav) {
+        if (currentViewingTier === 1) {
+            const allT1Done = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[0].target);
+            tierNav.style.display = allT1Done ? 'block' : 'none';
+        } else {
+            tierNav.style.display = 'none';
+        }
     }
 }
 
 function claimAchievementReward(achievementId, tier) {
     const achievement = ACHIEVEMENT_LIST.find(a => a.id === achievementId);
     if (!achievement) return;
-    
     const tierData = achievement.tiers.find(t => t.tier === tier);
     if (!tierData) return;
-    
     const claimKey = `${achievementId}_tier${tier}`;
-    if (playerData.achievements[claimKey]) {
-        alert('Reward sudah di-claim!');
-        return;
-    }
-    
-    // Give reward
+    if (playerData.achievements[claimKey]) return;
+
     if (tierData.reward.type === 'coins') {
-        tierData.reward.modes.forEach(mode => {
-            if (playerData.coins[mode] !== undefined) {
-                playerData.coins[mode] += tierData.reward.amount;
-            }
+        const modes = tierData.reward.modes || ['egypt','day','night','snow','ocean','sakura','ramadan'];
+        modes.forEach(mode => {
+            if (playerData.coins[mode] !== undefined) playerData.coins[mode] += tierData.reward.amount;
         });
         playerData.achievements[claimKey] = true;
         saveData();
         updateAllCoinDisplays();
         renderAchievements();
-        alert(`Reward claimed! +${tierData.reward.amount} coins untuk semua mode!`);
+        showToast(`🏆 +${tierData.reward.amount.toLocaleString()} koin semua mode!`, '#FFD700');
     }
 }
 
@@ -6141,96 +6235,80 @@ function checkDailyCheckin() {
 function renderDailyCheckin() {
     const container = document.getElementById('checkinContainer');
     container.innerHTML = '';
-    
-    if (!playerData.dailyCheckin) {
-        playerData.dailyCheckin = {
-            lastCheckin: null,
-            streak: 0,
-            checkedDays: [],
-            selectedMode: 'egypt'
-        };
-    }
-    
-    if (!playerData.dailyCheckin.selectedMode) {
-        playerData.dailyCheckin.selectedMode = 'egypt';
-    }
-    
+
+    if (!playerData.dailyCheckin) playerData.dailyCheckin = { lastCheckin:null, streak:0, checkedDays:[], selectedMode:'egypt' };
+    if (!playerData.dailyCheckin.selectedMode) playerData.dailyCheckin.selectedMode = 'egypt';
+
     const now = new Date();
     const witOffset = 9 * 60;
     const localOffset = now.getTimezoneOffset();
-    const totalOffset = witOffset + localOffset;
-    const witTime = new Date(now.getTime() + totalOffset * 60 * 1000);
+    const witTime = new Date(now.getTime() + (witOffset + localOffset) * 60000);
     const witToday = witTime.toISOString().split('T')[0];
-    
     const hasCheckedToday = playerData.dailyCheckin.checkedDays.includes(witToday);
-    
-    const rewards = [50, 75, 100, 150, 200, 300, 500]; // 7 days rewards - increased!
-    
-    const card = document.createElement('div');
-    card.className = 'checkin-card';
-    
-    // Mode selector
-    const modeSelector = `
-        <div style="margin-bottom: 20px;">
-            <div style="font-size: 10px; color: #aaa; margin-bottom: 10px;">SELECT REWARD MODE:</div>
-            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="selectCheckinMode('egypt')" class="mode-selector-btn ${playerData.dailyCheckin.selectedMode === 'egypt' ? 'active' : ''}" style="background: linear-gradient(135deg, #C19A6B, #8B6914);">
-                    <span class="coin-small coin-egypt" style="width: 16px; height: 16px;"></span> EGYPT
-                </button>
-                <button onclick="selectCheckinMode('day')" class="mode-selector-btn ${playerData.dailyCheckin.selectedMode === 'day' ? 'active' : ''}" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
-                    <span class="coin-small coin-day" style="width: 16px; height: 16px;"></span> DAY
-                </button>
-                <button onclick="selectCheckinMode('night')" class="mode-selector-btn ${playerData.dailyCheckin.selectedMode === 'night' ? 'active' : ''}" style="background: linear-gradient(135deg, #191970, #000080);">
-                    <span class="coin-small coin-night" style="width: 16px; height: 16px;"></span> NIGHT
-                </button>
-                <button onclick="selectCheckinMode('snow')" class="mode-selector-btn ${playerData.dailyCheckin.selectedMode === 'snow' ? 'active' : ''}" style="background: linear-gradient(135deg, #87CEEB, #B0E0E6);">
-                    <span class="coin-small coin-snow" style="width: 16px; height: 16px;"></span> SNOW
-                </button>
-                <button onclick="selectCheckinMode('ocean')" class="mode-selector-btn ${playerData.dailyCheckin.selectedMode === 'ocean' ? 'active' : ''}" style="background: linear-gradient(135deg, #4682B4, #00CED1);">
-                    <span class="coin-small coin-ocean" style="width: 16px; height: 16px;"></span> OCEAN
-                </button>
-            </div>
-        </div>
-    `;
-    
+
+    // Reward per hari — dinaikkan
+    const rewards   = [80, 120, 160, 220, 300, 450, 750];
+    const dayEmojis = ['🌱','🌿','🌳','⭐','🌟','💫','👑'];
+
+    // Mode config
+    const modes = [
+        { id:'egypt',  label:'MESIR',  emoji:'🏜️', bg:'linear-gradient(135deg,#3d2800,#1a1000)' },
+        { id:'day',    label:'SIANG',  emoji:'☀️', bg:'linear-gradient(135deg,#3d2e00,#1a1300)' },
+        { id:'night',  label:'MALAM',  emoji:'🌙', bg:'linear-gradient(135deg,#0d0d2e,#060614)' },
+        { id:'snow',   label:'SALJU',  emoji:'❄️', bg:'linear-gradient(135deg,#001a2e,#000d1a)' },
+        { id:'ocean',  label:'PANTAI', emoji:'🏖️', bg:'linear-gradient(135deg,#00141e,#000a12)' },
+        { id:'sakura', label:'SAKURA', emoji:'🌸', bg:'linear-gradient(135deg,#2e0014,#1a000c)' },
+        { id:'ramadan',label:'RAMADAN',emoji:'☪️', bg:'linear-gradient(135deg,#2e2800,#1a1600)' },
+    ];
+
+    const modeColors = { egypt:'#C19A6B', day:'#FFA500', night:'#8B5CF6', snow:'#87CEEB', ocean:'#4682B4', sakura:'#FF5588', ramadan:'#FFE033' };
+    const sel = playerData.dailyCheckin.selectedMode;
+
+    // Mode grid
+    const modeGridHTML = modes.map(m => `
+        <button onclick="selectCheckinMode('${m.id}')"
+            class="mode-selector-btn ${sel === m.id ? 'active' : ''}"
+            style="background:${m.bg};${sel===m.id?`border-color:${modeColors[m.id]};color:${modeColors[m.id]};box-shadow:2px 2px 0 ${modeColors[m.id]}44`:''}"
+        >
+            <span style="font-size:clamp(12px,3vw,16px);">${m.emoji}</span>
+            <span>${m.label}</span>
+        </button>
+    `).join('');
+
+    // Day tiles
     let daysHTML = '';
     for (let i = 0; i < 7; i++) {
-        const day = i + 1;
-        const reward = rewards[i];
         const isClaimed = i < playerData.dailyCheckin.checkedDays.length;
         const isCurrent = i === playerData.dailyCheckin.checkedDays.length && !hasCheckedToday;
-        
         daysHTML += `
-            <div class="checkin-day ${isClaimed ? 'claimed' : ''} ${isCurrent ? 'current' : ''}">
-                <div class="checkin-day-num">DAY ${day}</div>
-                <div class="checkin-reward">${isClaimed ? '✓' : '🪙'}</div>
-                <div style="font-size: 8px; color: #fff; margin-top: 3px;">${reward}</div>
+            <div class="checkin-day ${isClaimed?'claimed':''} ${isCurrent?'current':''}">
+                <div class="checkin-day-num">hari ${i+1}</div>
+                <div class="checkin-reward">${isClaimed ? '✅' : dayEmojis[i]}</div>
+                <div class="checkin-day-coins">${rewards[i]}</div>
             </div>
         `;
     }
-    
+
+    const streak = playerData.dailyCheckin.checkedDays.length;
+    const streakEmoji = streak >= 7 ? '👑' : streak >= 5 ? '🔥' : streak >= 3 ? '⚡' : '💧';
+
+    const card = document.createElement('div');
+    card.className = 'checkin-card';
     card.innerHTML = `
-        <div class="checkin-title">DAILY CHECK-IN</div>
-        ${modeSelector}
+        <div class="checkin-title">📅 DAILY CHECK-IN</div>
+        <div class="checkin-mode-label">PILIH MODE REWARD:</div>
+        <div class="checkin-mode-grid">${modeGridHTML}</div>
         <div class="checkin-days">${daysHTML}</div>
-        <button class="checkin-btn" onclick="claimDailyCheckin()" ${hasCheckedToday ? 'disabled' : ''}>
-            ${hasCheckedToday ? 'CLAIMED TODAY' : 'CLAIM REWARD'}
+        <button class="checkin-btn" onclick="claimDailyCheckin()" ${hasCheckedToday?'disabled':''}>
+            ${hasCheckedToday ? '✓ SUDAH CHECK-IN HARI INI' : '🎁 CLAIM CHECK-IN'}
         </button>
-        <div class="checkin-streak">🔥 Current Streak: ${playerData.dailyCheckin.checkedDays.length} Days</div>
+        <div class="checkin-streak">${streakEmoji} STREAK: ${streak} HARI${streak>=7?' — SEMPURNA!':''}</div>
     `;
-    
     container.appendChild(card);
 }
 
 function selectCheckinMode(mode) {
-    if (!playerData.dailyCheckin) {
-        playerData.dailyCheckin = {
-            lastCheckin: null,
-            streak: 0,
-            checkedDays: [],
-            selectedMode: mode
-        };
-    }
+    if (!playerData.dailyCheckin) playerData.dailyCheckin = { lastCheckin:null, streak:0, checkedDays:[], selectedMode:mode };
     playerData.dailyCheckin.selectedMode = mode;
     saveData();
     renderDailyCheckin();
@@ -6238,41 +6316,33 @@ function selectCheckinMode(mode) {
 
 function claimDailyCheckin() {
     const now = new Date();
-    const witOffset = 9 * 60;
-    const localOffset = now.getTimezoneOffset();
-    const totalOffset = witOffset + localOffset;
-    const witTime = new Date(now.getTime() + totalOffset * 60 * 1000);
+    const witTime = new Date(now.getTime() + (9*60 + now.getTimezoneOffset()) * 60000);
     const witToday = witTime.toISOString().split('T')[0];
-    
-    if (playerData.dailyCheckin.checkedDays.includes(witToday)) {
-        alert('You already checked in today!');
-        return;
-    }
-    
-    const rewards = [50, 75, 100, 150, 200, 300, 500]; // Increased rewards!
+
+    if (playerData.dailyCheckin.checkedDays.includes(witToday)) return;
+
+    const rewards = [80, 120, 160, 220, 300, 450, 750];
     const day = playerData.dailyCheckin.checkedDays.length;
-    const reward = rewards[day] || 10;
-    
-    // Add coins to selected mode
+    const reward = rewards[Math.min(day, rewards.length - 1)];
+
     const selectedMode = playerData.dailyCheckin.selectedMode || 'egypt';
+    if (!playerData.coins[selectedMode]) playerData.coins[selectedMode] = 0;
     playerData.coins[selectedMode] += reward;
-    
-    // Update checkin data
+    playerData.totalCoins = (playerData.totalCoins || 0) + reward;
+
     playerData.dailyCheckin.checkedDays.push(witToday);
     playerData.dailyCheckin.lastCheckin = witToday;
     playerData.dailyCheckin.streak = playerData.dailyCheckin.checkedDays.length;
-    
-    // Reset after 7 days
+
     if (playerData.dailyCheckin.checkedDays.length >= 7) {
         playerData.dailyCheckin.checkedDays = [];
         playerData.dailyCheckin.streak = 0;
     }
-    
+
     saveData();
     renderDailyCheckin();
     updateAllCoinDisplays();
-    
-    alert(`Check-in successful! +${reward} ${selectedMode.toUpperCase()} coins 🎉`);
+    showToast(`📅 +${reward} koin ${selectedMode.toUpperCase()} — hari ke-${day+1}!`, '#FFD700');
 }
 
 function renderMissionList() {
@@ -6280,23 +6350,45 @@ function renderMissionList() {
     container.innerHTML = '';
     
     if (!playerData.dailyMissions.missions || playerData.dailyMissions.missions.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:#fff; padding:40px;">No missions available</div>';
+        container.innerHTML = '<div style="text-align:center;color:#555;padding:40px;font-family:\'Press Start 2P\',monospace;font-size:9px;line-height:2;">Belum ada misi.<br>Coba lagi besok!</div>';
         return;
     }
+
+    // Warna per mode
+    const modeColors = {
+        egypt:'#C19A6B', day:'#FFA500', night:'#8B5CF6',
+        snow:'#87CEEB', ocean:'#4682B4', sakura:'#FF5588',
+        ramadan:'#FFE033', any:'#00ff88'
+    };
+    const modeLabels = {
+        egypt:'🏜️ MESIR', day:'☀️ SIANG', night:'🌙 MALAM',
+        snow:'❄️ SALJU', ocean:'🏖️ PANTAI', sakura:'🌸 SAKURA',
+        ramadan:'☪️ RAMADAN', any:'🌍 SEMUA MODE'
+    };
     
     playerData.dailyMissions.missions.forEach(mission => {
         const card = document.createElement('div');
-        card.className = 'mission-card' + (mission.completed ? ' completed' : '');
+        const isClaimed = mission.claimed;
+        card.className = 'mission-card' + (mission.completed ? ' completed' : '') + (isClaimed ? ' claimed-card' : '');
+        const modeColor = modeColors[mission.mode] || '#00ff88';
+        card.style.setProperty('--mode-color', modeColor);
         
         const progressPercent = Math.min(100, (mission.progress / mission.target) * 100);
+        const isFull = mission.progress >= mission.target;
         
         card.innerHTML = `
-            ${mission.completed && !mission.claimed ? '<div class="completed-badge">✓ DONE</div>' : ''}
-            ${mission.claimed ? '<div class="completed-badge" style="background:#999;">CLAIMED</div>' : ''}
-            
+            ${mission.completed && !mission.claimed
+                ? '<div class="completed-badge">✓ SELESAI</div>'
+                : mission.claimed
+                ? '<div class="claimed-badge-label">✓ CLAIMED</div>'
+                : ''}
+
             <div class="mission-title">
                 <span class="mission-icon">${mission.icon}</span>
-                <span>${mission.title}</span>
+                <div>
+                    <div>${mission.title}</div>
+                    <div style="font-size:clamp(5px,1.2vw,7px);color:${modeColor};margin-top:4px;letter-spacing:1px;">${modeLabels[mission.mode] || mission.mode.toUpperCase()}</div>
+                </div>
             </div>
             
             <div class="mission-desc">${mission.desc}</div>
@@ -6307,20 +6399,19 @@ function renderMissionList() {
                     <span><strong>${mission.progress}</strong> / ${mission.target}</span>
                 </div>
                 <div class="progress-bar-bg">
-                    <div class="progress-bar-fill-mission" style="width: ${progressPercent}%"></div>
+                    <div class="progress-bar-fill-mission ${isFull?'full':''}" style="width:${progressPercent}%;background:linear-gradient(90deg,${modeColor}88,${modeColor})"></div>
                 </div>
             </div>
             
             <div class="mission-reward">
                 <div class="reward-info">
-                    <span>Reward:</span>
-                    <span class="coin-small coin-${mission.mode === 'any' ? 'egypt' : mission.mode}"></span>
-                    <span>${mission.reward}</span>
+                    🎁 <span class="coin-small coin-${mission.mode === 'any' ? 'egypt' : mission.mode}"></span>
+                    <span>+${mission.reward} koin</span>
                 </div>
                 <button class="claim-btn" 
                         onclick="claimMissionReward('${mission.id}')"
                         ${!mission.completed || mission.claimed ? 'disabled' : ''}>
-                    ${mission.claimed ? 'CLAIMED' : 'CLAIM'}
+                    ${mission.claimed ? '✓ DONE' : mission.completed ? '🎁 KLAIM' : 'KLAIM'}
                 </button>
             </div>
         `;
@@ -6388,15 +6479,121 @@ updateMissionNotification();
             if (coinViewer) coinViewer.style.display = display;
         }
 
+        function updateMenuPlayerBar() {
+            const nameEl = document.getElementById('menuPlayerName');
+            if (!nameEl) return;
+            const name = playerData.name || '';
+            if (name) {
+                nameEl.textContent = '👤 ' + name;
+                nameEl.style.color = 'rgba(0,255,136,0.8)';
+            } else {
+                nameEl.textContent = '— belum login —';
+                nameEl.style.color = 'rgba(255,107,107,0.6)';
+            }
+        }
+
         function showMenu() { playSound('click_back');
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('menu').classList.add('active');
             gameRunning = false;
             gamePaused = false;
             setMenuIconsVisibility(true);
+            updateMenuPlayerBar();
             
             // Hide pause button
             document.getElementById('pauseBtn').style.display = 'none';
+        }
+
+        // Account quick menu — popup kecil di menu utama
+        function showAccountMenu() {
+            playSound('open');
+            const name = playerData.name || 'Belum login';
+            const isGuest = isGuestMode;
+            const msg = isGuest
+                ? 'Kamu sedang main offline.\nScore tidak masuk leaderboard.'
+                : `Login sebagai:\n${name}`;
+            const opts = isGuest
+                ? [{ label: '🔄 Coba Login Online', action: 'reload' }]
+                : [
+                    { label: '📊 Statistik & Leaderboard', action: 'stats' },
+                    { label: '⚙️ Pengaturan Akun', action: 'settings' },
+                    { label: '🚪 Logout', action: 'logout' },
+                  ];
+
+            // Buat overlay popup
+            const existing = document.getElementById('accountMenuOverlay');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'accountMenuOverlay';
+            overlay.style.cssText = `
+                position:fixed;top:0;left:0;width:100%;height:100%;
+                background:rgba(0,0,0,0.7);z-index:999;
+                display:flex;align-items:center;justify-content:center;
+                font-family:'Press Start 2P',monospace;
+            `;
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+            const box = document.createElement('div');
+            box.style.cssText = `
+                background:#0a0a0a;border:4px solid #00ff88;
+                box-shadow:8px 8px 0 #003322;padding:24px 20px;
+                min-width:260px;max-width:90vw;text-align:center;
+            `;
+
+            const icon = document.createElement('div');
+            icon.style.cssText = 'font-size:36px;margin-bottom:12px;';
+            icon.textContent = isGuest ? '🎮' : '👤';
+
+            const nameDiv = document.createElement('div');
+            nameDiv.style.cssText = 'font-size:clamp(8px,2vw,11px);color:#00ff88;margin-bottom:6px;letter-spacing:1px;';
+            nameDiv.textContent = isGuest ? 'OFFLINE MODE' : name.toUpperCase();
+
+            const subDiv = document.createElement('div');
+            subDiv.style.cssText = 'font-size:clamp(5px,1.2vw,7px);color:#555;margin-bottom:18px;line-height:2;';
+            subDiv.textContent = isGuest ? 'Score tidak masuk leaderboard' : 'Akun terverifikasi ✓';
+
+            const hr = document.createElement('div');
+            hr.style.cssText = 'border-top:2px solid #222;margin-bottom:14px;';
+
+            box.appendChild(icon);
+            box.appendChild(nameDiv);
+            box.appendChild(subDiv);
+            box.appendChild(hr);
+
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.style.cssText = `
+                    display:block;width:100%;padding:10px 12px;margin-bottom:10px;
+                    font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);
+                    background:#1a1a1a;border:2px solid #333;color:#ccc;cursor:pointer;
+                    letter-spacing:1px;text-align:left;transition:all 0.1s;
+                `;
+                btn.textContent = opt.label;
+                btn.onmouseover = () => { btn.style.borderColor='#00ff88'; btn.style.color='#00ff88'; };
+                btn.onmouseout = () => { btn.style.borderColor='#333'; btn.style.color='#ccc'; };
+                btn.onclick = () => {
+                    overlay.remove();
+                    if (opt.action === 'reload') location.reload();
+                    else if (opt.action === 'stats') showStats();
+                    else if (opt.action === 'settings') showSettings();
+                    else if (opt.action === 'logout') doLogout();
+                };
+                box.appendChild(btn);
+            });
+
+            const closeBtn = document.createElement('button');
+            closeBtn.style.cssText = `
+                display:block;width:100%;padding:8px;margin-top:4px;
+                font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.2vw,7px);
+                background:transparent;border:2px solid #222;color:#444;cursor:pointer;letter-spacing:1px;
+            `;
+            closeBtn.textContent = '✕ TUTUP';
+            closeBtn.onclick = () => overlay.remove();
+            box.appendChild(closeBtn);
+
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
         }
 
         function togglePause() {
@@ -6720,20 +6917,24 @@ function confirmLogout() {
 // Load leaderboard data
 let lbCurrentMap  = 'egypt';
 let lbCurrentType = 'jump';
+let lbCurrentPeriod = 'all';
 
 async function loadLeaderboard() {
     const content = document.getElementById('lbContent');
     if (!content) return;
     content.innerHTML = '<div class="lb-loading">Memuat...</div>';
     try {
-        const res = await fetch(`${SERVER_URL}/api/leaderboard/${lbCurrentMap}/${lbCurrentType}`);
+        const url = `${SERVER_URL}/api/leaderboard/${lbCurrentMap}/${lbCurrentType}?period=${lbCurrentPeriod}`;
+        const res = await fetch(url);
         const data = await res.json();
         if (!data.entries || data.entries.length === 0) {
-            content.innerHTML = '<div class="lb-empty">Belum ada score. Jadilah yang pertama! 🏆</div>';
+            const periodLabel = lbCurrentPeriod === 'daily' ? 'hari ini' : lbCurrentPeriod === 'weekly' ? 'minggu ini' : 'ini';
+            content.innerHTML = `<div class="lb-empty">Belum ada score ${periodLabel}.<br>Jadilah yang pertama! 🏆</div>`;
             return;
         }
         const myName = (playerData.name || '').toLowerCase();
         const rankBadges = ['🥇','🥈','🥉'];
+        const scoreLabel = lbCurrentType === 'coin' ? '🪙' : (lbCurrentType === 'jump' ? '🏆' : '🏃');
         const rows = data.entries.map((e, i) => {
             const isMe = e.name.toLowerCase() === myName;
             const rankClass = i < 3 ? `lb-rank-${i+1}` : (isMe ? 'lb-rank-me' : '');
@@ -6741,7 +6942,7 @@ async function loadLeaderboard() {
             return `<tr class="${rankClass}">
                 <td><span class="lb-rank-badge">${badge}</span></td>
                 <td>${e.name}${isMe ? ' 👈' : ''}</td>
-                <td style="text-align:right;">${e.score}</td>
+                <td style="text-align:right;">${scoreLabel} ${e.score}</td>
             </tr>`;
         }).join('');
         content.innerHTML = `
@@ -6768,7 +6969,16 @@ function selectLbMap(map, el) {
 function selectLbType(type) {
     lbCurrentType = type;
     document.getElementById('lbTypeJump').classList.toggle('active', type === 'jump');
-    document.getElementById('lbTypeRun').classList.toggle('active',  type === 'run');
+    document.getElementById('lbTypeRun').classList.toggle('active', type === 'run');
+    document.getElementById('lbTypeCoin').classList.toggle('active', type === 'coin');
+    loadLeaderboard();
+}
+
+function selectLbPeriod(period) {
+    lbCurrentPeriod = period;
+    document.getElementById('lbPeriodAll').classList.toggle('active', period === 'all');
+    document.getElementById('lbPeriodWeek').classList.toggle('active', period === 'weekly');
+    document.getElementById('lbPeriodDay').classList.toggle('active', period === 'daily');
     loadLeaderboard();
 }
 
@@ -6835,11 +7045,21 @@ function saveRedeemedCodes(codes) {
 const redeemedCodes = getRedeemedCodes();
 const adminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
 
-// Show admin button jika: owner (Rex) ATAU guest mode
+// Show admin button hanya untuk:
+// 1. Akun online "Rex" (login resmi, bukan guest)
+// 2. Offline murni — tidak pernah login online (file:// atau no-server deploy)
 function checkShowAdminBtn() {
-    const isOwner = (playerData.name || '').trim().toLowerCase() === 'rex';
-    const guestMode = typeof isGuestMode !== 'undefined' && isGuestMode;
-    if (isOwner || guestMode) {
+    const name = (playerData.name || '').trim().toLowerCase();
+    const isOnlineRex = (name === 'rex') && !isGuestMode;
+
+    // Offline admin: adminUnlocked=true DAN tidak pernah ada akun online
+    const offlineAdminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
+    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
+    const hasToken = !!localStorage.getItem('bl0ckrun_token');
+    // Tolak jika ada bukti pernah online (token atau flag)
+    const isOfflineAdmin = isGuestMode && offlineAdminUnlocked && !everOnline && !hasToken;
+
+    if (isOnlineRex || isOfflineAdmin) {
         document.getElementById('adminPanelBtn').style.display = 'block';
     } else {
         document.getElementById('adminPanelBtn').style.display = 'none';
@@ -6994,12 +7214,30 @@ function showAdminPanel() { playSound('open');
     document.getElementById('adminPanel').classList.add('active');
     setMenuIconsVisibility(false);
     
+    const currentName = (playerData.name || '').trim().toLowerCase();
+    const isOnlineRex = (currentName === 'rex') && !isGuestMode;
+    const offlineAdminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
+    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
+    const hasToken = !!localStorage.getItem('bl0ckrun_token');
+    const isOfflineAdmin = isGuestMode && offlineAdminUnlocked && !everOnline && !hasToken;
+
+    // Skip password kalau: Rex online ATAU offline admin yang sah
+    if (isOnlineRex || isOfflineAdmin) {
+        document.getElementById('adminPasswordCheck').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+    } else {
+        document.getElementById('adminPasswordCheck').style.display = 'block';
+        document.getElementById('adminContent').style.display = 'none';
+    }
+    
     // Load current coin values
-    document.getElementById('adminEgyptCoins').value = playerData.coins.egypt;
-    document.getElementById('adminDayCoins').value = playerData.coins.day;
-    document.getElementById('adminNightCoins').value = playerData.coins.night;
-    document.getElementById('adminSnowCoins').value = playerData.coins.snow;
-    document.getElementById('adminOceanCoins').value = playerData.coins.ocean;
+    document.getElementById('adminEgyptCoins').value = playerData.coins.egypt || 0;
+    document.getElementById('adminDayCoins').value = playerData.coins.day || 0;
+    document.getElementById('adminNightCoins').value = playerData.coins.night || 0;
+    document.getElementById('adminSnowCoins').value = playerData.coins.snow || 0;
+    document.getElementById('adminOceanCoins').value = playerData.coins.ocean || 0;
+    document.getElementById('adminSakuraCoins').value = playerData.coins.sakura || 0;
+    document.getElementById('adminRamadanCoins').value = playerData.coins.ramadan || 0;
 }
 
 function checkAdminPassword() {
@@ -7007,11 +7245,25 @@ function checkAdminPassword() {
     const password = input.value;
     const errorDiv = document.getElementById('adminPasswordError');
     const currentName = (playerData.name || '').trim().toLowerCase();
+    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
 
+    // KEAMANAN: kalau pernah login online tapi sekarang guest → TOLAK semua password
+    if (isGuestMode && everOnline) {
+        errorDiv.textContent = '⛔ Login online untuk akses admin!';
+        errorDiv.style.display = 'block';
+        input.value = '';
+        playSound('hit'); vibrate(300);
+        setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
+        return;
+    }
+
+    // Password rex0987 hanya untuk akun Rex yang login online
     if (password === 'rex0987') {
-        if (currentName !== 'rex') {
-            // Right password but wrong user — deny
-            errorDiv.textContent = '⛔ Access Denied';
+        const isOnlineRex = (currentName === 'rex') && !isGuestMode;
+        // Offline admin hanya boleh kalau belum pernah online
+        const isOfflineOk = isGuestMode && !everOnline;
+        if (!isOnlineRex && !isOfflineOk) {
+            errorDiv.textContent = '⛔ Access Denied!';
             errorDiv.style.display = 'block';
             input.value = '';
             playSound('hit'); vibrate(300);
@@ -7022,7 +7274,7 @@ function checkAdminPassword() {
             playSound('coin');
         }
     } else {
-        errorDiv.textContent = '❌ Wrong password!';
+        errorDiv.textContent = '❌ Password salah!';
         errorDiv.style.display = 'block';
         input.value = '';
         playSound('hit'); vibrate(100);
@@ -7044,11 +7296,13 @@ function setCoins(mode) {
     
     // Recalculate total coins
     playerData.totalCoins = 
-        playerData.coins.egypt + 
-        playerData.coins.day + 
-        playerData.coins.night + 
-        playerData.coins.snow + 
-        playerData.coins.ocean;
+        (playerData.coins.egypt || 0) + 
+        (playerData.coins.day || 0) + 
+        (playerData.coins.night || 0) + 
+        (playerData.coins.snow || 0) + 
+        (playerData.coins.ocean || 0) +
+        (playerData.coins.sakura || 0) +
+        (playerData.coins.ramadan || 0);
     
     // Save
     saveData();
@@ -7064,9 +7318,30 @@ function setCoins(mode) {
     const input = document.getElementById(inputId);
     const originalBg = input.style.background;
     input.style.background = '#00ff88';
+    const msgDiv = document.getElementById('coinSetMsg');
+    if (msgDiv) { msgDiv.textContent = '✓ ' + mode.toUpperCase() + ' COINS DISET!'; msgDiv.style.display = 'block'; setTimeout(()=>{msgDiv.style.display='none';},2000); }
     setTimeout(() => {
         input.style.background = originalBg;
     }, 200);
+}
+
+function setAllCoins() {
+    const allInput = document.getElementById('adminAllCoins');
+    const newValue = parseInt(allInput.value);
+    if (isNaN(newValue) || newValue < 0) { alert('Masukkan jumlah yang valid!'); return; }
+    const modes = ['egypt','day','night','snow','ocean','sakura','ramadan'];
+    modes.forEach(m => {
+        playerData.coins[m] = newValue;
+        const el = document.getElementById('admin' + m.charAt(0).toUpperCase() + m.slice(1) + 'Coins');
+        if (el) el.value = newValue;
+    });
+    playerData.totalCoins = newValue * modes.length;
+    saveData();
+    updateAllCoinDisplays();
+    playSound('coin'); vibrate(50);
+    const msgDiv = document.getElementById('coinSetMsg');
+    if (msgDiv) { msgDiv.textContent = '✓ SEMUA COINS DISET KE ' + newValue + '!'; msgDiv.style.display = 'block'; setTimeout(()=>{msgDiv.style.display='none';},2500); }
+    allInput.value = '';
 }
 
 function unlockAllModes() { playSound('unlock');
@@ -17216,6 +17491,7 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
     if (playerData.name) {
         submitScoreToServer(currentMode, 'run', playerData.highScoresRun[currentMode]);
         submitScoreToServer(currentMode, 'jump', playerData.highScoresJump[currentMode]);
+        submitScoreToServer(currentMode, 'coin', playerData.coins[currentMode] || 0);
     }
 
     // Check apakah ada mode yang baru unlock
