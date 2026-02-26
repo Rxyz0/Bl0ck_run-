@@ -4403,19 +4403,25 @@ async function onAuthSuccess(username, serverSaveData) {
 }
 
 // ============================================================
-// OFFLINE / GUEST MODE — STRICT DETECTION
 // ============================================================
-// isGuestMode = true hanya jika:
-//   1. Tidak ada server.js (bukan Railway deploy) — cek via /api/health
-//   2. DAN tidak ada token tersimpan
-// Jika ada token tapi server mati sementara → JANGAN beri guest mode, minta retry
+// AUTH & OFFLINE SYSTEM — CLEAN VERSION
+// ============================================================
+// Aturan:
+//   file://          → offline langsung, admin otomatis
+//   Railway + online → login normal
+//   Railway + offline + ada token → SERVER DOWN screen (bisa pilih main offline tanpa admin)
+//   Railway + offline + no token  → langsung offline tanpa admin
+// ============================================================
+
 let isGuestMode = false;
-let serverReachable = null; // null=unknown, true=ok, false=down
+let serverReachable = null;
+let _skipToOfflineRequested = false;
+let _authScreenOriginalContent = null;
 
 async function checkServerReachable() {
   try {
-    const res = await fetch(`${SERVER_URL}/api/health`, { 
-      signal: AbortSignal.timeout(4000) // timeout 4 detik
+    const res = await fetch(`${SERVER_URL}/api/health`, {
+      signal: AbortSignal.timeout(8000)
     });
     const data = await res.json();
     serverReachable = res.ok && data.status === 'ok';
@@ -4425,38 +4431,81 @@ async function checkServerReachable() {
   return serverReachable;
 }
 
-// Cek token tersimpan saat halaman dibuka
+function skipToOffline() {
+  _skipToOfflineRequested = true;
+}
+
+function showConnectingSpinner(attempt) {
+  const authScreen = document.getElementById('authScreen');
+  authScreen.classList.add('active');
+  const box = authScreen.querySelector('.name-box');
+  if (!box) return;
+  const pct = Math.round((attempt / 3) * 100);
+  box.innerHTML = `
+    <span class="name-pixel-icon">📡</span>
+    <div class="name-title" style="font-size:clamp(8px,2.5vw,12px);">MENGHUBUNGKAN...</div>
+    <div class="name-sub" style="color:#00ff88;margin-bottom:16px;">
+      Mencoba koneksi ke server...<br>
+      <span>Percobaan ${attempt} dari 3</span>
+    </div>
+    <div style="width:100%;background:#222;border:2px solid #333;height:10px;margin-bottom:18px;">
+      <div style="height:100%;background:#00ff88;width:${pct}%;transition:width 0.5s;"></div>
+    </div>
+    <button class="name-submit" onclick="skipToOffline()" style="background:#1a1a1a;color:#aaa;border-color:#444;box-shadow:3px 3px 0 #222;font-size:clamp(6px,1.5vw,8px);">
+      SKIP → MAIN OFFLINE
+    </button>
+  `;
+}
+
 async function tryAutoLogin() {
-  // ── OFFLINE MURNI: buka via file:// ──
-  // Langsung masuk tanpa layar apapun, admin auto unlock
-  const isPureOffline = window.location.protocol === 'file:';
-  if (isPureOffline) {
+  // ── KASUS 1: Buka via file:// — admin otomatis ──
+  if (window.location.protocol === 'file:') {
     localStorage.setItem('adminUnlocked', 'true');
-    startOfflineDirectly();
+    _enterOffline(true);
     return;
   }
 
+  // ── KASUS 2: Buka via server (Railway dll) ──
   const token = getAuthToken();
-  await checkServerReachable();
-  
-  if (!serverReachable) {
-    if (token) {
-      showServerDownScreen();
-      return;
-    } else {
-      // Tidak ada token DAN server mati — langsung offline
-      localStorage.setItem('adminUnlocked', 'true');
-      startOfflineDirectly();
-      return;
+  _skipToOfflineRequested = false;
+
+  // Coba konek 3x dengan spinner
+  let connected = false;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    showConnectingSpinner(attempt);
+    await checkServerReachable();
+    if (_skipToOfflineRequested) break;
+    if (serverReachable) { connected = true; break; }
+    if (attempt < 3) {
+      await new Promise(r => setTimeout(r, 1500));
+      if (_skipToOfflineRequested) break;
     }
   }
-  
+
+  // Restore auth screen ke form login
+  document.getElementById('authScreen').classList.remove('active');
+  const box = document.querySelector('#authScreen .name-box');
+  if (box && _authScreenOriginalContent) box.innerHTML = _authScreenOriginalContent;
+
+  if (!connected || _skipToOfflineRequested) {
+    if (token) {
+      // Punya akun tapi server mati — tawari main offline (tanpa admin)
+      showServerDownScreen();
+    } else {
+      // Tidak ada akun, server mati — langsung offline tanpa admin
+      localStorage.removeItem('adminUnlocked');
+      _enterOffline(false);
+    }
+    return;
+  }
+
+  // Server online
   if (!token) { showAuthScreen(); return; }
-  
+
   try {
-    const res = await fetch(`${SERVER_URL}/api/auth/me`, { 
+    const res = await fetch(`${SERVER_URL}/api/auth/me`, {
       headers: authHeaders(),
-      signal: AbortSignal.timeout(5000)
+      signal: AbortSignal.timeout(10000)
     });
     if (!res.ok) { clearAuth(); showAuthScreen(); return; }
     const data = await res.json();
@@ -4467,122 +4516,72 @@ async function tryAutoLogin() {
   }
 }
 
-function startOfflineDirectly() {
+// Masuk offline mode — giveAdmin hanya true kalau file://
+function _enterOffline(giveAdmin) {
   isGuestMode = true;
+  if (giveAdmin) {
+    localStorage.setItem('adminUnlocked', 'true');
+  } else {
+    localStorage.removeItem('adminUnlocked');
+  }
+
+  // Default playerData
   playerData = {
     name: 'OFFLINE',
-    coins: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    highScores: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    highScoresRun: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    highScoresJump: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    totalCoins:0, totalJumpScore:0,
-    unlockedModes:['egypt','snow','ocean','sakura','ramadan'],
-    skins:{default:['white','blue','red','pink'],egypt:[],day:[],night:[],snow:[],ocean:[],sakura:[],valentine:[],ramadan:[]},
-    equippedSkin:'white',
-    dailyMissions:{lastReset:null,missions:[],claimedToday:[]},
-    achievements:{},
-    dailyCheckin:{lastCheckin:null,streak:0,checkedDays:[]}
+    coins: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
+    highScores: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
+    highScoresRun: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
+    highScoresJump: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
+    totalCoins: 0, totalJumpScore: 0,
+    unlockedModes: ['egypt','snow','ocean','sakura','ramadan'],
+    skins: { default:['white','blue','red','pink'], egypt:[], day:[], night:[], snow:[], ocean:[], sakura:[], valentine:[], ramadan:[] },
+    equippedSkin: 'white',
+    dailyMissions: { lastReset:null, missions:[], claimedToday:[] },
+    achievements: {},
+    dailyCheckin: { lastCheckin:null, streak:0, checkedDays:[] }
   };
-  // Muat save lokal kalau ada
-  const saved = localStorage.getItem('bl0ckrun_guest_save');
+
+  // Load data lokal kalau ada
+  const saved = localStorage.getItem('bl0ckRunData') || localStorage.getItem('bl0ckrun_guest_save');
   if (saved) {
-    try { Object.assign(playerData, JSON.parse(saved)); } catch(e) {}
+    try {
+      Object.assign(playerData, JSON.parse(saved));
+      fixPlayerDataCompat();
+    } catch(e) {}
   }
+
+  document.getElementById('authScreen').classList.remove('active');
   startLoadingAndGame();
 }
 
 function showServerDownScreen() {
-  // Tampilkan pesan server down + tombol retry
   const authScreen = document.getElementById('authScreen');
   authScreen.classList.add('active');
   const box = authScreen.querySelector('.name-box');
-  if (box) {
-    box.innerHTML = `
-      <span class="name-pixel-icon">⚠️</span>
-      <div class="name-title" style="color:#ff6b6b;">SERVER DOWN</div>
-      <div class="name-sub" style="color:#ff9999;">
-        Kamu punya akun terdaftar.<br>
-        Tidak bisa masuk sebagai guest<br>
-        untuk melindungi datamu.<br><br>
-        Coba lagi saat koneksi stabil.
-      </div>
-      <button class="name-submit" onclick="location.reload()" style="margin-bottom:10px;">
-        🔄 COBA LAGI
-      </button>
-    `;
-  }
+  if (!box) return;
+  box.innerHTML = `
+    <span class="name-pixel-icon">⚠️</span>
+    <div class="name-title" style="color:#ff6b6b;">SERVER DOWN</div>
+    <div class="name-sub" style="color:#ff9999;">
+      Koneksi ke server gagal.<br>
+      Pilih mode lanjutkan:
+    </div>
+    <button class="name-submit" onclick="location.reload()" style="margin-bottom:10px;">
+      🔄 COBA LAGI
+    </button>
+    <button class="name-submit" onclick="startOfflineFromDown()" style="background:#1a1a1a;color:#FFD700;border-color:#FFD700;box-shadow:3px 3px 0 #8B6914;margin-top:4px;">
+      🎮 MAIN OFFLINE
+    </button>
+    <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#555;margin-top:12px;line-height:2;">
+      Mode offline: progress tidak sync ke server
+    </div>
+  `;
 }
 
-// ============================================================
-// SECURITY: Offline/Guest admin access control
-// Aturan:
-//   1. Pernah login online (ada token tersimpan) → TIDAK PERNAH dapat admin offline
-//      (mencegah orang sengaja matiin internet untuk bypass)
-//   2. Benar-benar tidak punya akun (tidak ada token) → boleh admin offline
-//      (ini untuk kasus deploy tanpa server / development)
-//   3. Online login sebagai Rex → admin langsung aktif (normal flow)
-// ============================================================
-function _isOfflineAdminAllowed() {
-  // Cek apakah pernah punya token (pernah login online)
-  const hadToken = !!localStorage.getItem('bl0ckrun_token');
-  // Cek apakah ada tanda pernah login online sebelumnya (extra flag)
-  const hadOnlineLogin = localStorage.getItem('bl0ckrun_ever_online') === '1';
-  // Jika salah satu true → pasti pernah online → TOLAK admin offline
-  if (hadToken || hadOnlineLogin) return false;
-  return true;
-}
-
-function enterGuestMode() {
-  isGuestMode = true;
-  playerData = {
-    name: '',
-    coins: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    highScores: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    highScoresRun: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    highScoresJump: { egypt:0,day:0,night:0,snow:0,ocean:0,sakura:0,ramadan:0 },
-    totalCoins:0, totalJumpScore:0,
-    unlockedModes:['egypt','snow','ocean','sakura','ramadan'],
-    skins:{default:['white','blue','red','pink'],egypt:[],day:[],night:[],snow:[],ocean:[],sakura:[],valentine:[],ramadan:[]},
-    equippedSkin:'white',
-    dailyMissions:{lastReset:null,missions:[],claimedToday:[]},
-    achievements:{},
-    dailyCheckin:{lastCheckin:null,streak:0,checkedDays:[]}
-  };
-
-  // Baca ulang setelah tryAutoLogin mungkin sudah set adminUnlocked
-  const offlineAdminOk = localStorage.getItem('adminUnlocked') === 'true';
-
-  const authScreen = document.getElementById('authScreen');
-  authScreen.classList.add('active');
-  const box = authScreen.querySelector('.name-box');
-  if (box) {
-    box.innerHTML = `
-      <span class="name-pixel-icon">🎮</span>
-      <div class="name-title">OFFLINE MODE</div>
-      <div class="name-sub">
-        Server tidak tersedia.<br>
-        Data tersimpan lokal saja.<br>
-        Score tidak masuk leaderboard.
-      </div>
-      <button class="name-submit" onclick="startAsGuest(${offlineAdminOk})">
-        MAIN OFFLINE →
-      </button>
-      <div style="margin-top:10px;">
-        <button class="name-submit" onclick="location.reload()" style="background:#333;color:#00ff88;border-color:#00ff88;box-shadow:3px 3px 0 #005533;">
-          🔄 COBA LOGIN
-        </button>
-      </div>
-    `;
-  }
-}
-
-function startAsGuest(allowAdmin = false) {
-  document.getElementById('authScreen').classList.remove('active');
-  // Hanya unlock admin offline jika benar-benar tidak pernah punya akun online
-  if (allowAdmin) {
-    localStorage.setItem('adminUnlocked', 'true');
-  }
-  startLoadingAndGame();
+function startOfflineFromDown() {
+  // Server down, user pilih main offline — TIDAK ada admin
+  localStorage.removeItem('adminUnlocked');
+  _enterOffline(false);
 }
 
 function showAuthScreen() {
@@ -5192,14 +5191,15 @@ let oceanWaves = [];
             { id: 'white', name: 'White', color: '#FFFFFF' },
             { id: 'blue', name: 'Blue', color: '#00CED1' },
             { id: 'red', name: 'Red', color: '#FF4444' },
-            { id: 'pink', name: 'Pink', color: '#FF69B4' }
+            { id: 'pink', name: 'Pink', color: '#FF69B4' },
+            { id: 'master_c', name: 'Master C', color: '#D4AF37', gradient: 'linear-gradient(135deg, #B8860B, #FFD700, #FFF8DC, #D4AF37)', rarity: 'legendary', ability: false, coinMultiplier: 2, lives: 2, hidden: true, masterC: true, crown: true }
         ];
 
         const egyptSkins = [
     { id: 'egypt_common', name: 'Desert', color: '#8B7355', rarity: 'common', ability: false },
     { id: 'egypt_rare', name: 'Sandstorm', color: '#A0826D', rarity: 'rare', ability: false, dust: true },
     { id: 'egypt_epic', name: 'Pharaoh Guard', color: '#CD853F', rarity: 'epic', ability: true, dust: true, cape: true, cooldown: 1080, lives: 1 },
-    { id: 'egypt_legendary', name: 'hexz', color: '#8B4513', gradient: 'linear-gradient(135deg, #8B4513, #FFD700, #40E0D0)', rarity: 'legendary', ability: true, abilityType: 'sand_tornado', abilityDuration: 300, dust: true, cape: true, crown: true, whiteEyes: true, cooldown: 900, lives: 3 }
+    { id: 'egypt_legendary', name: 'hexz', color: '#C8952C', gradient: 'linear-gradient(135deg, #7B4F00, #C8952C, #E8C84A, #4A90B8)', rarity: 'legendary', ability: true, abilityType: 'sand_tornado', abilityDuration: 300, dust: true, cape: true, crown: true, whiteEyes: true, cooldown: 900, lives: 3 }
 ];
         
 const daySkins = [
@@ -5360,7 +5360,7 @@ const tips = [
         'egypt_common':      { colors: ['#8B7355','#7A6348'] },
         'egypt_rare':        { colors: ['#A0826D','#8B7055'] },
         'egypt_epic':        { colors: ['#CD853F','#A06820'] },
-        'egypt_legendary':   { colors: ['#8B4513','#FFD700','#40E0D0'] },
+        'egypt_legendary':   { colors: ['#7B4F00','#C8952C','#E8C84A','#4A90B8'] },
         'day_common':        { colors: ['#FFF44F','#FFE66D'] },
         'day_rare':          { colors: ['#FF9500','#FFAB00'] },
         'day_epic':          { colors: ['#FFFACD','#FFD700'] },
@@ -5378,6 +5378,7 @@ const tips = [
         'ocean_epic':        { colors: ['#023E8A','#0077B6','#00B4D8'] },
         'ocean_legendary':   { colors: ['#03045E','#0077B6','#00B4D8','#90E0EF'] },
         'valentine_limited': { colors: ['#FF69B4','#FF1493'] },
+        'master_c':          { colors: ['#B8860B','#FFD700','#FFF8DC','#D4AF37'] },
     };
 
     const id = getSpinnerSkin();
@@ -5460,7 +5461,12 @@ const progressPercent = document.getElementById('progressPercent');
 if (tipElement) tipElement.textContent = tips[Math.floor(Math.random() * tips.length)];
 
 // Auth check — pakai setTimeout agar semua fungsi sudah terdefinisi dulu
-setTimeout(() => tryAutoLogin(), 0);
+setTimeout(() => {
+  // Simpan konten asli auth screen sebelum spinner overwrite-nya
+  const box = document.querySelector('#authScreen .name-box');
+  if (box) _authScreenOriginalContent = box.innerHTML;
+  tryAutoLogin();
+}, 0);
 
 function drawRdmPreview() {
     const c = document.getElementById('rdmPreviewCanvas');
@@ -5678,6 +5684,7 @@ function onSakuraClose() {
         document.getElementById('menu').classList.add('active');
         updateAllCoinDisplays();
         checkDailyCheckin();
+        checkShowAdminBtn();
         setInterval(() => { checkDailyCheckin(); }, 60*60*1000);
     });
 }
@@ -5774,54 +5781,54 @@ function submitName() {
 
 const MISSION_TEMPLATES = [
     // ── MESIR ──
-    { id: 'egypt_score_150',   mode: 'egypt',  icon: '🏺', title: 'Desert Runner',    desc: 'Capai 150 score di mode Mesir',         target: 150, type: 'score',  reward: 75 },
-    { id: 'egypt_score_300',   mode: 'egypt',  icon: '⚱️', title: 'Pharaoh Runner',   desc: 'Capai 300 score di mode Mesir',         target: 300, type: 'score',  reward: 140 },
-    { id: 'egypt_coins_15',    mode: 'egypt',  icon: '🪙', title: 'Kolektor Mesir',   desc: 'Kumpulkan 15 koin di mode Mesir',       target: 15,  type: 'coins',  reward: 60 },
-    { id: 'egypt_coins_40',    mode: 'egypt',  icon: '💰', title: 'Harta Firaun',     desc: 'Kumpulkan 40 koin di mode Mesir',       target: 40,  type: 'coins',  reward: 120 },
-    { id: 'egypt_games_3',     mode: 'egypt',  icon: '🎮', title: 'Petualang Mesir',  desc: 'Main 3 kali di mode Mesir',             target: 3,   type: 'games',  reward: 50 },
+    { id: 'egypt_score_150',   mode: 'egypt',  icon: '🏺', title: 'Desert Runner',    desc: 'Capai 150 score di mode Mesir',         target: 150, type: 'score',  reward: 40 },
+    { id: 'egypt_score_300',   mode: 'egypt',  icon: '⚱️', title: 'Pharaoh Runner',   desc: 'Capai 300 score di mode Mesir',         target: 300, type: 'score',  reward: 70 },
+    { id: 'egypt_coins_15',    mode: 'egypt',  icon: '🪙', title: 'Kolektor Mesir',   desc: 'Kumpulkan 15 koin di mode Mesir',       target: 15,  type: 'coins',  reward: 30 },
+    { id: 'egypt_coins_40',    mode: 'egypt',  icon: '💰', title: 'Harta Firaun',     desc: 'Kumpulkan 40 koin di mode Mesir',       target: 40,  type: 'coins',  reward: 60 },
+    { id: 'egypt_games_3',     mode: 'egypt',  icon: '🎮', title: 'Petualang Mesir',  desc: 'Main 3 kali di mode Mesir',             target: 3,   type: 'games',  reward: 25 },
 
     // ── SIANG ──
-    { id: 'day_score_150',     mode: 'day',    icon: '☀️', title: 'Sunny Runner',     desc: 'Capai 150 score di mode Siang',         target: 150, type: 'score',  reward: 75 },
-    { id: 'day_score_350',     mode: 'day',    icon: '🌤️', title: 'Solar Champion',   desc: 'Capai 350 score di mode Siang',         target: 350, type: 'score',  reward: 150 },
-    { id: 'day_coins_20',      mode: 'day',    icon: '🌟', title: 'Solar Collector',  desc: 'Kumpulkan 20 koin di mode Siang',       target: 20,  type: 'coins',  reward: 75 },
-    { id: 'day_games_3',       mode: 'day',    icon: '🎮', title: 'Penjelajah Siang', desc: 'Main 3 kali di mode Siang',             target: 3,   type: 'games',  reward: 50 },
+    { id: 'day_score_150',     mode: 'day',    icon: '☀️', title: 'Sunny Runner',     desc: 'Capai 150 score di mode Siang',         target: 150, type: 'score',  reward: 40 },
+    { id: 'day_score_350',     mode: 'day',    icon: '🌤️', title: 'Solar Champion',   desc: 'Capai 350 score di mode Siang',         target: 350, type: 'score',  reward: 75 },
+    { id: 'day_coins_20',      mode: 'day',    icon: '🌟', title: 'Solar Collector',  desc: 'Kumpulkan 20 koin di mode Siang',       target: 20,  type: 'coins',  reward: 35 },
+    { id: 'day_games_3',       mode: 'day',    icon: '🎮', title: 'Penjelajah Siang', desc: 'Main 3 kali di mode Siang',             target: 3,   type: 'games',  reward: 25 },
 
     // ── MALAM ──
-    { id: 'night_score_150',   mode: 'night',  icon: '🌙', title: 'Night Runner',     desc: 'Capai 150 score di mode Malam',         target: 150, type: 'score',  reward: 75 },
-    { id: 'night_score_350',   mode: 'night',  icon: '🌌', title: 'Lunar Champion',   desc: 'Capai 350 score di mode Malam',         target: 350, type: 'score',  reward: 150 },
-    { id: 'night_coins_20',    mode: 'night',  icon: '⭐', title: 'Lunar Collector',  desc: 'Kumpulkan 20 koin di mode Malam',       target: 20,  type: 'coins',  reward: 75 },
-    { id: 'night_games_3',     mode: 'night',  icon: '🎮', title: 'Penjelajah Malam', desc: 'Main 3 kali di mode Malam',             target: 3,   type: 'games',  reward: 50 },
+    { id: 'night_score_150',   mode: 'night',  icon: '🌙', title: 'Night Runner',     desc: 'Capai 150 score di mode Malam',         target: 150, type: 'score',  reward: 40 },
+    { id: 'night_score_350',   mode: 'night',  icon: '🌌', title: 'Lunar Champion',   desc: 'Capai 350 score di mode Malam',         target: 350, type: 'score',  reward: 75 },
+    { id: 'night_coins_20',    mode: 'night',  icon: '⭐', title: 'Lunar Collector',  desc: 'Kumpulkan 20 koin di mode Malam',       target: 20,  type: 'coins',  reward: 35 },
+    { id: 'night_games_3',     mode: 'night',  icon: '🎮', title: 'Penjelajah Malam', desc: 'Main 3 kali di mode Malam',             target: 3,   type: 'games',  reward: 25 },
 
     // ── SALJU ──
-    { id: 'snow_score_150',    mode: 'snow',   icon: '❄️', title: 'Snow Runner',      desc: 'Capai 150 score di mode Salju',         target: 150, type: 'score',  reward: 75 },
-    { id: 'snow_score_350',    mode: 'snow',   icon: '🌨️', title: 'Blizzard Runner',  desc: 'Capai 350 score di mode Salju',         target: 350, type: 'score',  reward: 150 },
-    { id: 'snow_coins_20',     mode: 'snow',   icon: '💎', title: 'Ice Collector',    desc: 'Kumpulkan 20 koin di mode Salju',       target: 20,  type: 'coins',  reward: 75 },
-    { id: 'snow_games_3',      mode: 'snow',   icon: '🎮', title: 'Penjelajah Salju', desc: 'Main 3 kali di mode Salju',             target: 3,   type: 'games',  reward: 50 },
+    { id: 'snow_score_150',    mode: 'snow',   icon: '❄️', title: 'Snow Runner',      desc: 'Capai 150 score di mode Salju',         target: 150, type: 'score',  reward: 40 },
+    { id: 'snow_score_350',    mode: 'snow',   icon: '🌨️', title: 'Blizzard Runner',  desc: 'Capai 350 score di mode Salju',         target: 350, type: 'score',  reward: 75 },
+    { id: 'snow_coins_20',     mode: 'snow',   icon: '💎', title: 'Ice Collector',    desc: 'Kumpulkan 20 koin di mode Salju',       target: 20,  type: 'coins',  reward: 35 },
+    { id: 'snow_games_3',      mode: 'snow',   icon: '🎮', title: 'Penjelajah Salju', desc: 'Main 3 kali di mode Salju',             target: 3,   type: 'games',  reward: 25 },
 
     // ── PANTAI ──
-    { id: 'ocean_score_150',   mode: 'ocean',  icon: '🏖️', title: 'Beach Runner',     desc: 'Capai 150 score di mode Pantai',        target: 150, type: 'score',  reward: 75 },
-    { id: 'ocean_score_350',   mode: 'ocean',  icon: '🌊', title: 'Wave Champion',    desc: 'Capai 350 score di mode Pantai',        target: 350, type: 'score',  reward: 150 },
-    { id: 'ocean_coins_20',    mode: 'ocean',  icon: '🐚', title: 'Shell Collector',  desc: 'Kumpulkan 20 koin di mode Pantai',      target: 20,  type: 'coins',  reward: 75 },
-    { id: 'ocean_games_3',     mode: 'ocean',  icon: '🎮', title: 'Penjelajah Pantai',desc: 'Main 3 kali di mode Pantai',            target: 3,   type: 'games',  reward: 50 },
+    { id: 'ocean_score_150',   mode: 'ocean',  icon: '🏖️', title: 'Beach Runner',     desc: 'Capai 150 score di mode Pantai',        target: 150, type: 'score',  reward: 40 },
+    { id: 'ocean_score_350',   mode: 'ocean',  icon: '🌊', title: 'Wave Champion',    desc: 'Capai 350 score di mode Pantai',        target: 350, type: 'score',  reward: 75 },
+    { id: 'ocean_coins_20',    mode: 'ocean',  icon: '🐚', title: 'Shell Collector',  desc: 'Kumpulkan 20 koin di mode Pantai',      target: 20,  type: 'coins',  reward: 35 },
+    { id: 'ocean_games_3',     mode: 'ocean',  icon: '🎮', title: 'Penjelajah Pantai',desc: 'Main 3 kali di mode Pantai',            target: 3,   type: 'games',  reward: 25 },
 
     // ── SAKURA ──
-    { id: 'sakura_score_150',  mode: 'sakura', icon: '🌸', title: 'Sakura Runner',    desc: 'Capai 150 score di mode Sakura',        target: 150, type: 'score',  reward: 80 },
-    { id: 'sakura_score_350',  mode: 'sakura', icon: '🌺', title: 'Hanami Champion',  desc: 'Capai 350 score di mode Sakura',        target: 350, type: 'score',  reward: 150 },
-    { id: 'sakura_coins_20',   mode: 'sakura', icon: '🌸', title: 'Petal Collector',  desc: 'Kumpulkan 20 koin di mode Sakura',      target: 20,  type: 'coins',  reward: 80 },
-    { id: 'sakura_games_3',    mode: 'sakura', icon: '🎮', title: 'Penjelajah Sakura',desc: 'Main 3 kali di mode Sakura',            target: 3,   type: 'games',  reward: 55 },
+    { id: 'sakura_score_150',  mode: 'sakura', icon: '🌸', title: 'Sakura Runner',    desc: 'Capai 150 score di mode Sakura',        target: 150, type: 'score',  reward: 40 },
+    { id: 'sakura_score_350',  mode: 'sakura', icon: '🌺', title: 'Hanami Champion',  desc: 'Capai 350 score di mode Sakura',        target: 350, type: 'score',  reward: 75 },
+    { id: 'sakura_coins_20',   mode: 'sakura', icon: '🌸', title: 'Petal Collector',  desc: 'Kumpulkan 20 koin di mode Sakura',      target: 20,  type: 'coins',  reward: 35 },
+    { id: 'sakura_games_3',    mode: 'sakura', icon: '🎮', title: 'Penjelajah Sakura',desc: 'Main 3 kali di mode Sakura',            target: 3,   type: 'games',  reward: 25 },
 
     // ── RAMADAN ──
-    { id: 'ramadan_score_150', mode: 'ramadan',icon: '☪️', title: 'Ramadan Runner',   desc: 'Capai 150 score di mode Ramadan',       target: 150, type: 'score',  reward: 80 },
-    { id: 'ramadan_score_350', mode: 'ramadan',icon: '🕌', title: 'Mubarak Champion', desc: 'Capai 350 score di mode Ramadan',       target: 350, type: 'score',  reward: 150 },
-    { id: 'ramadan_coins_20',  mode: 'ramadan',icon: '🏮', title: 'Lantern Collector',desc: 'Kumpulkan 20 koin di mode Ramadan',     target: 20,  type: 'coins',  reward: 80 },
-    { id: 'ramadan_games_3',   mode: 'ramadan',icon: '🎮', title: 'Penjelajah Ramadan',desc:'Main 3 kali di mode Ramadan',           target: 3,   type: 'games',  reward: 55 },
+    { id: 'ramadan_score_150', mode: 'ramadan',icon: '☪️', title: 'Ramadan Runner',   desc: 'Capai 150 score di mode Ramadan',       target: 150, type: 'score',  reward: 40 },
+    { id: 'ramadan_score_350', mode: 'ramadan',icon: '🕌', title: 'Mubarak Champion', desc: 'Capai 350 score di mode Ramadan',       target: 350, type: 'score',  reward: 75 },
+    { id: 'ramadan_coins_20',  mode: 'ramadan',icon: '🏮', title: 'Lantern Collector',desc: 'Kumpulkan 20 koin di mode Ramadan',     target: 20,  type: 'coins',  reward: 35 },
+    { id: 'ramadan_games_3',   mode: 'ramadan',icon: '🎮', title: 'Penjelajah Ramadan',desc:'Main 3 kali di mode Ramadan',           target: 3,   type: 'games',  reward: 25 },
 
     // ── UMUM ──
-    { id: 'any_play_5',        mode: 'any',    icon: '🎮', title: 'Pemain Setia',     desc: 'Main 5 kali di mode apapun',           target: 5,   type: 'games',  reward: 60 },
-    { id: 'any_play_10',       mode: 'any',    icon: '🏅', title: 'Veteran',          desc: 'Main 10 kali di mode apapun',          target: 10,  type: 'games',  reward: 100 },
-    { id: 'any_coins_50',      mode: 'any',    icon: '💰', title: 'Master Kolektor',  desc: 'Kumpulkan 50 koin di semua mode',      target: 50,  type: 'coins',  reward: 130 },
-    { id: 'any_score_200',     mode: 'any',    icon: '🏆', title: 'Score Master',     desc: 'Capai 200 score di mode apapun',       target: 200, type: 'score',  reward: 80 },
-    { id: 'any_score_500',     mode: 'any',    icon: '👑', title: 'Legenda',          desc: 'Capai 500 score di mode apapun',       target: 500, type: 'score',  reward: 200 },
+    { id: 'any_play_5',        mode: 'any',    icon: '🎮', title: 'Pemain Setia',     desc: 'Main 5 kali di mode apapun',           target: 5,   type: 'games',  reward: 30 },
+    { id: 'any_play_10',       mode: 'any',    icon: '🏅', title: 'Veteran',          desc: 'Main 10 kali di mode apapun',          target: 10,  type: 'games',  reward: 50 },
+    { id: 'any_coins_50',      mode: 'any',    icon: '💰', title: 'Master Kolektor',  desc: 'Kumpulkan 50 koin di semua mode',      target: 50,  type: 'coins',  reward: 60 },
+    { id: 'any_score_200',     mode: 'any',    icon: '🏆', title: 'Score Master',     desc: 'Capai 200 score di mode apapun',       target: 200, type: 'score',  reward: 45 },
+    { id: 'any_score_500',     mode: 'any',    icon: '👑', title: 'Legenda',          desc: 'Capai 500 score di mode apapun',       target: 500, type: 'score',  reward: 90 },
 ];
 
 function checkMissionReset() {
@@ -5849,8 +5856,8 @@ function generateDailyMissions() {
     const availableMissions = [...MISSION_TEMPLATES];
     const selected = [];
     
-    // Pick 3 random missions
-    for (let i = 0; i < 3; i++) {
+    // Pick 4 random missions
+    for (let i = 0; i < 4; i++) {
         const idx = Math.floor(Math.random() * availableMissions.length);
         selected.push({
             ...availableMissions[idx],
@@ -5974,9 +5981,9 @@ const ACHIEVEMENT_LIST = [
         icon: '🪙',
         title: 'Kolektor Koin',
         tiers: [
-            { tier: 1, target: 200,  reward: { type: 'coins', amount: 200,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 200 koin di semua mode' },
-            { tier: 2, target: 800,  reward: { type: 'coins', amount: 600,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 800 koin di semua mode' },
-            { tier: 3, target: 2000, reward: { type: 'coins', amount: 1500, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 2.000 koin di semua mode' },
+            { tier: 1, target: 200,  reward: { type: 'coins', amount: 80,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 200 koin di semua mode' },
+            { tier: 2, target: 800,  reward: { type: 'coins', amount: 250, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Kumpulkan total 800 koin di semua mode' },
+            { tier: 3, target: 2000, reward: { type: 'skin', skinId: 'master_c' }, desc: 'Kumpulkan total 2.000 koin di semua mode — Unlock skin MASTER C!' },
         ]
     },
     {
@@ -5984,9 +5991,9 @@ const ACHIEVEMENT_LIST = [
         icon: '⬆️',
         title: 'Jump Master',
         tiers: [
-            { tier: 1, target: 500,   reward: { type: 'coins', amount: 300,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 500 (gabungan semua mode)' },
-            { tier: 2, target: 3000,  reward: { type: 'coins', amount: 800,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 3.000' },
-            { tier: 3, target: 10000, reward: { type: 'coins', amount: 2000, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 10.000' },
+            { tier: 1, target: 500,   reward: { type: 'coins', amount: 100, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 500 (gabungan semua mode)' },
+            { tier: 2, target: 3000,  reward: { type: 'coins', amount: 300, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 3.000' },
+            { tier: 3, target: 10000, reward: { type: 'coins', amount: 700, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai total jump score 10.000' },
         ]
     },
     {
@@ -5994,9 +6001,9 @@ const ACHIEVEMENT_LIST = [
         icon: '👑',
         title: 'Score Master',
         tiers: [
-            { tier: 1, target: 500,  reward: { type: 'coins', amount: 300,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 500 di mode manapun' },
-            { tier: 2, target: 2000, reward: { type: 'coins', amount: 800,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 2.000 di mode manapun' },
-            { tier: 3, target: 5000, reward: { type: 'coins', amount: 2000, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 5.000 di mode manapun' },
+            { tier: 1, target: 500,  reward: { type: 'coins', amount: 100, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 500 di mode manapun' },
+            { tier: 2, target: 2000, reward: { type: 'coins', amount: 300, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 2.000 di mode manapun' },
+            { tier: 3, target: 5000, reward: { type: 'coins', amount: 700, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Capai score 5.000 di mode manapun' },
         ]
     },
     {
@@ -6004,9 +6011,9 @@ const ACHIEVEMENT_LIST = [
         icon: '🎯',
         title: 'Mission Hunter',
         tiers: [
-            { tier: 1, target: 5,  reward: { type: 'coins', amount: 250,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 5 daily mission' },
-            { tier: 2, target: 20, reward: { type: 'coins', amount: 700,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 20 daily mission' },
-            { tier: 3, target: 50, reward: { type: 'coins', amount: 1800, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 50 daily mission' },
+            { tier: 1, target: 5,  reward: { type: 'coins', amount: 80,  modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 5 daily mission' },
+            { tier: 2, target: 20, reward: { type: 'coins', amount: 250, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 20 daily mission' },
+            { tier: 3, target: 50, reward: { type: 'coins', amount: 600, modes: ['egypt','day','night','snow','ocean','sakura','ramadan'] }, desc: 'Selesaikan 50 daily mission' },
         ]
     },
 ];
@@ -6034,9 +6041,35 @@ function switchMissionTab(tab) { playSound('tab');
 // Tier navigation system
 let currentViewingTier = 1;
 
+function initTierFromData() {
+    // Restore tier yang sudah di-unlock dari playerData
+    if (playerData.achievements && playerData.achievements.viewingTier) {
+        currentViewingTier = playerData.achievements.viewingTier;
+    } else {
+        currentViewingTier = 1;
+    }
+}
+
 function unlockNextTier() {
-    const tier1Complete = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[0].target);
-    if (tier1Complete) { currentViewingTier = 2; renderAchievements(); }
+    if (currentViewingTier === 1) {
+        const allT1Done = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[0].target);
+        if (allT1Done) {
+            currentViewingTier = 2;
+            if (!playerData.achievements) playerData.achievements = {};
+            playerData.achievements.viewingTier = 2;
+            saveData();
+            renderAchievements();
+        }
+    } else if (currentViewingTier === 2) {
+        const allT2Done = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[1].target);
+        if (allT2Done) {
+            currentViewingTier = 3;
+            if (!playerData.achievements) playerData.achievements = {};
+            playerData.achievements.viewingTier = 3;
+            saveData();
+            renderAchievements();
+        }
+    }
 }
 
 function getAchievementProgress(id) {
@@ -6048,6 +6081,9 @@ function getAchievementProgress(id) {
 }
 
 function renderAchievements() {
+    // Restore tier yang sudah di-unlock
+    initTierFromData();
+
     const container = document.getElementById('achievementList');
     container.innerHTML = '';
     if (!playerData.achievements) playerData.achievements = {};
@@ -6096,6 +6132,8 @@ function renderAchievements() {
             let rewardText = '';
             if (tier.reward.type === 'coins') {
                 rewardText = `+${tier.reward.amount.toLocaleString()} koin semua mode`;
+            } else if (tier.reward.type === 'skin') {
+                rewardText = `🎭 Skin MASTER C + x2 Coin`;
             } else {
                 rewardText = 'Coming Soon';
             }
@@ -6129,7 +6167,7 @@ function renderAchievements() {
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #1a1a1a;">
                     <div style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);color:#FFD700;">🎁 ${rewardText}</div>
-                    ${isUnlocked && !isClaimed && tier.reward.type === 'coins' ? `
+                    ${isUnlocked && !isClaimed && (tier.reward.type === 'coins' || tier.reward.type === 'skin') ? `
                         <button onclick="claimAchievementReward('${achievement.id}',${tier.tier})"
                             style="padding:clamp(6px,1.5vh,8px) clamp(10px,2.5vw,14px);font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);
                             background:linear-gradient(135deg,#FFD700,#FFA500);border:3px solid #000;color:#000;cursor:pointer;
@@ -6152,9 +6190,18 @@ function renderAchievements() {
     // Tier nav
     const tierNav = document.getElementById('tierNavigation');
     if (tierNav) {
-        if (currentViewingTier === 1) {
-            const allT1Done = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[0].target);
-            tierNav.style.display = allT1Done ? 'block' : 'none';
+        if (currentViewingTier < 3) {
+            const currentTierTargets = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[currentViewingTier - 1].target);
+            if (currentTierTargets) {
+                tierNav.style.display = 'block';
+                const nextTierNum = document.getElementById('nextTierNum');
+                const tierReq = document.getElementById('tierRequirement');
+                const tierNames = ['', 'Perunggu', 'Perak', 'Emas'];
+                if (nextTierNum) nextTierNum.textContent = currentViewingTier + 1;
+                if (tierReq) tierReq.textContent = `Semua Tier ${tierNames[currentViewingTier]} selesai! Buka Tier ${tierNames[currentViewingTier + 1]}`;
+            } else {
+                tierNav.style.display = 'none';
+            }
         } else {
             tierNav.style.display = 'none';
         }
@@ -6179,6 +6226,17 @@ function claimAchievementReward(achievementId, tier) {
         updateAllCoinDisplays();
         renderAchievements();
         showToast(`🏆 +${tierData.reward.amount.toLocaleString()} koin semua mode!`, '#FFD700');
+    } else if (tierData.reward.type === 'skin') {
+        const skinId = tierData.reward.skinId;
+        // Unlock skin master_c
+        if (!playerData.skins.default) playerData.skins.default = [];
+        if (!playerData.skins.default.includes(skinId)) {
+            playerData.skins.default.push(skinId);
+        }
+        playerData.achievements[claimKey] = true;
+        saveData();
+        renderAchievements();
+        showToast(`🏆 Skin MASTER C berhasil di-unlock!`, '#FFD700');
     }
 }
 
@@ -6482,6 +6540,7 @@ updateMissionNotification();
             gamePaused = false;
             setMenuIconsVisibility(true);
             updateMenuPlayerBar();
+            checkShowAdminBtn();
             
             // Hide pause button
             document.getElementById('pauseBtn').style.display = 'none';
@@ -7032,12 +7091,9 @@ function saveRedeemedCodes(codes) {
     const pid = getPlayerId() || 'guest';
     localStorage.setItem('redeemedCodes_' + pid, JSON.stringify(codes));
 }
-const redeemedCodes = getRedeemedCodes();
-const adminUnlocked = localStorage.getItem('adminUnlocked') === 'true';
-
 // Show admin button hanya untuk:
 // 1. Akun online "Rex" (login resmi, bukan guest)
-// 2. Offline murni — tidak pernah login online (file:// atau no-server deploy)
+// 2. Offline murni — buka via file://
 function checkShowAdminBtn() {
     const name = (playerData.name || '').trim().toLowerCase();
     const isOnlineRex = (name === 'rex') && !isGuestMode;
@@ -7046,7 +7102,8 @@ function checkShowAdminBtn() {
     const btn = document.getElementById('adminPanelBtn');
     if (btn) btn.style.display = (isOnlineRex || isOfflineAdmin) ? 'block' : 'none';
 }
-checkShowAdminBtn();
+// JANGAN panggil checkShowAdminBtn di sini — playerData belum siap saat halaman load
+// Dipanggil dari startLoadingAndGame() setelah semua data siap
 
 function redeemCode() {
     const input = document.getElementById('redeemInput');
@@ -7058,7 +7115,8 @@ function redeemCode() {
         return;
     }
     
-    // Check if already redeemed
+    // Check if already redeemed (baca fresh, bukan cache)
+    const redeemedCodes = getRedeemedCodes();
     if (redeemedCodes.includes(code)) {
         showRedeemMessage('Code already redeemed!', '#ff6b6b');
         return;
@@ -7222,42 +7280,30 @@ function checkAdminPassword() {
     const input = document.getElementById('adminPasswordInput');
     const password = input.value;
     const errorDiv = document.getElementById('adminPasswordError');
-    const currentName = (playerData.name || '').trim().toLowerCase();
-    const everOnline = localStorage.getItem('bl0ckrun_ever_online') === '1';
 
-    // KEAMANAN: kalau pernah login online tapi sekarang guest → TOLAK semua password
-    if (isGuestMode && everOnline) {
-        errorDiv.textContent = '⛔ Login online untuk akses admin!';
-        errorDiv.style.display = 'block';
-        input.value = '';
-        playSound('hit'); vibrate(300);
-        setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
-        return;
-    }
-
-    // Password rex0987 hanya untuk akun Rex yang login online
+    // Password rex0987: bisa masuk kalau:
+    // 1. Online sebagai Rex (login resmi)
+    // 2. Buka via file:// (HTML doang, no server)
+    // TIDAK bisa kalau buka dari Railway tapi internet mati
     if (password === 'rex0987') {
+        const currentName = (playerData.name || '').trim().toLowerCase();
         const isOnlineRex = (currentName === 'rex') && !isGuestMode;
-        // Offline admin hanya boleh kalau belum pernah online
-        const isOfflineOk = isGuestMode && !everOnline;
-        if (!isOnlineRex && !isOfflineOk) {
-            errorDiv.textContent = '⛔ Access Denied!';
-            errorDiv.style.display = 'block';
+        const isPureFile = window.location.protocol === 'file:';
+        if (isOnlineRex || isPureFile) {
             input.value = '';
-            playSound('hit'); vibrate(300);
-            setTimeout(() => { errorDiv.style.display = 'none'; }, 2500);
-        } else {
             document.getElementById('adminPasswordCheck').style.display = 'none';
             document.getElementById('adminContent').style.display = 'block';
             playSound('coin');
+            return;
         }
-    } else {
-        errorDiv.textContent = '❌ Password salah!';
-        errorDiv.style.display = 'block';
-        input.value = '';
-        playSound('hit'); vibrate(100);
-        setTimeout(() => { errorDiv.style.display = 'none'; }, 2000);
     }
+
+    // Password salah
+    errorDiv.textContent = '❌ Password salah!';
+    errorDiv.style.display = 'block';
+    input.value = '';
+    playSound('hit'); vibrate(100);
+    setTimeout(() => { errorDiv.style.display = 'none'; }, 2000);
 }
 
 function setCoins(mode) {
@@ -7413,6 +7459,11 @@ function unlockAllSkins() { playSound('unlock');
                 playerData.skins.valentine.push(skin.id);
             }
         });
+    }
+
+    // Unlock Master C skin
+    if (!playerData.skins.default.includes('master_c')) {
+        playerData.skins.default.push('master_c');
     }
 
     // Save
@@ -7920,6 +7971,26 @@ function renderSkinBlock(blockDiv, skin, isMini) {
                 ctx.fillRect(x+2, y-7, w-4, 5);
                 ctx.strokeStyle = '#FFD700'; ctx.lineWidth = 1;
                 ctx.strokeRect(x, y-8, w, 8);
+            } else if (skin.masterC) {
+                // Master C crown — huruf C emas dengan gem biru
+                ctx.fillStyle = '#B8860B';
+                ctx.fillRect(x+1, y-8, w-2, 8); // base
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(x+1, y-9, w-2, 2); // trim atas
+                // huruf C pixel
+                ctx.fillStyle = '#FFF8DC';
+                ctx.fillRect(x+4,   y-8, 3, 3);
+                ctx.fillRect(x+w-7, y-8, 3, 3);
+                ctx.fillRect(x+4,   y-4, 3, 3);
+                ctx.fillRect(x+w-7, y-4, 3, 3);
+                ctx.fillRect(x+4,   y-6, 2, 2);
+                // Gem biru tengah
+                ctx.fillStyle = '#00BFFF';
+                ctx.fillRect(x+w/2-2, y-10, 4, 4);
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(x+w/2-1, y-10, 2, 1);
+                ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+                ctx.strokeRect(x+w/2-2, y-10, 4, 4);
             }
 
             // ── 8. OUTLINE crown area ──
@@ -7971,6 +8042,15 @@ function renderSkinBlock(blockDiv, skin, isMini) {
                     ? '⚡ ' + abilityName
                     : '🔒 ABILITY';
                 card.appendChild(abilityEl);
+            }
+
+            // Master C: tampilkan info coinMultiplier
+            if (skin.coinMultiplier) {
+                const coinEl = document.createElement('div');
+                coinEl.className = 'skin-ability-line';
+                coinEl.style.color = '#FFD700';
+                coinEl.textContent = owned ? `💰 x${skin.coinMultiplier} COIN` : '🔒 x2 COIN';
+                card.appendChild(coinEl);
             }
 
             if (owned) {
@@ -8038,9 +8118,12 @@ function renderSkinBlock(blockDiv, skin, isMini) {
             const defaultGrid = document.getElementById('defaultSkinGrid');
             defaultGrid.innerHTML = '';
             defaultSkins.forEach(skin => {
-                const owned = true; // default skins always owned
+                // Master C: hanya tampil jika dimiliki (hidden skin)
+                if (skin.hidden && !playerData.skins.default.includes(skin.id)) return;
+                const owned = skin.hidden ? playerData.skins.default.includes(skin.id) : true;
                 const equipped = playerData.equippedSkin === skin.id;
                 const { card, preview } = makeSkinCard(skin, owned, equipped, () => {
+                    if (!owned) return;
                     playerData.equippedSkin = skin.id; saveData(); renderSkinGrids();
                 });
                 drawSkinCanvas(preview, skin, owned);
@@ -10587,8 +10670,8 @@ if (surfing && waveActive) {
         const flow = Math.sin(frameCount * 0.06);      // -1→1 smooth wave
         const shimmer = (Math.sin(frameCount * 0.08) + 1) / 2;  // 0→1 shimmer
         
-        // — BASE MANTLE (coklat saddle - sesuai skin) —
-        ctx.fillStyle = '#8B4513';  // coklat skin
+        // — BASE MANTLE (coklat emas - sesuai skin Mesir) —
+        ctx.fillStyle = '#7B4F00';  // coklat tua Mesir
         ctx.fillRect(this.x - 4,  yPos + 2,  6, 4);
         ctx.fillRect(this.x - 8,  yPos + 6 + flow * 0.5,  10, 4);
         ctx.fillRect(this.x - 10, yPos + 10 + flow,       12, 4);
@@ -10600,19 +10683,19 @@ if (surfing && waveActive) {
         ctx.fillRect(this.x - 16, yPos + 34 + flow * 3,   16, 4);
         
         // Shadow layer (darker)
-        ctx.fillStyle = '#654321';
+        ctx.fillStyle = '#5A3800';
         ctx.fillRect(this.x - 20, yPos + 28 + flow * 3, 2, 10);
         
-        // — INNER ACCENT (turquoise strips - sesuai gradient) —
-        ctx.fillStyle = '#40E0D0';  // turquoise
+        // — INNER ACCENT (biru Nil - warna Egypt) —
+        ctx.fillStyle = '#4A90B8';  // biru Nil
         ctx.fillRect(this.x - 6,  yPos + 8 + flow * 0.8,  6, 2);
         ctx.fillRect(this.x - 8,  yPos + 12 + flow * 1.2, 8, 2);
         ctx.fillRect(this.x - 10, yPos + 16 + flow * 1.8, 10, 2);
         ctx.fillRect(this.x - 12, yPos + 20 + flow * 2.2, 12, 2);
         ctx.fillRect(this.x - 14, yPos + 24 + flow * 2.8, 14, 2);
         
-        // — GOLDEN TRIM (border emas) —
-        ctx.fillStyle = `rgba(255, 215, 0, ${0.8 + shimmer * 0.2})`;
+        // — GOLDEN TRIM (border emas Mesir) —
+        ctx.fillStyle = `rgba(232, 200, 74, ${0.8 + shimmer * 0.2})`;
         // Border kiri
         for (let i = 0; i < 6; i++) {
             ctx.fillRect(this.x - 20, yPos + 26 + i * 2 + flow * (2.5 + i * 0.2), 2, 2);
@@ -10623,25 +10706,25 @@ if (surfing && waveActive) {
             ctx.fillRect(this.x - 18 + x, yPos + 38 + flow * 3 + waveY, 2, 2);
         }
         
-        // — ANKH SYMBOL (turquoise sacred) —
-        ctx.fillStyle = '#40E0D0';
+        // — ANKH SYMBOL (biru Nil sacred) —
+        ctx.fillStyle = '#4A90B8';
         ctx.fillRect(this.x - 9, yPos + 12 + flow * 1.5, 2, 8);  // vertical
         ctx.fillRect(this.x - 13, yPos + 14 + flow * 1.5, 10, 2); // horizontal
         ctx.fillRect(this.x - 11, yPos + 8 + flow * 1.5,  6, 2);  // loop
         ctx.fillRect(this.x - 13, yPos + 10 + flow * 1.5, 2, 2);
         ctx.fillRect(this.x - 7,  yPos + 10 + flow * 1.5, 2, 2);
         
-        // — EYE OF HORUS (emas) —
-        ctx.fillStyle = '#FFD700';
+        // — EYE OF HORUS (emas Mesir) —
+        ctx.fillStyle = '#E8C84A';
         ctx.fillRect(this.x - 12, yPos + 24 + flow * 2.8, 8, 2);
         ctx.fillRect(this.x - 10, yPos + 22 + flow * 2.8, 4, 2);
         ctx.fillRect(this.x - 10, yPos + 26 + flow * 2.8, 2, 2);
         // Pupil (coklat)
-        ctx.fillStyle = '#8B4513';
+        ctx.fillStyle = '#7B4F00';
         ctx.fillRect(this.x - 9, yPos + 24 + flow * 2.8, 2, 2);
         
-        // — SCARAB BEETLES (turquoise) —
-        ctx.fillStyle = `rgba(64, 224, 208, ${0.8 + shimmer * 0.2})`;
+        // — SCARAB BEETLES (biru Nil) —
+        ctx.fillStyle = `rgba(74, 144, 184, ${0.8 + shimmer * 0.2})`;
         // Beetle atas
         ctx.fillRect(this.x - 8, yPos + 6 + flow * 0.8,  4, 2);
         ctx.fillRect(this.x - 7, yPos + 4 + flow * 0.8,  2, 2);
@@ -10649,10 +10732,10 @@ if (surfing && waveActive) {
         ctx.fillRect(this.x - 4,  yPos + 8 + flow * 0.8, 2, 2);
         
         // — SHOULDER CLASP (emas) —
-        ctx.fillStyle = '#FFD700';
+        ctx.fillStyle = '#E8C84A';
         ctx.fillRect(this.x - 2, yPos,     6, 3);
         ctx.fillRect(this.x - 4, yPos + 3, 8, 2);
-        ctx.fillStyle = '#40E0D0';  // turquoise accent
+        ctx.fillStyle = '#4A90B8';  // biru Nil accent
         ctx.fillRect(this.x,     yPos + 1, 2, 2);
         
     } else {
@@ -11626,6 +11709,61 @@ if (skin.snowflakeCrown && !this.isDucking) {
                     ctx.fillRect(cx + 20, cy - 14, 2, 8);  // garis tengah
                     ctx.fillRect(cx + 14, cy - 13, 2, 6);  // kiri
                     ctx.fillRect(cx + 26, cy - 13, 2, 6);  // kanan
+                }
+
+                // === MASTER C CROWN (Kolektor Koin Legendary) ===
+                if (skin.masterC && !this.isDucking) {
+                    const t = frameCount;
+                    const cx = this.x;
+                    const cy = yPos;
+                    const shimmer = (Math.sin(t * 0.1) + 1) / 2;
+                    const pulse = (Math.sin(t * 0.15) + 1) / 2;
+
+                    // — BASE CROWN (emas) —
+                    ctx.fillStyle = `rgba(184,134,11,${0.9 + shimmer * 0.1})`;
+                    ctx.fillRect(cx + 2,  cy - 8, this.width - 4, 8);
+                    // Trim atas emas cerah
+                    ctx.fillStyle = `rgba(255,215,0,${0.85 + shimmer * 0.15})`;
+                    ctx.fillRect(cx + 2,  cy - 9, this.width - 4, 2);
+                    // Tiga puncak
+                    ctx.fillStyle = `rgba(212,175,55,${0.9 + shimmer * 0.1})`;
+                    ctx.fillRect(cx + 4,       cy - 13, 6, 5);
+                    ctx.fillRect(cx + this.width/2 - 3, cy - 16, 6, 8);
+                    ctx.fillRect(cx + this.width - 10, cy - 13, 6, 5);
+                    // Gem biru di tengah mahkota
+                    ctx.fillStyle = `rgba(0,191,255,${0.8 + pulse * 0.2})`;
+                    ctx.fillRect(cx + this.width/2 - 2, cy - 17, 4, 4);
+                    // Cahaya gem
+                    ctx.fillStyle = `rgba(135,206,235,${pulse * 0.8})`;
+                    ctx.fillRect(cx + this.width/2 - 1, cy - 17, 2, 1);
+                    // Gem di sudut crown
+                    ctx.fillStyle = `rgba(255,69,0,${0.8 + pulse * 0.2})`;
+                    ctx.fillRect(cx + 5, cy - 7, 3, 3);
+                    ctx.fillRect(cx + this.width - 8, cy - 7, 3, 3);
+                    // Outline hitam
+                    ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+                    ctx.strokeRect(cx + 2, cy - 8, this.width - 4, 8);
+                    // Coin aura (golden sparkles)
+                    if (t % 8 === 0) {
+                        particles.push({
+                            x: cx + 2 + Math.random() * this.width,
+                            y: cy - 4 + Math.random() * 4,
+                            vx: (Math.random() - 0.5) * 1.5,
+                            vy: -1.5 - Math.random(),
+                            life: 20, color: '#FFD700'
+                        });
+                    }
+                }
+
+                // === MASTER C COIN x2 INDICATOR ===
+                if (skin.masterC && !this.isDucking) {
+                    const t = frameCount;
+                    const pulse = (Math.sin(t * 0.12) + 1) / 2;
+                    ctx.font = `bold ${Math.round(8 + pulse * 2)}px 'Press Start 2P', monospace`;
+                    ctx.fillStyle = `rgba(255,215,0,${0.7 + pulse * 0.3})`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('×2', this.x + this.width/2, yPos - 20);
+                    ctx.textAlign = 'left';
                 }
 
                 // === HAORI MANTLE (Samurai Sakura Legendary) ===
@@ -16417,7 +16555,9 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
                 
                 if (coin.collidesWith(player)) {
                     coin.collected = true;
-                    sessionCoins++;
+                    const activeSkin = getCurrentSkin();
+                    const coinAmount = (activeSkin && activeSkin.coinMultiplier) ? activeSkin.coinMultiplier : 1;
+                    sessionCoins += coinAmount;
                     document.getElementById('coinCount').textContent = sessionCoins;
                     coins.splice(i, 1);
 
@@ -17194,12 +17334,13 @@ if (currentMode === 'night' && gameMode === 'minigame') {
             // Skin body colors untuk blok tengah
             const SKIN_COLORS2 = {
                 'white':['#FFFFFF','#CCCCCC'],'blue':['#00CED1','#008B8B'],'red':['#FF4444','#BB0000'],'pink':['#FF69B4','#C43584'],
-                'egypt_common':['#8B7355','#7A6348'],'egypt_rare':['#A0826D','#8B7055'],'egypt_epic':['#CD853F','#A06820'],'egypt_legendary':['#8B4513','#FFD700','#40E0D0'],
+                'egypt_common':['#8B7355','#7A6348'],'egypt_rare':['#A0826D','#8B7055'],'egypt_epic':['#CD853F','#A06820'],'egypt_legendary':['#7B4F00','#C8952C','#E8C84A','#4A90B8'],
                 'day_common':['#FFF44F','#FFE66D'],'day_rare':['#FF9500','#FFAB00'],'day_epic':['#FFFACD','#FFD700'],'day_legendary':['#FFFFFF','#FFD700','#FF8C00','#FF6347'],
                 'night_common':['#2C3E50','#1A2530'],'night_rare':['#5B21B6','#7C3AED'],'night_epic':['#1E1B4B','#4C1D95','#5B21B6'],'night_legendary':['#0F172A','#4C1D95','#C084FC','#4C1D95','#0F172A'],
                 'snow_common':['#E0F7FF','#C0E8F8'],'snow_rare':['#87CEEB','#B0E0E6'],'snow_epic':['#4682B4','#87CEEB','#E0F7FF'],'snow_legendary':['#1E90FF','#87CEEB','#F0F8FF','#FFFFFF'],
                 'ocean_common':['#00CED1','#20B2AA'],'ocean_rare':['#0077B6','#00B4D8'],'ocean_epic':['#023E8A','#0077B6','#00B4D8'],'ocean_legendary':['#03045E','#0077B6','#00B4D8','#90E0EF'],
                 'valentine_limited':['#FF69B4','#FF1493'],
+                'master_c':['#B8860B','#FFD700','#FFF8DC','#D4AF37'],
             };
             let skinColors;
             try {
