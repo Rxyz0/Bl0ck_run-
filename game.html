@@ -3152,7 +3152,7 @@
     <span class="name-pixel-icon">🎮</span>
     <div class="name-title">ENTER YOUR NAME</div>
     <div class="name-sub">Nama kamu akan tampil di<br>leaderboard & profil game</div>
-    <input class="name-field" id="nameField" type="text" maxlength="16" placeholder="YOUR NAME..." autocomplete="off" spellcheck="false">
+    <input class="name-field" id="nameField" type="text" maxlength="16" placeholder="YOUR NAME..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();submitName();}">
     <div class="name-err" id="nameErr"></div>
     <button class="name-submit" onclick="submitName()">START PLAYING →</button>
   </div>
@@ -3998,56 +3998,8 @@
         <div style="width: 100%; padding: clamp(15px, 3vh, 25px) 0; overflow-y: auto; flex: 1;">
             <div class="page-title">👑 ADMIN PANEL</div>
             
-            <!-- Password Check -->
-            <div id="adminPasswordCheck" style="text-align: center; padding: 40px 20px;">
-                <div style="
-                    background: linear-gradient(135deg, #1a1a2e, #16213e);
-                    border: 3px solid #00ff88;
-                    box-shadow: 0 0 30px rgba(0,255,136,0.2), 6px 6px 0 #003322;
-                    padding: 30px 20px;
-                    max-width: 320px;
-                    margin: 0 auto;
-                ">
-                    <div style="font-size: 40px; margin-bottom: 15px;">🔐</div>
-                    <div style="font-size: clamp(10px, 2.5vw, 13px); color: #00ff88; margin-bottom: 20px; font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-                        ADMIN LOGIN
-                    </div>
-                    <input 
-                        type="password" 
-                        id="adminPasswordInput" 
-                        placeholder="Password..." 
-                        style="
-                            width: 100%;
-                            padding: 14px;
-                            font-size: clamp(10px, 2.5vw, 13px);
-                            font-family: 'Press Start 2P', monospace;
-                            background: #0a0a1a;
-                            border: 3px solid #00ff88;
-                            color: #00ff88;
-                            text-align: center;
-                            box-shadow: inset 0 0 10px rgba(0,255,136,0.1), 4px 4px 0 #003322;
-                            margin-bottom: 15px;
-                            display: block;
-                        "
-                    >
-                    <button class="btn" onclick="checkAdminPassword()" style="width: 100%; background: linear-gradient(135deg, #00ff88, #00cc66); color: #000; letter-spacing: 2px;">
-                        ▶ MASUK
-                    </button>
-                    <div id="adminPasswordError" style="
-                        margin-top: 15px;
-                        color: #ff6b6b;
-                        font-size: clamp(8px, 2vw, 10px);
-                        font-family: 'Press Start 2P', monospace;
-                        display: none;
-                        background: rgba(255,107,107,0.1);
-                        border: 2px solid #ff6b6b;
-                        padding: 8px;
-                    ">WRONG PASSWORD!</div>
-                </div>
-            </div>
-            
-            <!-- Admin Content (Hidden until password correct) -->
-            <div id="adminContent" style="display: none;">
+            <!-- Admin Content -->
+            <div id="adminContent">
                 <div class="settings-container">
 
                     <!-- Owner Info -->
@@ -4421,7 +4373,7 @@ let _authScreenOriginalContent = null;
 async function checkServerReachable() {
   try {
     const res = await fetch(`${SERVER_URL}/api/health`, {
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(3000)
     });
     const data = await res.json();
     serverReachable = res.ok && data.status === 'ok';
@@ -4458,29 +4410,19 @@ function showConnectingSpinner(attempt) {
 }
 
 async function tryAutoLogin() {
-  // ── KASUS 1: Buka via file:// — admin otomatis ──
+  // ── KASUS 1: Buka via file:// — langsung offline ──
   if (window.location.protocol === 'file:') {
-    localStorage.setItem('adminUnlocked', 'true');
-    _enterOffline(true);
+    _enterOffline();
     return;
   }
 
-  // ── KASUS 2: Buka via server (Railway dll) ──
+  // ── KASUS 2: Buka via HTTP — cek server 1x cepat (3 detik timeout) ──
   const token = getAuthToken();
   _skipToOfflineRequested = false;
 
-  // Coba konek 3x dengan spinner
-  let connected = false;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    showConnectingSpinner(attempt);
-    await checkServerReachable();
-    if (_skipToOfflineRequested) break;
-    if (serverReachable) { connected = true; break; }
-    if (attempt < 3) {
-      await new Promise(r => setTimeout(r, 1500));
-      if (_skipToOfflineRequested) break;
-    }
-  }
+  // Quick check — 1x saja, tidak ada spinner
+  await checkServerReachable();
+  const connected = serverReachable;
 
   // Restore auth screen ke form login
   document.getElementById('authScreen').classList.remove('active');
@@ -4492,9 +4434,8 @@ async function tryAutoLogin() {
       // Punya akun tapi server mati — tawari main offline (tanpa admin)
       showServerDownScreen();
     } else {
-      // Tidak ada akun, server mati — langsung offline tanpa admin
-      localStorage.removeItem('adminUnlocked');
-      _enterOffline(false);
+      // Tidak ada akun, server tidak ada — langsung offline
+      _enterOffline();
     }
     return;
   }
@@ -4516,18 +4457,13 @@ async function tryAutoLogin() {
   }
 }
 
-// Masuk offline mode — giveAdmin hanya true kalau file://
-function _enterOffline(giveAdmin) {
+// Masuk offline mode
+function _enterOffline() {
   isGuestMode = true;
-  if (giveAdmin) {
-    localStorage.setItem('adminUnlocked', 'true');
-  } else {
-    localStorage.removeItem('adminUnlocked');
-  }
 
   // Default playerData
   playerData = {
-    name: 'OFFLINE',
+    name: '',
     coins: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
     highScores: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
     highScoresRun: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
@@ -4551,7 +4487,23 @@ function _enterOffline(giveAdmin) {
   }
 
   document.getElementById('authScreen').classList.remove('active');
-  startLoadingAndGame();
+
+  // Kalau belum punya nama, minta input nama dulu
+  if (!playerData.name || playerData.name === 'OFFLINE' || !playerData.name.trim()) {
+    playerData.name = '';
+    _showOfflineNameEntry();
+  } else {
+    startLoadingAndGame();
+  }
+}
+
+// Tampilkan form enter name untuk offline mode
+function _showOfflineNameEntry() {
+  const nameScreen = document.getElementById('nameScreen');
+  // Update subtitle khusus offline
+  const sub = nameScreen.querySelector('.name-sub');
+  if (sub) sub.innerHTML = 'Mode OFFLINE<br><span style="color:#aaa;font-size:0.85em;">Progress tersimpan di perangkat ini</span>';
+  nameScreen.classList.add('active');
 }
 
 function showServerDownScreen() {
@@ -4579,9 +4531,7 @@ function showServerDownScreen() {
 }
 
 function startOfflineFromDown() {
-  // Server down, user pilih main offline — TIDAK ada admin
-  localStorage.removeItem('adminUnlocked');
-  _enterOffline(false);
+  _enterOffline();
 }
 
 function showAuthScreen() {
@@ -5704,7 +5654,18 @@ function submitName() {
     if (!/^[a-zA-Z0-9_]+$/.test(v)) { err.textContent='Hanya huruf, angka, underscore!'; err.style.display='block'; return; }
     
     err.style.display='none';
-    // Register ke server dulu
+
+    // Offline mode: langsung simpan nama lokal, no server check
+    if (isGuestMode) {
+        playerData.name = v;
+        saveData();
+        document.getElementById('nameScreen').classList.remove('active');
+        if (window._nameCallback) { window._nameCallback(); window._nameCallback = null; return; }
+        startLoadingAndGame();
+        return;
+    }
+
+    // Online mode: register ke server dulu
     registerPlayerName(v).then(result => {
         if (result.code === 'NAME_TAKEN') {
             err.textContent='Nama sudah dipakai orang lain!'; err.style.display='block'; return;
@@ -7097,10 +7058,8 @@ function saveRedeemedCodes(codes) {
 function checkShowAdminBtn() {
     const name = (playerData.name || '').trim().toLowerCase();
     const isOnlineRex = (name === 'rex') && !isGuestMode;
-    const isOfflineAdmin = localStorage.getItem('adminUnlocked') === 'true' && isGuestMode;
-
     const btn = document.getElementById('adminPanelBtn');
-    if (btn) btn.style.display = (isOnlineRex || isOfflineAdmin) ? 'block' : 'none';
+    if (btn) btn.style.display = (isGuestMode || isOnlineRex) ? 'block' : 'none';
 }
 // JANGAN panggil checkShowAdminBtn di sini — playerData belum siap saat halaman load
 // Dipanggil dari startLoadingAndGame() setelah semua data siap
@@ -7145,19 +7104,6 @@ function redeemCode() {
         
         message = '✓ +100 SNOW COINS!';
         success = true;
-        
-    } else if (code === 'Admin0209') {
-        // Unlock admin panel
-        localStorage.setItem('adminUnlocked', 'true');
-        checkShowAdminBtn();
-        
-        message = '✓ ADMIN PANEL UNLOCKED!';
-        success = true;
-        
-        // Show notification (tanpa kasih tau password)
-        setTimeout(() => {
-            alert('🔐 ADMIN PANEL UNLOCKED!\n\nCheck Settings > Admin Panel');
-        }, 500);
         
     } else if (code === 'Bonus2025') {
         // 200 coins Egypt mode
@@ -7252,20 +7198,7 @@ function showAdminPanel() { playSound('open');
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('adminPanel').classList.add('active');
     setMenuIconsVisibility(false);
-    
-    const currentName = (playerData.name || '').trim().toLowerCase();
-    const isOnlineRex = (currentName === 'rex') && !isGuestMode;
-    const isOfflineAdmin = isGuestMode && localStorage.getItem('adminUnlocked') === 'true';
 
-    // Skip password kalau: Rex online ATAU offline admin yang sah
-    if (isOnlineRex || isOfflineAdmin) {
-        document.getElementById('adminPasswordCheck').style.display = 'none';
-        document.getElementById('adminContent').style.display = 'block';
-    } else {
-        document.getElementById('adminPasswordCheck').style.display = 'block';
-        document.getElementById('adminContent').style.display = 'none';
-    }
-    
     // Load current coin values
     document.getElementById('adminEgyptCoins').value = playerData.coins.egypt || 0;
     document.getElementById('adminDayCoins').value = playerData.coins.day || 0;
@@ -7274,36 +7207,6 @@ function showAdminPanel() { playSound('open');
     document.getElementById('adminOceanCoins').value = playerData.coins.ocean || 0;
     document.getElementById('adminSakuraCoins').value = playerData.coins.sakura || 0;
     document.getElementById('adminRamadanCoins').value = playerData.coins.ramadan || 0;
-}
-
-function checkAdminPassword() {
-    const input = document.getElementById('adminPasswordInput');
-    const password = input.value;
-    const errorDiv = document.getElementById('adminPasswordError');
-
-    // Password rex0987: bisa masuk kalau:
-    // 1. Online sebagai Rex (login resmi)
-    // 2. Buka via file:// (HTML doang, no server)
-    // TIDAK bisa kalau buka dari Railway tapi internet mati
-    if (password === 'rex0987') {
-        const currentName = (playerData.name || '').trim().toLowerCase();
-        const isOnlineRex = (currentName === 'rex') && !isGuestMode;
-        const isPureFile = window.location.protocol === 'file:';
-        if (isOnlineRex || isPureFile) {
-            input.value = '';
-            document.getElementById('adminPasswordCheck').style.display = 'none';
-            document.getElementById('adminContent').style.display = 'block';
-            playSound('coin');
-            return;
-        }
-    }
-
-    // Password salah
-    errorDiv.textContent = '❌ Password salah!';
-    errorDiv.style.display = 'block';
-    input.value = '';
-    playSound('hit'); vibrate(100);
-    setTimeout(() => { errorDiv.style.display = 'none'; }, 2000);
 }
 
 function setCoins(mode) {
@@ -17714,17 +17617,10 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
             // Redeem code with Enter
             if (e.code === 'Enter') {
                 const redeemInput = document.getElementById('redeemInput');
-                const adminPwInput = document.getElementById('adminPasswordInput');
                 
                 if (document.activeElement === redeemInput) {
                     e.preventDefault();
                     redeemCode();
-                    return;
-                }
-                
-                if (document.activeElement === adminPwInput) {
-                    e.preventDefault();
-                    checkAdminPassword();
                     return;
                 }
             }
