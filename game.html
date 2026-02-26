@@ -1706,68 +1706,66 @@
 /* === DAILY MISSION STYLES === */
 #dailyMission {
     background: #0a0a0a;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: clamp(15px, 3vh, 25px) 0;
+    overflow: hidden;
+    padding: 0;
 }
 
-/* Tab Navigation untuk Mission */
-.mission-tabs {
+/* Tab bar horizontal atas */
+.mission-tab-bar {
     display: flex;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 20px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
+    background: #0d0d0d;
+    border-bottom: 3px solid #1a1a1a;
+    padding-top: clamp(44px, 10vh, 56px);
+    flex-shrink: 0;
+    gap: 0;
 }
 
 .mission-tab {
-    flex: 1;
-    min-width: 100px;
-    max-width: 150px;
-    padding: 10px 15px;
-    font-size: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: clamp(8px, 2vh, 12px) clamp(8px, 2vw, 16px);
     font-family: 'Press Start 2P', monospace;
-    background: #333;
-    color: #fff;
-    border: 3px solid #000;
+    background: #111;
+    color: #444;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-right: 2px solid #1a1a1a;
     cursor: pointer;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
     transition: all 0.1s;
+    flex: 1;
     text-align: center;
+    margin-bottom: -3px;
+}
+
+.tab-icon {
+    font-size: clamp(12px, 3vw, 16px);
+    line-height: 1;
+}
+
+.tab-label {
+    font-size: clamp(5px, 1.2vw, 7px);
+    letter-spacing: 0.5px;
 }
 
 .mission-tab.active {
-    background: #00ff88;
-    color: #000;
-    box-shadow: 3px 3px 0 #006644;
+    background: #1a1a1a;
+    color: #00ff88;
+    border-bottom: 3px solid #00ff88;
+    box-shadow: inset 0 -2px 8px rgba(0,255,136,0.05);
 }
 
 .mission-tab:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-}
-
-/* Fix untuk portrait mode - tabs tidak terpotong */
-@media (orientation: portrait) and (max-width: 480px) {
-    .mission-tabs {
-        padding: 8px 10px;
-        gap: 6px;
-        margin-bottom: 12px;
-    }
-    
-    .mission-tab {
-        min-width: 80px;
-        max-width: 120px;
-        padding: 8px 10px;
-        font-size: 8px;
-    }
+    background: #222;
 }
 
 .mission-header {
-    text-align: center;
-    padding: 0 clamp(15px, 4vw, 20px) clamp(12px, 2.5vh, 18px) clamp(15px, 4vw, 20px);
-    margin-bottom: clamp(10px, 2vh, 15px);
+    padding: 0 0 clamp(10px, 2vh, 14px) 0;
+    margin-bottom: clamp(8px, 1.5vh, 12px);
 }
 
 .mission-timer {
@@ -1920,177 +1918,218 @@
 
 /* Daily Check-in */
 .checkin-container {
-    width: 90%;
-    max-width: 800px;
+    width: 100%;
+    max-width: 700px;
     margin: 0 auto;
-    padding: 0 10px 100px 10px;
+    padding: 0;
 }
 
+/* === CHECK-IN — pixel konsisten dengan UI lain === */
 .checkin-card {
-    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
-    border: 3px solid #222;
-    box-shadow: 5px 5px 0 #111;
-    padding: clamp(14px, 3.5vw, 20px);
+    background: #0d0d0d;
+    border: 4px solid #00ff88;
+    box-shadow: 6px 6px 0 #006644;
+    padding: clamp(14px, 3.5vw, 22px);
+    margin-bottom: clamp(16px, 3.5vh, 24px);
     position: relative;
 }
 
-/* Left accent stripe */
-.checkin-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; bottom: 0;
-    width: 4px;
-    background: #FFD700;
-}
-
-.checkin-title {
+.checkin-card-title {
+    font-family: 'Press Start 2P', monospace;
     font-size: clamp(9px, 2.3vw, 12px);
-    color: #FFD700;
-    margin-bottom: clamp(12px, 3vh, 16px);
-    font-family: 'Press Start 2P', monospace;
-    padding-left: 10px;
-    letter-spacing: 1px;
-}
-
-.checkin-mode-label {
-    font-family: 'Press Start 2P', monospace;
-    font-size: clamp(6px, 1.5vw, 8px);
-    color: #555;
-    margin-bottom: clamp(8px, 2vh, 10px);
-    padding-left: 10px;
-    letter-spacing: 1px;
-}
-
-.checkin-mode-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    color: #00ff88;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0 #006644;
+    border-bottom: 3px solid #00ff88;
+    padding-bottom: clamp(8px, 2vh, 12px);
     margin-bottom: clamp(14px, 3vh, 18px);
+    text-align: center;
 }
 
-@media (max-width: 360px) {
-    .checkin-mode-grid { grid-template-columns: repeat(3, 1fr); }
+.checkin-section-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(5px, 1.2vw, 7px);
+    color: #00ff88;
+    margin-bottom: clamp(8px, 1.8vh, 12px);
+    letter-spacing: 2px;
+    opacity: 0.5;
 }
+
+.checkin-mode-strip {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    margin-bottom: clamp(14px, 3vh, 20px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+}
+
+.checkin-mode-strip::-webkit-scrollbar { height: 3px; }
+.checkin-mode-strip::-webkit-scrollbar-track { background: #111; }
+.checkin-mode-strip::-webkit-scrollbar-thumb { background: #444; }
 
 .mode-selector-btn {
-    padding: clamp(6px, 1.5vh, 8px) 4px;
-    border: 2px solid #222;
-    color: #555;
-    font-size: clamp(5px, 1.2vw, 7px);
+    padding: clamp(7px, 1.8vh, 10px) clamp(10px, 2.5vw, 14px);
+    border: 3px solid #222;
+    color: #444;
+    font-size: clamp(5px, 1.1vw, 7px);
     font-family: 'Press Start 2P', monospace;
     cursor: pointer;
-    transition: all 0.1s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: #0a0a0a;
+    background: #111;
     letter-spacing: 0.5px;
+    box-shadow: 3px 3px 0 #000;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.1s;
 }
 
 .mode-selector-btn.active {
-    border-color: #FFD700;
-    color: #FFD700;
-    background: #1a1500;
-    box-shadow: 2px 2px 0 #4a3800;
+    background: #0d0d0d;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.6);
 }
 
 .mode-selector-btn:active {
-    transform: translate(1px, 1px);
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #000;
 }
 
 .checkin-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: clamp(5px, 1.5vw, 8px);
+    gap: clamp(4px, 1vw, 6px);
     margin-bottom: clamp(14px, 3vh, 18px);
 }
 
-@media (max-width: 480px) {
-    .checkin-days { grid-template-columns: repeat(4, 1fr); }
-}
-
 .checkin-day {
-    background: #0a0a0a;
-    border: 2px solid #1a1a1a;
-    padding: clamp(7px, 2vw, 10px) 4px;
+    background: #111;
+    border: 3px solid #1a1a1a;
+    padding: clamp(6px, 1.5vw, 10px) 2px;
     text-align: center;
     position: relative;
+    box-shadow: 3px 3px 0 #000;
 }
 
 .checkin-day.claimed {
-    background: linear-gradient(135deg, #0d2d0d, #162016);
-    border-color: #4CAF50;
+    background: #0a1a0a;
+    border-color: #1a4a1a;
+    box-shadow: 3px 3px 0 #003300;
 }
 
 .checkin-day.current {
     border-color: #FFD700;
-    background: #1a1500;
-    box-shadow: 0 0 8px rgba(255,215,0,0.3);
+    background: #111000;
+    box-shadow: 3px 3px 0 #4a3800;
 }
 
 .checkin-day-num {
-    font-size: clamp(5px, 1.2vw, 7px);
-    color: #444;
-    margin-bottom: 4px;
+    font-size: clamp(5px, 1.1vw, 7px);
+    color: #333;
+    margin-bottom: 5px;
     font-family: 'Press Start 2P', monospace;
 }
 
 .checkin-day.current .checkin-day-num { color: #FFD700; }
-.checkin-day.claimed .checkin-day-num { color: #4CAF50; }
-
-.checkin-reward {
-    font-size: clamp(14px, 3.5vw, 18px);
-    line-height: 1;
-    margin-bottom: 3px;
-}
+.checkin-day.claimed .checkin-day-num { color: #1a6a1a; }
 
 .checkin-day-coins {
-    font-size: clamp(5px, 1.2vw, 7px);
-    color: #666;
+    font-size: clamp(4px, 0.9vw, 6px);
+    color: #333;
     font-family: 'Press Start 2P', monospace;
+    line-height: 1.4;
 }
 
 .checkin-day.current .checkin-day-coins { color: #FFD700; }
-.checkin-day.claimed .checkin-day-coins { color: #4CAF50; }
+.checkin-day.claimed .checkin-day-coins { color: #1a6a1a; }
+
+.checkin-day-check {
+    font-size: clamp(7px, 1.8vw, 10px);
+    color: #00ff88;
+    font-family: 'Press Start 2P', monospace;
+    margin-top: 3px;
+    text-shadow: 1px 1px 0 #006644;
+}
+
+.checkin-streak-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: clamp(14px, 3vh, 18px);
+}
+
+.checkin-streak-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(5px, 1.1vw, 7px);
+    color: #555;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.checkin-streak-bar {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+.streak-block {
+    flex: 1;
+    height: 12px;
+    background: #1a1a1a;
+    border: 2px solid #222;
+    box-shadow: 2px 2px 0 #000;
+}
+
+.streak-block.filled {
+    background: #00ff88;
+    border-color: #006644;
+    box-shadow: 2px 2px 0 #003322;
+}
+
+.streak-block.current-block {
+    background: #FFD700;
+    border-color: #8B6914;
+    box-shadow: 2px 2px 0 #443300;
+}
 
 .checkin-btn {
     width: 100%;
-    padding: clamp(10px, 2.5vh, 13px);
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    border: 3px solid #000;
+    padding: clamp(12px, 3vh, 16px);
+    background: #00ff88;
+    border: 4px solid #000;
     color: #000;
-    font-size: clamp(8px, 2vw, 10px);
+    font-size: clamp(7px, 1.8vw, 10px);
     font-family: 'Press Start 2P', monospace;
     cursor: pointer;
-    box-shadow: 4px 4px 0 #8B6914;
+    box-shadow: 5px 5px 0 #006644;
     transition: all 0.1s;
     letter-spacing: 1px;
     margin-bottom: clamp(10px, 2.5vh, 14px);
+    text-align: center;
 }
 
 .checkin-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #8B6914;
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 #006644;
 }
 
 .checkin-btn:disabled {
     background: #1a1a1a;
     border-color: #222;
-    box-shadow: 3px 3px 0 #111;
+    box-shadow: 4px 4px 0 #111;
     color: #333;
     cursor: not-allowed;
 }
 
-.checkin-streak {
-    font-size: clamp(7px, 1.8vw, 9px);
-    color: #888;
+.checkin-info {
     font-family: 'Press Start 2P', monospace;
-    padding-left: 10px;
-    padding-top: clamp(10px, 2.5vh, 14px);
-    border-top: 1px solid #1a1a1a;
+    font-size: clamp(5px, 1.1vw, 7px);
+    color: #444;
+    text-align: center;
     letter-spacing: 1px;
+    padding-top: clamp(8px, 2vh, 10px);
+    border-top: 2px solid #1a1a1a;
 }
+
 
 /* Fix untuk landscape mode */
 @media (max-height: 500px) {
@@ -2592,16 +2631,12 @@
         margin-bottom: 15px;
     }
     
-    .mission-tabs {
-        gap: 8px;
-        padding: 8px 15px;
-        margin-bottom: 10px;
+    .mission-tab {
+        padding: 10px 4px;
+        font-size: 5px;
     }
     
-    .mission-tab {
-        padding: 8px 12px;
-        font-size: 8px;
-    }
+    .tab-icon { font-size: 13px; }
     
     .mission-list {
         padding: 5px 10px 80px 10px;
@@ -2643,13 +2678,9 @@
         padding: 8px;
     }
     
-    .checkin-title {
-        font-size: 12px;
-    }
-    
     .mode-selector-btn {
-        font-size: 7px;
-        padding: 6px 10px;
+        font-size: 6px;
+        padding: 6px 8px;
     }
 }
 
@@ -2663,15 +2694,8 @@
         width: 100%;
     }
     
-    .mission-tabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
     .mission-tab {
         flex-shrink: 0;
-        min-width: 90px;
     }
     
     .mission-card {
@@ -2683,9 +2707,8 @@
     }
     
     .mode-selector-btn {
-        font-size: 7px;
-        padding: 6px 8px;
-        gap: 3px;
+        font-size: 6px;
+        padding: 6px 2px;
     }
 }
 
@@ -2713,22 +2736,18 @@
 /* Extra small screens */
 @media (max-height: 600px) {
     #dailyMission {
-        padding: 10px 0;
-    }
-    
-    .mission-tabs {
-        padding: 5px 10px;
-        gap: 5px;
-        margin-bottom: 8px;
+        padding: 0;
     }
     
     .mission-tab {
-        padding: 6px 10px;
-        font-size: 7px;
+        padding: 8px 4px;
     }
     
+    .tab-icon { font-size: 12px; }
+    .tab-label { display: none; }
+    
     .mission-header {
-        padding: 0 15px 8px 15px;
+        padding: 0 0 6px 0;
     }
     
     .page-title {
@@ -2737,7 +2756,7 @@
     }
     
     .mission-list {
-        padding: 0 10px 70px 10px;
+        padding: 0 0 70px 0;
         gap: 10px;
     }
     
@@ -2746,7 +2765,7 @@
     }
     
     .checkin-card {
-        padding: 15px;
+        padding: 12px;
     }
 }
 
@@ -3069,6 +3088,11 @@
       <button class="rdm-btn-play" onclick="onRamadanPlayNow()">▶ PLAY NOW</button>
       <button class="rdm-btn-close" onclick="onRamadanClose()">✕ CLOSE</button>
     </div>
+    <div style="text-align:center;margin-top:10px;">
+      <button onclick="dontShowPopup('ramadan')" style="background:none;border:none;font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.1vw,7px);color:#333;cursor:pointer;letter-spacing:1px;padding:4px;">
+        [ JANGAN TAMPILKAN LAGI ]
+      </button>
+    </div>
   </div>
 </div>
 
@@ -3107,8 +3131,13 @@
       </div>
     </div>
     <div class="skr-btns">
-      <button class="skr-btn-shop" onclick="onSakuraGoShop()">🛍️ BUKA SHOP</button>
-      <button class="skr-btn-close" onclick="onSakuraClose()">✕ NANTI</button>
+      <button class="skr-btn-shop" onclick="onSakuraGoShop()">BUKA SHOP</button>
+      <button class="skr-btn-close" onclick="onSakuraClose()">NANTI</button>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <button onclick="dontShowPopup('sakura')" style="background:none;border:none;font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.1vw,7px);color:#333;cursor:pointer;letter-spacing:1px;padding:4px;">
+        [ JANGAN TAMPILKAN LAGI ]
+      </button>
     </div>
   </div>
 </div>
@@ -3232,48 +3261,51 @@
 
 <div id="dailyMission" class="screen">
     <button class="close-btn" onclick="showMenu()">×</button>
-    
-    <div class="mission-tabs">
-        <button class="mission-tab active" onclick="switchMissionTab('daily')">DAILY</button>
-        <button class="mission-tab" onclick="switchMissionTab('achievement')">ACHIEVEMENT</button>
-        <button class="mission-tab" onclick="switchMissionTab('checkin')">CHECK-IN</button>
-    </div>
-    
-    <div id="dailyTab" class="tab-content">
-        <div class="mission-header">
-            <div class="page-title">DAILY MISSION</div>
-            <div class="mission-timer" id="missionTimer">Reset in: --:--:--</div>
+
+    <!-- Layout: tab atas + konten bawah -->
+    <div style="display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden;">
+
+        <!-- Tab bar horizontal atas -->
+        <div class="mission-tab-bar">
+            <button class="mission-tab active" onclick="switchMissionTab('daily')" id="tabDaily">
+                <span class="tab-icon">📋</span>
+                <span class="tab-label">DAILY</span>
+            </button>
+            <button class="mission-tab" onclick="switchMissionTab('achievement')" id="tabAchievement">
+                <span class="tab-icon">🏆</span>
+                <span class="tab-label">ACHV</span>
+            </button>
+            <button class="mission-tab" onclick="switchMissionTab('checkin')" id="tabCheckin">
+                <span class="tab-icon">📅</span>
+                <span class="tab-label">CHECK-IN</span>
+            </button>
         </div>
-        
-        <div class="mission-list" id="missionList">
-            <!-- Mission cards akan di-generate oleh JavaScript -->
-        </div>
-    </div>
-    
-    <div id="achievementTab" class="tab-content" style="display: none;">
-        <div class="mission-header">
-            <div class="page-title">ACHIEVEMENT</div>
-        </div>
-        
-        <!-- Tier Navigation -->
-        <div id="tierNavigation" class="tier-navigation" style="display: none;">
-            <div class="tier-title">🔒 TIER <span id="nextTierNum">2</span> LOCKED</div>
-            <div class="tier-requirement" id="tierRequirement">Complete all Tier 1 achievements to unlock</div>
-            <button class="tier-nav-btn" id="showNextTierBtn" onclick="unlockNextTier()">🔓 VIEW NEXT TIER</button>
-        </div>
-        
-        <div class="mission-list" id="achievementList">
-            <!-- Achievement cards akan di-generate oleh JavaScript -->
-        </div>
-    </div>
-    
-    <div id="checkinTab" class="tab-content" style="display: none;">
-        <div class="mission-header">
-            <div class="page-title">DAILY CHECK-IN</div>
-        </div>
-        
-        <div class="checkin-container" id="checkinContainer">
-            <!-- Check-in content akan di-generate oleh JavaScript -->
+
+        <!-- Konten -->
+        <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:clamp(10px,2vh,18px) clamp(10px,2vw,18px) 80px;">
+
+            <div id="dailyTab" class="tab-content">
+                <div class="mission-header">
+                    <div class="page-title">DAILY MISSION</div>
+                    <div class="mission-timer" id="missionTimer">Reset in: --:--:--</div>
+                </div>
+                <div class="mission-list" id="missionList"></div>
+            </div>
+
+            <div id="achievementTab" class="tab-content" style="display:none;">
+                <div class="mission-header">
+                    <div class="page-title">ACHIEVEMENT</div>
+                </div>
+                <div class="mission-list" id="achievementList"></div>
+            </div>
+
+            <div id="checkinTab" class="tab-content" style="display:none;">
+                <div class="mission-header">
+                    <div class="page-title">DAILY CHECK-IN</div>
+                </div>
+                <div class="checkin-container" id="checkinContainer"></div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -5458,16 +5490,37 @@ function drawRdmPreview() {
     x.fillStyle='#162040'; x.fillRect(0,h-20,w,4);
 }
 
+function dontShowPopup(type) {
+    localStorage.setItem(`bl0ck_hide_popup_${type}`, 'true');
+    if (type === 'ramadan') {
+        document.getElementById('ramadanNewMapPopup').classList.remove('active');
+        setTimeout(() => {
+            if (!localStorage.getItem('bl0ck_hide_popup_sakura')) {
+                drawSkrPreview();
+                document.getElementById('sakuraPackPopup').classList.add('active');
+            } else {
+                document.getElementById('menu').classList.add('active');
+            }
+        }, 300);
+    } else if (type === 'sakura') {
+        document.getElementById('sakuraPackPopup').classList.remove('active');
+        document.getElementById('menu').classList.add('active');
+    }
+}
+
 function onRamadanPlayNow() {
     document.getElementById('ramadanNewMapPopup').classList.remove('active');
     afterPopup(() => showStartOverlay('ramadan', () => startGame('ramadan')));
 }
 function onRamadanClose() {
     document.getElementById('ramadanNewMapPopup').classList.remove('active');
-    // Tampilkan Sakura Pack popup setelah Ramadan popup ditutup
     setTimeout(() => {
-        drawSkrPreview();
-        document.getElementById('sakuraPackPopup').classList.add('active');
+        if (!localStorage.getItem('bl0ck_hide_popup_sakura')) {
+            drawSkrPreview();
+            document.getElementById('sakuraPackPopup').classList.add('active');
+        } else {
+            document.getElementById('menu').classList.add('active');
+        }
     }, 300);
 }
 
@@ -5731,8 +5784,17 @@ function submitName() {
                         document.getElementById('loading').classList.remove('active');
                         if (typeof updateMenuPlayerBar === 'function') updateMenuPlayerBar();
                         if (typeof checkShowAdminBtn === 'function') checkShowAdminBtn();
-                        drawRdmPreview();
-                        document.getElementById('ramadanNewMapPopup').classList.add('active');
+                        updateMissionNotification();
+                        // Tampilkan popup kalau belum di-hide
+                        if (!localStorage.getItem('bl0ck_hide_popup_ramadan')) {
+                            drawRdmPreview();
+                            document.getElementById('ramadanNewMapPopup').classList.add('active');
+                        } else if (!localStorage.getItem('bl0ck_hide_popup_sakura')) {
+                            drawSkrPreview();
+                            document.getElementById('sakuraPackPopup').classList.add('active');
+                        } else {
+                            document.getElementById('menu').classList.add('active');
+                        }
                     }, 900);
                 }
             }, 200);
@@ -5982,7 +6044,9 @@ const ACHIEVEMENT_LIST = [
 function switchMissionTab(tab) { playSound('tab');
     // Update tab buttons
     document.querySelectorAll('.mission-tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+    const tabMap = { daily:'tabDaily', achievement:'tabAchievement', checkin:'tabCheckin' };
+    const activeBtn = document.getElementById(tabMap[tab]);
+    if (activeBtn) activeBtn.classList.add('active');
     
     // Hide all tabs
     document.getElementById('dailyTab').style.display = 'none';
@@ -5994,8 +6058,10 @@ function switchMissionTab(tab) { playSound('tab');
         document.getElementById('dailyTab').style.display = 'block';
     } else if (tab === 'achievement') {
         document.getElementById('achievementTab').style.display = 'block';
+        renderAchievements();
     } else if (tab === 'checkin') {
         document.getElementById('checkinTab').style.display = 'block';
+        renderDailyCheckin();
     }
 }
 
@@ -6003,40 +6069,18 @@ function switchMissionTab(tab) { playSound('tab');
 let currentViewingTier = 1;
 
 function initTierFromData() {
-    // Restore tier yang sudah di-unlock dari playerData
-    if (playerData.achievements && playerData.achievements.viewingTier) {
-        currentViewingTier = playerData.achievements.viewingTier;
-    } else {
-        currentViewingTier = 1;
-    }
-}
-
-function unlockNextTier() {
-    if (currentViewingTier === 1) {
-        const allT1Done = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[0].target);
-        if (allT1Done) {
-            currentViewingTier = 2;
-            if (!playerData.achievements) playerData.achievements = {};
-            playerData.achievements.viewingTier = 2;
-            saveData();
-            renderAchievements();
-        }
-    } else if (currentViewingTier === 2) {
-        const allT2Done = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[1].target);
-        if (allT2Done) {
-            currentViewingTier = 3;
-            if (!playerData.achievements) playerData.achievements = {};
-            playerData.achievements.viewingTier = 3;
-            saveData();
-            renderAchievements();
-        }
-    }
+    const saved = playerData.achievements?.viewingTier || 1;
+    // Jangan downgrade — ambil yang lebih tinggi
+    currentViewingTier = Math.max(currentViewingTier, saved);
 }
 
 function getAchievementProgress(id) {
     if (id === 'coin_collector')  return playerData.totalCoins || 0;
     if (id === 'jump_master')     return playerData.totalJumpScore || 0;
-    if (id === 'score_master')    return Math.max(0, ...Object.values(playerData.highScoresRun || {egypt:0}));
+    if (id === 'score_master') {
+        const vals = Object.values(playerData.highScoresRun || {});
+        return vals.length ? Math.max(0, ...vals) : 0;
+    }
     if (id === 'mission_hunter')  return playerData.achievements?.missions_completed || 0;
     return 0;
 }
@@ -6147,26 +6191,6 @@ function renderAchievements() {
 
         container.appendChild(card);
     });
-
-    // Tier nav
-    const tierNav = document.getElementById('tierNavigation');
-    if (tierNav) {
-        if (currentViewingTier < 3) {
-            const currentTierTargets = ACHIEVEMENT_LIST.every(a => getAchievementProgress(a.id) >= a.tiers[currentViewingTier - 1].target);
-            if (currentTierTargets) {
-                tierNav.style.display = 'block';
-                const nextTierNum = document.getElementById('nextTierNum');
-                const tierReq = document.getElementById('tierRequirement');
-                const tierNames = ['', 'Perunggu', 'Perak', 'Emas'];
-                if (nextTierNum) nextTierNum.textContent = currentViewingTier + 1;
-                if (tierReq) tierReq.textContent = `Semua Tier ${tierNames[currentViewingTier]} selesai! Buka Tier ${tierNames[currentViewingTier + 1]}`;
-            } else {
-                tierNav.style.display = 'none';
-            }
-        } else {
-            tierNav.style.display = 'none';
-        }
-    }
 }
 
 function claimAchievementReward(achievementId, tier) {
@@ -6177,28 +6201,47 @@ function claimAchievementReward(achievementId, tier) {
     const claimKey = `${achievementId}_tier${tier}`;
     if (playerData.achievements[claimKey]) return;
 
+    // Mark claimed FIRST sebelum cek apapun
+    playerData.achievements[claimKey] = true;
+
     if (tierData.reward.type === 'coins') {
         const modes = tierData.reward.modes || ['egypt','day','night','snow','ocean','sakura','ramadan'];
         modes.forEach(mode => {
             if (playerData.coins[mode] !== undefined) playerData.coins[mode] += tierData.reward.amount;
         });
-        playerData.achievements[claimKey] = true;
         saveData();
         updateAllCoinDisplays();
-        renderAchievements();
-        showToast(`🏆 +${tierData.reward.amount.toLocaleString()} koin semua mode!`, '#FFD700');
+        showToast(`+${tierData.reward.amount.toLocaleString()} KOIN SEMUA MODE!`, '#FFD700');
     } else if (tierData.reward.type === 'skin') {
         const skinId = tierData.reward.skinId;
-        // Unlock skin master_c
         if (!playerData.skins.default) playerData.skins.default = [];
         if (!playerData.skins.default.includes(skinId)) {
             playerData.skins.default.push(skinId);
         }
-        playerData.achievements[claimKey] = true;
         saveData();
-        renderAchievements();
-        showToast(`🏆 Skin MASTER C berhasil di-unlock!`, '#FFD700');
+        showToast(`SKIN MASTER C UNLOCKED!`, '#FFD700');
+    } else {
+        saveData();
     }
+
+    // Cek auto-unlock tier berikutnya SETELAH semua claim key sudah di-set
+    const tierNames = ['', '🥉 PERUNGGU', '🥈 PERAK', '🥇 EMAS'];
+    if (currentViewingTier < 3) {
+        const allCurrentTierClaimed = ACHIEVEMENT_LIST.every(a =>
+            !!playerData.achievements[`${a.id}_tier${currentViewingTier}`]
+        );
+        if (allCurrentTierClaimed) {
+            currentViewingTier++;
+            playerData.achievements.viewingTier = currentViewingTier;
+            saveData();
+            setTimeout(() => {
+                showToast(`TIER ${tierNames[currentViewingTier]} TERBUKA!`, '#00ff88');
+            }, 600);
+        }
+    }
+
+    updateMissionNotification();
+    renderAchievements();
 }
 
 function checkDailyCheckin() {
@@ -6242,69 +6285,84 @@ function renderDailyCheckin() {
     if (!playerData.dailyCheckin.selectedMode) playerData.dailyCheckin.selectedMode = 'egypt';
 
     const now = new Date();
-    const witOffset = 9 * 60;
-    const localOffset = now.getTimezoneOffset();
-    const witTime = new Date(now.getTime() + (witOffset + localOffset) * 60000);
+    const witTime = new Date(now.getTime() + (9*60 + now.getTimezoneOffset()) * 60000);
     const witToday = witTime.toISOString().split('T')[0];
     const hasCheckedToday = playerData.dailyCheckin.checkedDays.includes(witToday);
+    const streak = playerData.dailyCheckin.checkedDays.length;
 
-    // Reward per hari — dinaikkan
     const rewards   = [80, 120, 160, 220, 300, 450, 750];
-    const dayEmojis = ['🌱','🌿','🌳','⭐','🌟','💫','👑'];
+    const dayLabels = ['D1','D2','D3','D4','D5','D6','D7'];
 
-    // Mode config
     const modes = [
-        { id:'egypt',  label:'MESIR',  emoji:'🏜️', bg:'linear-gradient(135deg,#3d2800,#1a1000)' },
-        { id:'day',    label:'SIANG',  emoji:'☀️', bg:'linear-gradient(135deg,#3d2e00,#1a1300)' },
-        { id:'night',  label:'MALAM',  emoji:'🌙', bg:'linear-gradient(135deg,#0d0d2e,#060614)' },
-        { id:'snow',   label:'SALJU',  emoji:'❄️', bg:'linear-gradient(135deg,#001a2e,#000d1a)' },
-        { id:'ocean',  label:'PANTAI', emoji:'🏖️', bg:'linear-gradient(135deg,#00141e,#000a12)' },
-        { id:'sakura', label:'SAKURA', emoji:'🌸', bg:'linear-gradient(135deg,#2e0014,#1a000c)' },
-        { id:'ramadan',label:'RAMADAN',emoji:'☪️', bg:'linear-gradient(135deg,#2e2800,#1a1600)' },
+        { id:'egypt',   label:'🏜 MESIR',   color:'#C19A6B' },
+        { id:'day',     label:'☀ SIANG',    color:'#FFA500' },
+        { id:'night',   label:'🌙 MALAM',   color:'#8B5CF6' },
+        { id:'snow',    label:'❄ SALJU',    color:'#87CEEB' },
+        { id:'ocean',   label:'🏖 PANTAI',  color:'#4682B4' },
+        { id:'sakura',  label:'🌸 SAKURA',  color:'#FF5588' },
+        { id:'ramadan', label:'☪ RAMADAN',  color:'#FFE033' },
     ];
-
-    const modeColors = { egypt:'#C19A6B', day:'#FFA500', night:'#8B5CF6', snow:'#87CEEB', ocean:'#4682B4', sakura:'#FF5588', ramadan:'#FFE033' };
     const sel = playerData.dailyCheckin.selectedMode;
+    const selMode = modes.find(m => m.id === sel) || modes[0];
 
-    // Mode grid
-    const modeGridHTML = modes.map(m => `
+    // Mode strip
+    const modeStripHTML = modes.map(m => `
         <button onclick="selectCheckinMode('${m.id}')"
             class="mode-selector-btn ${sel === m.id ? 'active' : ''}"
-            style="background:${m.bg};${sel===m.id?`border-color:${modeColors[m.id]};color:${modeColors[m.id]};box-shadow:2px 2px 0 ${modeColors[m.id]}44`:''}"
-        >
-            <span style="font-size:clamp(12px,3vw,16px);">${m.emoji}</span>
-            <span>${m.label}</span>
-        </button>
+            style="${sel === m.id ? `border-color:${m.color};color:${m.color};box-shadow:3px 3px 0 ${m.color}55;` : ''}"
+        >${m.label}</button>
     `).join('');
 
     // Day tiles
     let daysHTML = '';
     for (let i = 0; i < 7; i++) {
-        const isClaimed = i < playerData.dailyCheckin.checkedDays.length;
-        const isCurrent = i === playerData.dailyCheckin.checkedDays.length && !hasCheckedToday;
+        const isClaimed = i < streak;
+        const isCurrent = i === streak && !hasCheckedToday;
         daysHTML += `
-            <div class="checkin-day ${isClaimed?'claimed':''} ${isCurrent?'current':''}">
-                <div class="checkin-day-num">hari ${i+1}</div>
-                <div class="checkin-reward">${isClaimed ? '✅' : dayEmojis[i]}</div>
-                <div class="checkin-day-coins">${rewards[i]}</div>
+            <div class="checkin-day ${isClaimed ? 'claimed' : ''} ${isCurrent ? 'current' : ''}">
+                <div class="checkin-day-num">${dayLabels[i]}</div>
+                <div class="checkin-day-coins">${isClaimed ? '' : ''}${rewards[i]}</div>
+                ${isClaimed ? '<div class="checkin-day-check">✓</div>' : ''}
             </div>
         `;
     }
 
-    const streak = playerData.dailyCheckin.checkedDays.length;
-    const streakEmoji = streak >= 7 ? '👑' : streak >= 5 ? '🔥' : streak >= 3 ? '⚡' : '💧';
+    // Streak blocks
+    let streakBlocksHTML = '';
+    for (let i = 0; i < 7; i++) {
+        const cls = i < streak ? 'filled' : (i === streak && !hasCheckedToday ? 'current-block' : '');
+        streakBlocksHTML += `<div class="streak-block ${cls}"></div>`;
+    }
+
+    const nextReward = rewards[Math.min(streak, rewards.length - 1)];
+    const infoText = hasCheckedToday
+        ? (streak >= 7 ? '★ STREAK SEMPURNA — RESET BESOK' : `KEMBALI BESOK — HARI KE-${streak + 1}`)
+        : `HARI KE-${streak + 1} DARI 7`;
 
     const card = document.createElement('div');
     card.className = 'checkin-card';
     card.innerHTML = `
-        <div class="checkin-title">📅 DAILY CHECK-IN</div>
-        <div class="checkin-mode-label">PILIH MODE REWARD:</div>
-        <div class="checkin-mode-grid">${modeGridHTML}</div>
+        <div class="checkin-card-title">📅 DAILY CHECK-IN</div>
+
+        <div class="checkin-section-label">▶ REWARD KE MODE</div>
+        <div class="checkin-mode-strip">${modeStripHTML}</div>
+
+        <div class="checkin-section-label">▶ 7-DAY STREAK</div>
         <div class="checkin-days">${daysHTML}</div>
-        <button class="checkin-btn" onclick="claimDailyCheckin()" ${hasCheckedToday?'disabled':''}>
-            ${hasCheckedToday ? '✓ SUDAH CHECK-IN HARI INI' : '🎁 CLAIM CHECK-IN'}
+
+        <div class="checkin-streak-row">
+            <div class="checkin-streak-label">STREAK</div>
+            <div class="checkin-streak-bar">${streakBlocksHTML}</div>
+            <div class="checkin-streak-label">${streak}/7</div>
+        </div>
+
+        <button class="checkin-btn" onclick="claimDailyCheckin()" ${hasCheckedToday ? 'disabled' : ''}>
+            ${hasCheckedToday
+                ? '✓ SUDAH CHECK-IN HARI INI'
+                : `🪙 CLAIM +${nextReward} KOIN ${selMode.label}`}
         </button>
-        <div class="checkin-streak">${streakEmoji} STREAK: ${streak} HARI${streak>=7?' — SEMPURNA!':''}</div>
+
+        <div class="checkin-info">${infoText}</div>
     `;
     container.appendChild(card);
 }
@@ -6451,15 +6509,28 @@ function updateMissionNotification() {
     const notifMenu = document.getElementById('missionNotifMenu');
     const notifIcon = document.getElementById('missionNotifIcon');
     
-    if (!playerData.dailyMissions.missions) {
-        if (notifMenu) notifMenu.style.display = 'none';
-        if (notifIcon) notifIcon.style.display = 'none';
-        return;
+    // Cek daily mission yang bisa diklaim
+    const hasMissionClaimable = playerData.dailyMissions?.missions?.some(m => m.completed && !m.claimed) || false;
+
+    // Cek achievement yang bisa diklaim
+    let hasAchievementClaimable = false;
+    if (playerData.achievements) {
+        for (const a of ACHIEVEMENT_LIST) {
+            const progress = getAchievementProgress(a.id);
+            for (const tier of a.tiers) {
+                if (tier.tier > currentViewingTier) continue;
+                const claimed = !!playerData.achievements[`${a.id}_tier${tier.tier}`];
+                if (!claimed && progress >= tier.target) {
+                    hasAchievementClaimable = true;
+                    break;
+                }
+            }
+            if (hasAchievementClaimable) break;
+        }
     }
-    
-    const hasClaimable = playerData.dailyMissions.missions.some(m => m.completed && !m.claimed);
-    const displayStyle = hasClaimable ? 'inline-block' : 'none';
-    
+
+    const show = hasMissionClaimable || hasAchievementClaimable;
+    const displayStyle = show ? 'inline-block' : 'none';
     if (notifMenu) notifMenu.style.display = displayStyle;
     if (notifIcon) notifIcon.style.display = displayStyle;
 }
@@ -17508,6 +17579,7 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
     }
     
     saveData();
+    updateMissionNotification();
     
     // Submit score ke server (leaderboard global)
     if (playerData.name) {
