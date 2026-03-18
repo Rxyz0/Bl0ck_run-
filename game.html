@@ -527,6 +527,7 @@
         .coin-ocean { background: linear-gradient(135deg, #4682B4, #00CED1); }
         .coin-sakura { background: linear-gradient(135deg, #FFB7C5, #FF5588); }
         .coin-ramadan { background: linear-gradient(135deg, #FFE033, #FFA500); box-shadow: 0 0 6px rgba(255,200,0,.5); }
+        .coin-space { background: linear-gradient(135deg, #4466ff, #aa44ff); box-shadow: 0 0 6px rgba(100,100,255,.5); }
         .shop-content {
             width: 90%;
             max-width: 500px;
@@ -1126,6 +1127,8 @@
         .mode-card.sakura { background: linear-gradient(135deg, #FFB7C5, #FFC0CB); }
         .mode-card.ramadan { background: linear-gradient(160deg, #0D1B3E 0%, #1A3A5C 35%, #2E6B50 65%, #4A8B38 100%); }
         .mode-card.ramadan h3 { color: #FFE9A0; text-shadow: 0 0 8px rgba(255,200,80,0.8); }
+        .mode-card.space { background: linear-gradient(135deg, #020510 0%, #0d1b4b 50%, #1a0a3a 100%); border-color: #4466ff; }
+        .mode-card.space h3 { color: #aaccff; text-shadow: 0 0 8px rgba(100,150,255,0.8); }
         .mode-card h3 {
             font-size: clamp(14px, 4vw, 20px);
             margin-top: clamp(10px, 2vh, 15px);
@@ -3025,6 +3028,126 @@
     padding: 8px 12px; cursor: pointer; white-space: nowrap;
 }
 .name-edit-status { font-size: clamp(5px,1vw,6px); min-height: 14px; margin-bottom: 8px; }
+
+/* ═══ MENU BACKGROUND SYSTEM ═══ */
+#menuBgCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    image-rendering: pixelated;
+}
+
+/* Tema Mesir */
+#menu.theme-egypt { background: #1a0e04; }
+#menu.theme-egypt .title {
+    color: #FFD700;
+    text-shadow: 3px 3px 0 #8B6914, 6px 6px 0 #4a3008;
+}
+#menu.theme-egypt .btn {
+    background: #CD853F;
+    color: #1a0a00;
+    box-shadow: 6px 6px 0 #7a4e1a, inset -2px -2px 0 rgba(0,0,0,0.2);
+}
+#menu.theme-egypt .btn:active {
+    box-shadow: 3px 3px 0 #7a4e1a, inset -2px -2px 0 rgba(0,0,0,0.2);
+}
+#menu.theme-egypt .menu-coin-viewer {
+    border-color: #CD853F; box-shadow: 3px 3px 0 #8B6914; color: #FFD700;
+}
+#menu.theme-egypt .settings-icon { background: #CD853F; box-shadow: 4px 4px 0 #8B6914; }
+#menu.theme-egypt .mission-icon  { background: linear-gradient(180deg,#FFD700,#CD853F); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
+#menu.theme-egypt .stats-icon    { background: linear-gradient(180deg,#CD853F,#8B6914); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
+
+/* BG card di shop */
+.bg-section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(9px,2.5vw,13px);
+    color: #00ff88;
+    text-shadow: 2px 2px 0 #006644;
+    letter-spacing: 2px;
+    margin: 24px 0 16px;
+    text-align: center;
+}
+.bg-card {
+    background: #1a1a1a;
+    border: 4px solid #333;
+    margin: 0 0 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.5);
+}
+.bg-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,transparent,rgba(0,255,136,.4),transparent);
+    animation: shimmer 2s infinite;
+}
+.bg-card.owned { border-color: #00ff88; box-shadow: 6px 6px 0 #006644, 0 0 20px rgba(0,255,136,.2); }
+.bg-card.equipped-bg { border-color: #FFD700; box-shadow: 6px 6px 0 #8B6914, 0 0 20px rgba(255,215,0,.25); }
+.bg-card-header {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(10px,2.8vw,15px);
+    color: #FFD700;
+    padding: 14px 16px 10px;
+    text-shadow: 2px 2px 0 #8B6914;
+    letter-spacing: 1px;
+}
+.bg-preview-canvas {
+    width: 100%; height: 100px;
+    display: block;
+    image-rendering: pixelated;
+}
+.bg-card-features {
+    font-size: clamp(7px,1.8vw,9px);
+    color: #aaa;
+    padding: 10px 16px;
+    line-height: 2;
+    font-family: 'Press Start 2P', monospace;
+    background: rgba(0,0,0,.3);
+    border-top: 2px solid #222;
+}
+.bg-card-features div { padding: 2px 0; }
+.bg-card-actions { padding: 14px 16px; display: flex; gap: 10px; align-items: center; }
+.bg-buy-btn {
+    flex: 1;
+    padding: clamp(10px,2.5vh,16px) 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(8px,2vw,11px);
+    border: 4px solid #000;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all .1s;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.5);
+}
+.bg-buy-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 rgba(0,0,0,.5); }
+.bg-equip-btn {
+    flex: 1;
+    padding: clamp(10px,2.5vh,16px) 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(8px,2vw,11px);
+    background: #00ff88; color: #000;
+    border: 4px solid #000;
+    box-shadow: 4px 4px 0 #006644;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all .1s;
+}
+.bg-equip-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #006644; }
+.bg-equip-btn.active-equipped {
+    background: #FFD700; color: #000;
+    box-shadow: 4px 4px 0 #8B6914;
+}
+.bg-coin-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(7px,1.8vw,9px);
+    color: #C19A6B;
+}
+
 </style>
 </head>
 <body>
@@ -3188,6 +3311,7 @@
 </div>
 
     <div id="menu" class="screen">
+    <canvas id="menuBgCanvas"></canvas>
         <div class="menu-container">
             <div class="menu-coin-viewer">
                 <span class="cycling-coin" id="cyclingCoinIcon"></span>
@@ -3378,7 +3502,21 @@
         
         <div style="width: 100%; padding: 60px 0 20px 0; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
             <div class="page-title">SHOP</div>
-            
+
+            <!-- Tab nav -->
+            <div style="display:flex;gap:0;margin:0 0 0;border-bottom:4px solid #00ff88;">
+                <button id="shopTabPack" onclick="switchShopTab('pack')"
+                    style="flex:1;padding:12px 8px;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);background:#00ff88;color:#000;border:none;cursor:pointer;letter-spacing:1px;box-shadow:inset -2px -2px 0 rgba(0,0,0,.2);">
+                    🎁 BLOCK PACK
+                </button>
+                <button id="shopTabBg" onclick="switchShopTab('bg')"
+                    style="flex:1;padding:12px 8px;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);background:#1a1a1a;color:#555;border:none;cursor:pointer;letter-spacing:1px;">
+                    🖼️ BG MENU
+                </button>
+            </div>
+
+            <!-- BLOCK PACK section -->
+            <div id="shopSectionPack">
             <div class="shop-content">
 
 <!-- ===== MESIR PACK ===== -->
@@ -3636,8 +3774,32 @@
         <button class="gacha-btn" onclick="doGacha('sakura',10)" style="border-color:#FF8FAB;">10x<br><span class="coin-small coin-sakura" style="margin:3px auto;width:14px;height:14px;display:block;"></span>150</button>
     </div>
 </div>
+
+<!-- ═════════════════════════════════════════════════════ -->
+<!-- ===== BACKGROUND MENU SECTION ===== -->
+<!-- ═════════════════════════════════════════════════════ -->
+</div></div><!-- end shopSectionPack -->
+
+            <!-- BG MENU section -->
+            <div id="shopSectionBg" style="display:none;">
+            <div class="shop-content">
+<div class="bg-section-title" style="display:none;"></div>
+
+<!-- BG Mesir -->
+<div class="pack-card" id="bgCardEgypt">
+    <div class="pack-header">🏜️ MESIR BACKGROUND</div>
+    <div class="pack-image" style="overflow:hidden;padding:0;">
+        <canvas id="bgThumbEgypt" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas>
+    </div>
+    <div class="pack-features">
+        <div>🌅 Langit sunset pixel animasi</div>
+        <div>🏛️ Piramida scrolling berlapis</div>
+        <div>🎨 Tema warna tombol & teks berubah</div>
+    </div>
+    <div id="bgActionsEgypt" style="padding:14px 0 4px;display:flex;gap:10px;"></div>
+</div>
             </div>
-        </div>
+        </div></div><!-- end shopSectionBg -->
     </div>
 
     <div id="skinSelector" class="screen">
@@ -4496,14 +4658,16 @@ function _enterOffline() {
   // Default playerData
   playerData = {
     name: '',
-    coins: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
-    highScores: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
-    highScoresRun: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
-    highScoresJump: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0 },
+    coins: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0, space:0 },
+    highScores: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0, space:0 },
+    highScoresRun: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0, space:0 },
+    highScoresJump: { egypt:0, day:0, night:0, snow:0, ocean:0, sakura:0, ramadan:0, space:0 },
     totalCoins: 0, totalJumpScore: 0,
-    unlockedModes: ['egypt','snow','ocean','sakura','ramadan'],
+    unlockedModes: ['egypt','snow','ocean','sakura','ramadan','space'],
     skins: { default:['white','blue','red','pink'], egypt:[], day:[], night:[], snow:[], ocean:[], sakura:[], valentine:[], ramadan:[] },
     equippedSkin: 'white',
+    equippedBg: 'none',
+    ownedBgs: [],
     dailyMissions: { lastReset:null, missions:[], claimedToday:[] },
     achievements: {},
     dailyCheckin: { lastCheckin:null, streak:0, checkedDays:[] }
@@ -4681,6 +4845,11 @@ let playerSnowTrail = [];
 let playerLoveTrail = [];
 let frameCount = 0;
 let groundY = 0;
+// === SPACE MODE ===
+let cameraY = 0, cameraTargetY = 0, spaceVY = 0;
+const SPACE_THRUST = -5.5, SPACE_INERTIA = 0.88;
+const SPACE_WORLD_TOP = -2000, SPACE_WORLD_BOTTOM = 2000;
+let alienLasers = [];
 let abilityAvailable = false;
 let abilityCooldown = 0;
 let abilityCooldownMax = 1800;
@@ -5138,13 +5307,13 @@ let seagulls = [];
 let oceanWaves = [];
         playerData = {
     name: '',
-    coins: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
-    highScores: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
-    highScoresRun: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
-    highScoresJump: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
+    coins: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
+    highScores: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
+    highScoresRun: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
+    highScoresJump: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
     totalCoins: 0,
     totalJumpScore: 0,
-    unlockedModes: ['egypt', 'snow', 'ocean', 'sakura', 'ramadan'],
+    unlockedModes: ['egypt', 'snow', 'ocean', 'sakura', 'ramadan', 'space'],
     skins: {
         default: ['white', 'blue', 'red', 'pink'],
         egypt: [],
@@ -5157,6 +5326,8 @@ let oceanWaves = [];
         ramadan: []
     },
     equippedSkin: 'white',
+    equippedBg: 'none',
+    ownedBgs: [],
     dailyMissions: {
         lastReset: null,
         missions: [],
@@ -5249,10 +5420,10 @@ const sakuraSkins = [
         } catch(e) {
             // Reset jika error
             playerData = {
-                coins: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
-                highScores: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
-                highScoresRun: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
-                highScoresJump: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0 },
+                coins: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
+                highScores: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
+                highScoresRun: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
+                highScoresJump: { egypt: 0, day: 0, night: 0, snow: 0, ocean: 0, sakura: 0, ramadan: 0, space: 0 },
                 totalCoins: 0,
                 totalJumpScore: 0,
                 unlockedModes: ['egypt', 'snow'],
@@ -6066,14 +6237,6 @@ function switchMissionTab(tab) { playSound('tab');
 }
 
 // Tier navigation system
-let currentViewingTier = 1;
-
-function initTierFromData() {
-    const saved = playerData.achievements?.viewingTier || 1;
-    // Jangan downgrade — ambil yang lebih tinggi
-    currentViewingTier = Math.max(currentViewingTier, saved);
-}
-
 function getAchievementProgress(id) {
     if (id === 'coin_collector')  return playerData.totalCoins || 0;
     if (id === 'jump_master')     return playerData.totalJumpScore || 0;
@@ -6086,14 +6249,10 @@ function getAchievementProgress(id) {
 }
 
 function renderAchievements() {
-    // Restore tier yang sudah di-unlock
-    initTierFromData();
-
     const container = document.getElementById('achievementList');
     container.innerHTML = '';
     if (!playerData.achievements) playerData.achievements = {};
 
-    // Tier badge colors
     const tierColors = ['', '#C19A6B', '#87CEEB', '#FFD700'];
     const tierNames  = ['', '🥉 PERUNGGU', '🥈 PERAK', '🥇 EMAS'];
 
@@ -6110,7 +6269,6 @@ function renderAchievements() {
             position: relative;
         `;
 
-        // Header row
         const header = document.createElement('div');
         header.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #222;';
         header.innerHTML = `
@@ -6124,9 +6282,12 @@ function renderAchievements() {
         `;
         card.appendChild(header);
 
-        // Tier rows
-        achievement.tiers.forEach((tier, index) => {
-            if (tier.tier > currentViewingTier) return;
+        achievement.tiers.forEach((tier) => {
+            // Tier ini tampil kalau:
+            // - tier 1: selalu tampil
+            // - tier 2+: tier sebelumnya sudah di-reach (progress >= target tier sebelumnya)
+            const prevTier = achievement.tiers.find(t => t.tier === tier.tier - 1);
+            if (prevTier && currentProgress < prevTier.target) return; // tier sebelumnya belum reach
 
             const isUnlocked = currentProgress >= tier.target;
             const isClaimed  = !!playerData.achievements[`${achievement.id}_tier${tier.tier}`];
@@ -6138,7 +6299,7 @@ function renderAchievements() {
             if (tier.reward.type === 'coins') {
                 rewardText = `+${tier.reward.amount.toLocaleString()} koin semua mode`;
             } else if (tier.reward.type === 'skin') {
-                rewardText = `🎭 Skin MASTER C + x2 Coin`;
+                rewardText = `Skin MASTER C`;
             } else {
                 rewardText = 'Coming Soon';
             }
@@ -6172,7 +6333,7 @@ function renderAchievements() {
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #1a1a1a;">
                     <div style="font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);color:#FFD700;">🎁 ${rewardText}</div>
-                    ${isUnlocked && !isClaimed && (tier.reward.type === 'coins' || tier.reward.type === 'skin') ? `
+                    ${isUnlocked && !isClaimed ? `
                         <button onclick="claimAchievementReward('${achievement.id}',${tier.tier})"
                             style="padding:clamp(6px,1.5vh,8px) clamp(10px,2.5vw,14px);font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);
                             background:linear-gradient(135deg,#FFD700,#FFA500);border:3px solid #000;color:#000;cursor:pointer;
@@ -6201,7 +6362,6 @@ function claimAchievementReward(achievementId, tier) {
     const claimKey = `${achievementId}_tier${tier}`;
     if (playerData.achievements[claimKey]) return;
 
-    // Mark claimed FIRST sebelum cek apapun
     playerData.achievements[claimKey] = true;
 
     if (tierData.reward.type === 'coins') {
@@ -6215,29 +6375,11 @@ function claimAchievementReward(achievementId, tier) {
     } else if (tierData.reward.type === 'skin') {
         const skinId = tierData.reward.skinId;
         if (!playerData.skins.default) playerData.skins.default = [];
-        if (!playerData.skins.default.includes(skinId)) {
-            playerData.skins.default.push(skinId);
-        }
+        if (!playerData.skins.default.includes(skinId)) playerData.skins.default.push(skinId);
         saveData();
         showToast(`SKIN MASTER C UNLOCKED!`, '#FFD700');
     } else {
         saveData();
-    }
-
-    // Cek auto-unlock tier berikutnya SETELAH semua claim key sudah di-set
-    const tierNames = ['', '🥉 PERUNGGU', '🥈 PERAK', '🥇 EMAS'];
-    if (currentViewingTier < 3) {
-        const allCurrentTierClaimed = ACHIEVEMENT_LIST.every(a =>
-            !!playerData.achievements[`${a.id}_tier${currentViewingTier}`]
-        );
-        if (allCurrentTierClaimed) {
-            currentViewingTier++;
-            playerData.achievements.viewingTier = currentViewingTier;
-            saveData();
-            setTimeout(() => {
-                showToast(`TIER ${tierNames[currentViewingTier]} TERBUKA!`, '#00ff88');
-            }, 600);
-        }
     }
 
     updateMissionNotification();
@@ -6418,12 +6560,12 @@ function renderMissionList() {
     const modeColors = {
         egypt:'#C19A6B', day:'#FFA500', night:'#8B5CF6',
         snow:'#87CEEB', ocean:'#4682B4', sakura:'#FF5588',
-        ramadan:'#FFE033', any:'#00ff88'
+        ramadan:'#FFE033', space:'#4466ff', any:'#00ff88'
     };
     const modeLabels = {
         egypt:'🏜️ MESIR', day:'☀️ SIANG', night:'🌙 MALAM',
         snow:'❄️ SALJU', ocean:'🏖️ PANTAI', sakura:'🌸 SAKURA',
-        ramadan:'☪️ RAMADAN', any:'🌍 SEMUA MODE'
+        ramadan:'☪️ RAMADAN', space:'🚀 LUAR ANGKASA', any:'🌍 SEMUA MODE'
     };
     
     playerData.dailyMissions.missions.forEach(mission => {
@@ -6518,7 +6660,9 @@ function updateMissionNotification() {
         for (const a of ACHIEVEMENT_LIST) {
             const progress = getAchievementProgress(a.id);
             for (const tier of a.tiers) {
-                if (tier.tier > currentViewingTier) continue;
+                // Tier tampil kalau tier sebelumnya sudah di-reach
+                const prevTier = a.tiers.find(t => t.tier === tier.tier - 1);
+                if (prevTier && progress < prevTier.target) continue;
                 const claimed = !!playerData.achievements[`${a.id}_tier${tier.tier}`];
                 if (!claimed && progress >= tier.target) {
                     hasAchievementClaimable = true;
@@ -6566,6 +6710,7 @@ updateMissionNotification();
         }
 
         function showMenu() { playSound('click_back');
+            applyMenuBg();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('menu').classList.add('active');
             gameRunning = false;
@@ -6742,10 +6887,9 @@ updateMissionNotification();
                     <div class="mode-icon">🌸</div>
                     <h3>SAKURA</h3>
                 </div>
-                <div class="mode-card locked-mode" style="background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%); opacity: 0.7;">
-                    <div class="mode-icon">🔒</div>
-                    <h3 style="color: #fff;">GUNUNG API</h3>
-                    <p style="font-size: 10px; margin-top: 8px; color: rgba(255,255,255,0.9);">COMING SOON</p>
+                <div class="mode-card space" onclick="showStartOverlay('space', () => startGame('space'))">
+                    <div class="mode-icon">🚀</div>
+                    <h3>LUAR ANGKASA</h3>
                 </div>
             `;
             showModeSelect();
@@ -6762,7 +6906,6 @@ updateMissionNotification();
                 <div class="mode-card ramadan" onclick="showStartOverlay('ramadan', () => startGame('ramadan'))">
                     <div class="mode-icon">🪔</div>
                     <h3>RAMADAN</h3>
-                    <p style="font-size: 9px; margin-top: 8px; color: #FFE4A0;">🌅 Siklus Waktu</p>
                 </div>
             `;
             showModeSelect();
@@ -6814,6 +6957,7 @@ if (!playerData.unlockedModes.includes('ocean')) {
         }
 
         function showShop() { playSound('open');
+            setTimeout(() => { switchShopTab('pack'); }, 50);
             updateCoinDisplays();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('shop').classList.add('active');
@@ -7494,7 +7638,9 @@ function unlockAllSkins() { playSound('unlock');
             const coinAmount = playerData.coins[currentCoin.mode] || 0;
             
             coinIcon.style.background = currentCoin.gradient;
-            coinText.textContent = coinAmount;
+            if (coinAmount >= 1000000) coinText.textContent = (coinAmount/1000000).toFixed(1)+'M';
+            else if (coinAmount >= 10000) coinText.textContent = (coinAmount/1000).toFixed(1)+'K';
+            else coinText.textContent = coinAmount;
             
             currentCoinIndex = (currentCoinIndex + 1) % coinModes.length;
         }
@@ -8305,7 +8451,7 @@ function updatePlayerSnowTrail() {
     const skin = getCurrentSkin();
     
     // Hanya untuk Legendary snow skin
-    if (skin.id === 'snow_legendary' && gameRunning) {
+    if (skin.id === 'snow_legendary' && gameRunning && currentMode !== 'space') {
         // Spawn snowflake setiap 3 frames
         if (frameCount % 3 === 0) {
             playerSnowTrail.push({
@@ -8384,7 +8530,7 @@ function createAndUpdateLoveTrail() {
     const skin = getCurrentSkin();
     
     // Hanya untuk Valentine skin
-    if (skin.loveTrail && gameRunning) {
+    if (skin.loveTrail && gameRunning && currentMode !== 'space') {
         // Spawn love heart setiap 5 frames
         if (frameCount % 5 === 0) {
             playerLoveTrail.push({
@@ -10519,7 +10665,7 @@ function drawHeartShot() {
                 
                 const skin = getCurrentSkin();
                 const dustSpawnRate = graphicsQuality === 'low' ? 9 : (graphicsQuality === 'high' ? 2 : 3);
-                if (skin.dust && frameCount % dustSpawnRate === 0 && !this.isJumping) {
+                if (skin.dust && frameCount % dustSpawnRate === 0 && !this.isJumping && currentMode !== 'space') {
                     createDustParticle();
                 }
             },
@@ -11511,7 +11657,7 @@ if (skin.snowflakeCrown && !this.isDucking) {
                 }
 
                 // === PETAL TRAIL (Hanami - Common) ===
-                if (skin.petalTrail && gameRunning && frameCount % 4 === 0) {
+                if (skin.petalTrail && gameRunning && frameCount % 4 === 0 && currentMode !== 'space') {
                     const petalColors = ['#FFB7C5','#FF8FAB','#FFD6E0','#FF69B4'];
                     particles.push({
                         x: player.x + Math.random() * player.width,
@@ -11807,7 +11953,7 @@ if (skin.snowflakeCrown && !this.isDucking) {
                     ctx.fillRect(mx + this.width - 1, myBase, 2, 2);
 
                     // — PETAL DROP dari jubah (animasi) —
-                    if (t % 20 === 0) {
+                    if (t % 20 === 0 && currentMode !== 'space') {
                         particles.push({
                             x: mx - 10 + Math.random() * 4,
                             y: myBase + 24 + flow * 2,
@@ -11873,8 +12019,9 @@ if (skin.snowflakeCrown && !this.isDucking) {
                 this.width = 20;
                 this.height = 20;
                 this.collected = false;
-                
-                if (isAirborne) {
+                if (currentMode === 'space') {
+                    this.y = player.y + (Math.random() - 0.5) * 200;
+                } else if (isAirborne) {
                     this.y = groundY - 100 - Math.random() * 80;
                 } else {
                     this.y = groundY - 50;
@@ -12014,6 +12161,15 @@ if (skin.snowflakeCrown && !this.isDucking) {
         ctx.fillStyle=`rgba(255,255,170,${sp})`;
         ctx.fillRect(cx+7,cy-10,4,2); ctx.fillRect(cx+8,cy-12,2,6);
     }
+} else if (currentMode === 'space') {
+    const cx=this.x+10, cy=this.y+10;
+    const pulse=(Math.sin(frameCount*0.13)+1)/2;
+    ctx.fillStyle=`rgba(100,140,255,${0.12+pulse*0.15})`;
+    for(let px=-14;px<=14;px++) for(let py=-14;py<=14;py++) if(px*px+py*py<196) ctx.fillRect(cx+px,cy+py,1,1);
+    ctx.fillStyle='#6688ff'; ctx.fillRect(cx-4,cy-8,8,4); ctx.fillRect(cx-8,cy-4,16,4); ctx.fillRect(cx-8,cy,16,4); ctx.fillRect(cx-4,cy+4,8,4);
+    ctx.fillStyle='#aaccff'; ctx.fillRect(cx-2,cy-4,4,4); ctx.fillRect(cx-4,cy,8,4); ctx.fillRect(cx-2,cy+4,4,4);
+    ctx.fillStyle='#ffffff'; ctx.fillRect(cx-2,cy-2,4,4);
+    if(pulse>0.6){const sp=(pulse-0.6)*2.5; ctx.fillStyle=`rgba(200,220,255,${sp})`; ctx.fillRect(cx,cy-12,2,6); ctx.fillRect(cx,cy+8,2,6); ctx.fillRect(cx-12,cy,6,2); ctx.fillRect(cx+8,cy,6,2);}
 }
             }
 
@@ -12587,10 +12743,22 @@ class Meteor {
     this.height = 65;
     this.y = groundY - this.height;
 } else if (type === 'bedug') {
-    // Bedug / gendang Ramadan - ground obstacle
-    this.width = 55;
-    this.height = 38;
-    this.y = groundY - this.height;
+    this.width = 55; this.height = 38; this.y = groundY - this.height;
+} else if (type === 'ufo_alien') {
+    this.width = 72; this.height = 60;
+    this.y = currentMode==='space' ? player.y : canvas.height*0.3+Math.random()*canvas.height*0.4;
+    this.bobOffset=Math.random()*Math.PI*2; this.shootDone=false; this.shootDelay=55; this.shootTimer=0; this.lightPhase=0;
+} else if (type === 'space_rock') {
+    const sz=[36,44,52][Math.floor(Math.random()*3)];
+    this.width=sz; this.height=sz;
+    this.y=currentMode==='space' ? player.y+(Math.random()-0.5)*160 : canvas.height*0.3;
+    this.rotFrame=Math.random()*60|0;
+    this.variant=Math.floor(Math.random()*3);
+    this.fireOffset=Math.random()*Math.PI*2; // fase api unik tiap meteor
+} else if (type === 'space_mine') {
+    this.width=46; this.height=46;
+    this.y=currentMode==='space' ? player.y+(Math.random()-0.5)*160 : canvas.height*0.4;
+    this.spikePhase=Math.random()*Math.PI*2;
 }
             }
 
@@ -13363,10 +13531,218 @@ class Meteor {
     ctx.fillRect(this.x + bw, this.y + bh/2 - 18, 10, 8);
     ctx.fillStyle = '#C09040';
     ctx.fillRect(this.x + bw, this.y + bh/2 - 18, 10, 4);
+        } else if (this.type === 'ufo_alien') {
+    const bx=this.x, by=this.y;
+    const bob=Math.round(Math.sin(this.bobOffset+frameCount*0.05)*3);
+    // Ring shadow
+    ctx.fillStyle='rgba(0,200,255,0.10)'; ctx.fillRect(bx+4,by+44+bob,64,8);
+    // Ring luar
+    ctx.fillStyle='#1e2e3e'; ctx.fillRect(bx,by+32+bob,72,8); ctx.fillRect(bx+2,by+28+bob,68,4); ctx.fillRect(bx+2,by+40+bob,68,4);
+    // Ring cyan
+    ctx.fillStyle='#00c8e0'; ctx.fillRect(bx+6,by+30+bob,60,4); ctx.fillRect(bx+4,by+34+bob,64,6); ctx.fillRect(bx+8,by+40+bob,56,2);
+    ctx.fillStyle='#80eeff'; ctx.fillRect(bx+12,by+30+bob,48,2);
+    // 5 lampu berkedip
+    this.lightPhase=(this.lightPhase+1)%60;
+    [[10,'#ff4444'],[20,'#44ff88'],[32,'#ffff44'],[44,'#ff88ff'],[54,'#44aaff']].forEach(([lx2,lc],li)=>{
+        const on=((this.lightPhase+li*12)%60)<30;
+        ctx.fillStyle=on?lc:'#111'; ctx.fillRect(bx+lx2,by+42+bob,6,4);
+    });
+    // Kubah
+    ctx.fillStyle='#101a28'; ctx.fillRect(bx+20,by+12+bob,32,4); ctx.fillRect(bx+14,by+16+bob,44,4); ctx.fillRect(bx+10,by+20+bob,52,4); ctx.fillRect(bx+8,by+24+bob,56,4); ctx.fillRect(bx+8,by+28+bob,56,2);
+    ctx.fillStyle='rgba(0,220,255,0.20)'; ctx.fillRect(bx+21,by+13+bob,30,3); ctx.fillRect(bx+15,by+16+bob,42,3); ctx.fillRect(bx+11,by+19+bob,50,7); ctx.fillRect(bx+9,by+25+bob,54,3);
+    ctx.fillStyle='rgba(200,255,255,0.45)'; ctx.fillRect(bx+22,by+13+bob,16,2); ctx.fillRect(bx+16,by+17+bob,18,2);
+    // Antena
+    ctx.fillStyle='#00c8e0'; ctx.fillRect(bx+34,by+5+bob,4,8);
+    ctx.fillStyle='#ff4444'; ctx.fillRect(bx+32,by+2+bob,8,6); ctx.fillStyle='#ff8888'; ctx.fillRect(bx+34,by+2+bob,4,4);
+    // Alien
+    const ax=bx+18, ay=by+14+bob;
+    ctx.fillStyle='#33dd55'; ctx.fillRect(ax+4,ay,20,4); ctx.fillRect(ax+2,ay+4,24,6); ctx.fillRect(ax+4,ay+10,20,2);
+    ctx.fillStyle='#22cc44'; ctx.fillRect(ax+6,ay+8,16,10); ctx.fillRect(ax+4,ay+10,20,6);
+    ctx.fillStyle='#88ffaa'; ctx.fillRect(ax+6,ay+1,8,2);
+    ctx.fillStyle='#ff2200'; ctx.fillRect(ax+4,ay+4,6,4); ctx.fillRect(ax+16,ay+4,6,4);
+    ctx.fillStyle='#ff8800'; ctx.fillRect(ax+5,ay+5,4,2); ctx.fillRect(ax+17,ay+5,4,2);
+    ctx.fillStyle='#ffff00'; ctx.fillRect(ax+6,ay+5,2,2); ctx.fillRect(ax+18,ay+5,2,2);
+    ctx.fillStyle='#22cc44'; ctx.fillRect(ax+6,ay-4,2,5); ctx.fillRect(ax+18,ay-4,2,5);
+    ctx.fillStyle='#ffff00'; ctx.fillRect(ax+5,ay-6,4,4); ctx.fillRect(ax+17,ay-6,4,4);
+    // Ray gun (kiri)
+    ctx.fillStyle='#22cc44'; ctx.fillRect(ax,ay+9,6,4); ctx.fillRect(ax-4,ay+8,6,4); ctx.fillRect(ax-10,ay+7,8,4);
+    ctx.fillStyle='#888800'; ctx.fillRect(ax-14,ay+6,6,6); ctx.fillStyle='#cccc00'; ctx.fillRect(ax-16,ay+7,4,4);
+    ctx.fillStyle='#ffff44'; ctx.fillRect(ax-18,ay+8,4,3); ctx.fillStyle='#444400'; ctx.fillRect(ax-22,ay+8,6,3);
+    ctx.fillStyle=Math.sin(frameCount*0.3)>0?'#00ff88':'#004422'; ctx.fillRect(ax-24,ay+8,4,3);
+    // Tangan kanan
+    ctx.fillStyle='#22cc44'; ctx.fillRect(ax+22,ay+9,6,4); ctx.fillRect(ax+26,ay+8,6,4);
+        } else if (this.type === 'space_rock') {
+    const rx=this.x, ry=this.y, rs=this.width, rv=this.variant||0;
+    const flick = frameCount + (this.rotFrame||0) + Math.round((this.fireOffset||0)*10);
+
+    // ── GLOW AURA ORANYE PIXEL (seperti golden aura di player) ──
+    const glowA = 0.22 + 0.10*Math.sin(flick*0.15);
+    const cx=rx+rs/2, cy=ry+rs/2, cr=rs/2;
+    const pulse = (Math.sin(flick*0.18)+1)/2;
+
+    // Outer glow ring (radius cr+16)
+    const gr1 = cr+16;
+    ctx.fillStyle=`rgba(255,120,20,${(glowA+pulse*0.08).toFixed(2)})`;
+    for(let px=-gr1;px<=gr1;px+=4) for(let py=-gr1;py<=gr1;py+=4){
+        const d=Math.sqrt(px*px+py*py);
+        if(d>=cr+6&&d<gr1) ctx.fillRect(cx+px,cy+py,4,4);
+    }
+    // Inner glow (radius cr+8)
+    const gr2 = cr+8;
+    ctx.fillStyle=`rgba(255,180,50,${(glowA*1.4+pulse*0.12).toFixed(2)})`;
+    for(let px=-gr2;px<=gr2;px+=4) for(let py=-gr2;py<=gr2;py+=4){
+        const d=Math.sqrt(px*px+py*py);
+        if(d>=cr&&d<gr2) ctx.fillRect(cx+px,cy+py,4,4);
+    }
+    // Core glow (isi dalam — warna putih panas di depan batu)
+    ctx.fillStyle=`rgba(255,240,180,${(glowA*0.5).toFixed(2)})`;
+    for(let px=-cr;px<=cr;px+=4) for(let py=-cr;py<=cr;py+=4){
+        const d=Math.sqrt(px*px+py*py);
+        if(d<cr&&px>0) ctx.fillRect(cx+px,cy+py,4,4); // hanya sisi kanan (arah gerak)
+    }
+
+    // ── API BOLA-BOLA PIXEL (bukan garis, tapi cluster orb) ──────
+    // Setiap "bola api" = pixel circle kecil yang bergetar & bergeser
+    const fireBalls = [
+        // [offset_x_base, size, warna_r, warna_g, speed_wiggle]
+        [cr+8,  cr*0.55, 255,255,0.20], // putih panas - paling dekat
+        [cr+20, cr*0.50, 255,220,0.22], // kuning
+        [cr+32, cr*0.45, 255,160,0.25], // oranye
+        [cr+45, cr*0.38, 255,100,0.28], // oranye tua
+        [cr+57, cr*0.30, 255,60, 0.30], // merah-oranye
+        [cr+68, cr*0.22, 220,30, 0.32], // merah
+        [cr+78, cr*0.16, 180,20, 0.35], // merah gelap
+        [cr+86, cr*0.10, 120,10, 0.38], // bara terakhir
+    ];
+    fireBalls.forEach(([ox, sz, fr, fg, spd], fi) => {
+        const wobble = Math.sin(flick*spd + fi*1.3) * (sz*0.6);
+        const wobble2 = Math.cos(flick*spd*0.7 + fi*2.1) * (sz*0.4);
+        const fcx = cx + ox;
+        const fcy = cy + wobble;
+        const fcy2 = cy + wobble2;
+        const fa = 0.85 - fi*0.09;
+        if(fa<=0) return;
+        // Bola api atas
+        ctx.fillStyle=`rgba(${fr},${fg},10,${fa.toFixed(2)})`;
+        for(let px=-sz;px<=sz;px+=2) for(let py=-sz;py<=sz;py+=2){
+            if(Math.sqrt(px*px+py*py)<=sz) ctx.fillRect(fcx+px,fcy+py,2,2);
+        }
+        // Bola api bawah (simetris, lebih kecil)
+        const sz2=sz*0.75;
+        ctx.fillStyle=`rgba(${fr},${Math.round(fg*0.85)},10,${(fa*0.8).toFixed(2)})`;
+        for(let px=-sz2;px<=sz2;px+=2) for(let py=-sz2;py<=sz2;py+=2){
+            if(Math.sqrt(px*px+py*py)<=sz2) ctx.fillRect(fcx+px,fcy2+py,2,2);
+        }
+        // Inti terang (putih-kuning di tengah bola)
+        if(fi<=3){
+            const ic=sz*0.35;
+            ctx.fillStyle=`rgba(255,255,${fi<=1?220:180},${(fa*0.65).toFixed(2)})`;
+            for(let px=-ic;px<=ic;px+=2) for(let py=-ic;py<=ic;py+=2){
+                if(Math.sqrt(px*px+py*py)<=ic) ctx.fillRect(fcx+px,fcy+py,2,2);
+            }
+        }
+    });
+
+    // Spark terlempar dari bola-bola api
+    for(let s=0;s<10;s++){
+        const sfx = cx + cr + ((flick*4+s*37)%110)+4;
+        const sfy = cy + (((flick*3+s*19)%36)-18);
+        const sa = 0.6+Math.sin(flick*0.2+s)*0.35;
+        const sc = s%4===0?`rgba(255,255,200,${sa.toFixed(2)})`
+                 : s%4===1?`rgba(255,180,40,${sa.toFixed(2)})`
+                 : s%4===2?`rgba(255,80,10,${sa.toFixed(2)})`
+                 :         `rgba(150,200,255,${sa.toFixed(2)})`; // kadang biru plasma
+        ctx.fillStyle=sc; ctx.fillRect(Math.floor(sfx/2)*2,Math.floor(sfy/2)*2,2,2);
+    }
+
+    // ── BATU ASTEROID BULAT PIXEL ─────────────────────────────────
+    const rcols=[
+        {outer:'#2a1608',base:'#4a2e18',mid:'#6a4830',hi:'#8a6848'},
+        {outer:'#201010',base:'#3a2020',mid:'#5a3838',hi:'#7a5858'},
+        {outer:'#281a08',base:'#483018',mid:'#685040',hi:'#887060'},
+    ];
+    const rc=rcols[rv];
+    const emberA=0.32+0.15*Math.sin(flick*0.20);
+    const lavA=0.50+0.25*Math.sin(flick*0.25);
+    for(let px=-cr;px<=cr;px+=2) for(let py=-cr;py<=cr;py+=2){
+        const d=Math.sqrt(px*px+py*py);
+        if(d>cr) continue;
+        // Tentukan warna layer
+        let col;
+        if(d>cr-2)       col=rc.outer;
+        else if(d>cr-6)  col=rc.base;
+        else if(d>cr-12) col=rc.mid;
+        else             col=rc.mid;
+        // Sisi kanan terbakar
+        if(px>cr*0.15){
+            const ratio=(px-cr*0.15)/cr;
+            const ea=emberA*ratio*1.4;
+            const la=lavA*ratio;
+            if(d<cr-2){
+                ctx.fillStyle=`rgba(255,${Math.round(90-ratio*60)},10,${Math.min(0.85,ea).toFixed(2)})`;
+            } else {
+                ctx.fillStyle=`rgba(255,${Math.round(100-ratio*50)},20,${Math.min(0.7,ea*0.7).toFixed(2)})`;
+            }
+        } else {
+            // Sisi kiri — highlight bintang
+            if(px<-cr*0.45&&d>cr-6){ctx.fillStyle=rc.hi;}
+            else ctx.fillStyle=col;
+        }
+        ctx.fillRect(cx+px,cy+py,2,2);
+    }
+    // Kawah (pixel circle kecil dalam)
+    const cr2=rc.outer;
+    const kr=Math.max(3,cr*0.20);
+    for(let px=-kr;px<=kr;px+=2) for(let py=-kr;py<=kr;py+=2){
+        if(Math.sqrt(px*px+py*py)>kr) continue;
+        ctx.fillStyle=cr2; ctx.fillRect(cx-cr*0.30+px,cy-cr*0.18+py,2,2);
+    }
+    const kr2=Math.max(2,cr*0.15);
+    for(let px=-kr2;px<=kr2;px+=2) for(let py=-kr2;py<=kr2;py+=2){
+        if(Math.sqrt(px*px+py*py)>kr2) continue;
+        ctx.fillStyle=cr2; ctx.fillRect(cx-cr*0.50+px,cy+cr*0.28+py,2,2);
+    }
+    // Bercak lava kecil di sisi kanan
+    ctx.fillStyle=`rgba(255,70,0,${lavA*0.55})`;
+    for(let px=-3;px<=3;px+=2) for(let py=-3;py<=3;py+=2){
+        if(Math.sqrt(px*px+py*py)<=3) ctx.fillRect(cx+cr*0.42+px,cy-cr*0.14+py,2,2);
+        if(Math.sqrt(px*px+py*py)<=2) ctx.fillRect(cx+cr*0.30+px,cy+cr*0.32+py,2,2);
+    }
+    // Kilap sesekali
+    if(flick%18<8){ctx.fillStyle='rgba(255,255,200,0.28)'; ctx.fillRect(cx-cr*0.42,cy-cr*0.32,2,2);}
+        } else if (this.type === 'space_mine') {
+    const mx2=this.x+23,my2=this.y+23;
+    const pulse=(Math.sin(frameCount*0.12)+1)/2;
+    ctx.fillStyle=`rgba(255,30,30,${0.08+pulse*0.12})`;
+    for(let px=-22;px<=22;px+=2) for(let py=-22;py<=22;py+=2) if(px*px+py*py<484) ctx.fillRect(mx2+px,my2+py,2,2);
+    const sl=12+Math.round(Math.sin((this.spikePhase||0)+frameCount*0.04)*2);
+    for(let si=0;si<8;si++){
+        const ang=si*Math.PI/4;
+        for(let s=10;s<=sl;s+=2){ctx.fillStyle=s>sl-4?'#ff5555':'#cc2222'; ctx.fillRect(Math.round(mx2+Math.cos(ang)*s)-2,Math.round(my2+Math.sin(ang)*s)-2,4,4);}
+        ctx.fillStyle='#ff9999'; ctx.fillRect(Math.round(mx2+Math.cos(ang)*(sl+2))-2,Math.round(my2+Math.sin(ang)*(sl+2))-2,4,4);
+    }
+    ctx.fillStyle='#1a1a22'; for(let px=-9;px<=9;px+=2) for(let py=-9;py<=9;py+=2) if(px*px+py*py<81) ctx.fillRect(mx2+px,my2+py,2,2);
+    ctx.fillStyle='#2a2a38'; for(let px=-7;px<=7;px+=2) for(let py=-7;py<=7;py+=2) if(px*px+py*py<49) ctx.fillRect(mx2+px,my2+py,2,2);
+    ctx.fillStyle='#3a3a50'; ctx.fillRect(mx2-4,my2-4,8,8);
+    ctx.fillStyle='rgba(180,180,220,0.5)'; ctx.fillRect(mx2-4,my2-6,6,2); ctx.fillRect(mx2-5,my2-4,2,4);
+    ctx.fillStyle=pulse>0.5?'#ff2200':'#440000'; ctx.fillRect(mx2-2,my2-2,4,4);
+    if(pulse>0.7){ctx.fillStyle='rgba(255,50,0,0.45)'; ctx.fillRect(mx2-4,my2-4,8,8);}
         }
             }
             update() {
                 this.x -= gameSpeed;
+                // UFO tembak laser ke arah player
+                if (this.type === 'ufo_alien' && !this.shootDone) {
+                    this.shootTimer++;
+                    if (this.shootTimer >= this.shootDelay && this.x < canvas.width + 10) {
+                        this.shootDone = true;
+                        const lx=this.x+14, ly=this.y+22;
+                        const dx=player.x-lx, dy=player.y-ly;
+                        const dist=Math.sqrt(dx*dx+dy*dy)||1;
+                        const spd=Math.min(13,Math.max(6,dist/40));
+                        alienLasers.push({x:lx,y:ly,vx:(dx/dist)*spd,vy:(dy/dist)*spd,life:130,hit:false});
+                    }
+                }
             }
 
             collidesWith(p) {
@@ -16181,21 +16557,340 @@ if (waveActive) {
             if (p.life <= 0) particles.splice(i, 1);
         }
     });
+} else if (currentMode === 'space') {
+    // ═══════════════════════════════════════════════════
+    // DEEP SPACE BACKGROUND — pixel art luar angkasa
+    // ═══════════════════════════════════════════════════
+    const bgPx = cameraY * 0.15;
+
+    // Sky — tidak terlalu gelap, ada nuansa ungu-biru deep space
+    const spBands=[
+        ['#06052a',0.20], // ungu tua gelap atas
+        ['#080a38',0.20], // navy dalam
+        ['#0a1045',0.20], // biru tua
+        ['#0c1452',0.20], // biru navy
+        ['#0e183e',0.20], // biru tua bawah
+    ];
+    let spY=0;
+    spBands.forEach(([c,h])=>{ const bh=canvas.height*h; ctx.fillStyle=c; ctx.fillRect(0,spY,canvas.width,bh); spY+=bh; });
+    // Dithering antar band
+    spY=0;
+    for(let i=0;i<spBands.length-1;i++){
+        spY+=canvas.height*spBands[i][1];
+        ctx.fillStyle=spBands[i+1][0];
+        for(let x=0;x<canvas.width;x+=4) for(let dy=-8;dy<0;dy+=4) if((x/4+dy/4)%2===0) ctx.fillRect(x,spY+dy,4,4);
+    }
+
+    // Parallax layer (semua elemen dekoratif)
+    ctx.save();
+    ctx.translate(0,-bgPx);
+
+    // ── NEBULA BESAR UNGU (kiri, dramatis) ──────────────────────
+    const na1=0.38+0.12*Math.sin(frameCount*0.007);
+    // Lapisan luar pudar
+    for(let nx=-60;nx<300;nx+=4) for(let ny=-30;ny<220;ny+=4){
+        const dx=nx-110,dy2=ny-90,d=dx*dx*0.0032+dy2*dy2*0.006;
+        if(d<1){ctx.fillStyle=`rgba(120,30,200,${na1*0.5*(1-d*0.7)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+    // Lapisan tengah
+    for(let nx=10;nx<240;nx+=4) for(let ny=0;ny<180;ny+=4){
+        const dx=nx-120,dy2=ny-85,d=dx*dx*0.007+dy2*dy2*0.012;
+        if(d<1){ctx.fillStyle=`rgba(160,50,240,${na1*0.6*(1-d)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+    // Core terang
+    for(let nx=60;nx<190;nx+=4) for(let ny=30;ny<150;ny+=4){
+        const dx=nx-125,dy2=ny-90,d=dx*dx*0.016+dy2*dy2*0.022;
+        if(d<1){ctx.fillStyle=`rgba(200,100,255,${na1*0.5*(1-d)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+    // Streak/filamen nebula (garis-garis khas nebula)
+    ctx.fillStyle=`rgba(180,80,255,${na1*0.3})`;
+    for(let nx=20;nx<200;nx+=8){
+        const wy=85+Math.sin(nx*0.05)*20;
+        ctx.fillRect(nx,wy,4,2); ctx.fillRect(nx+2,wy+2,4,2);
+    }
+    ctx.fillStyle=`rgba(140,60,220,${na1*0.25})`;
+    for(let nx=40;nx<180;nx+=8){
+        const wy=110+Math.cos(nx*0.07)*15;
+        ctx.fillRect(nx,wy,4,2);
+    }
+
+    // ── NEBULA BIRU-TEAL (kanan bawah) ───────────────────────────
+    const na2=0.30+0.10*Math.sin(frameCount*0.009+2);
+    const nb2x=Math.floor(canvas.width*0.74), nb2y=Math.floor(canvas.height*0.42);
+    for(let nx=nb2x-130;nx<nb2x+160;nx+=4) for(let ny=nb2y-80;ny<nb2y+140;ny+=4){
+        const dx=nx-nb2x,dy2=ny-nb2y,d=dx*dx*0.003+dy2*dy2*0.006;
+        if(d<1){ctx.fillStyle=`rgba(0,100,220,${na2*0.6*(1-d*0.6)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+    for(let nx=nb2x-80;nx<nb2x+110;nx+=4) for(let ny=nb2y-50;ny<nb2y+90;ny+=4){
+        const dx=nx-nb2x,dy2=ny-nb2y,d=dx*dx*0.007+dy2*dy2*0.013;
+        if(d<1){ctx.fillStyle=`rgba(0,200,240,${na2*0.45*(1-d)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+    // Core teal
+    for(let nx=nb2x-40;nx<nb2x+60;nx+=4) for(let ny=nb2y-30;ny<nb2y+50;ny+=4){
+        const dx=nx-nb2x,dy2=ny-nb2y,d=dx*dx*0.018+dy2*dy2*0.030;
+        if(d<1){ctx.fillStyle=`rgba(80,230,255,${na2*0.4*(1-d)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+
+    // ── NEBULA MERAH/ORANYE (tengah kanan, supernova remnant) ────
+    const na3=0.22+0.08*Math.sin(frameCount*0.006+4);
+    const nb3x=Math.floor(canvas.width*0.64), nb3y=70;
+    for(let nx=nb3x-100;nx<nb3x+120;nx+=4) for(let ny=nb3y-60;ny<nb3y+100;ny+=4){
+        const dx=nx-nb3x,dy2=ny-nb3y,d=dx*dx*0.005+dy2*dy2*0.008;
+        if(d<1){ctx.fillStyle=`rgba(220,60,30,${na3*0.55*(1-d*0.6)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+    for(let nx=nb3x-60;nx<nb3x+80;nx+=4) for(let ny=nb3y-35;ny<nb3y+65;ny+=4){
+        const dx=nx-nb3x,dy2=ny-nb3y,d=dx*dx*0.010+dy2*dy2*0.018;
+        if(d<1){ctx.fillStyle=`rgba(255,120,40,${na3*0.4*(1-d)})`;ctx.fillRect(nx,ny,4,4);}
+    }
+
+    // ── MILKY WAY BAND (jalur bintang padat diagonal) ────────────
+    const mwAlpha=0.18+0.05*Math.sin(frameCount*0.004);
+    for(let i=0;i<120;i++){
+        const mwx=(i*71+23)%canvas.width;
+        const mwy=canvas.height*0.28 + (mwx/canvas.width)*canvas.height*0.3 + (Math.sin(mwx*0.02))*12;
+        const a=mwAlpha*(0.5+Math.sin(i*0.7)*0.5);
+        ctx.fillStyle=`rgba(200,210,255,${a})`; ctx.fillRect(mwx,mwy,2,2);
+        if(i%3===0){ctx.fillStyle=`rgba(220,230,255,${a*0.6})`; ctx.fillRect(mwx+1,mwy-2,2,2);}
+    }
+
+    // ── BINTANG KECIL (layer jauh, banyak) ───────────────────────
+    for(let i=0;i<130;i++){
+        const sx=(i*83+19)%canvas.width, sy=(i*59+13)%(canvas.height+80)-40;
+        const a=0.45+((i*37)%10)*0.04;
+        ctx.fillStyle=`rgba(210,220,255,${a})`; if(i%5!==0) ctx.fillRect(sx,sy,2,2);
+    }
+    // ── BINTANG SEDANG (berkedip) ─────────────────────────────────
+    for(let i=0;i<60;i++){
+        const sx=(i*113+47)%canvas.width, sy=(i*73+27)%(canvas.height+60)-30;
+        const tw=Math.sin(frameCount*0.07+i*1.5)*0.5+0.5;
+        ctx.fillStyle=`rgba(255,255,255,${0.4+tw*0.55})`; ctx.fillRect(sx,sy,2,2);
+    }
+    // ── BINTANG BESAR (cross sparkle) ────────────────────────────
+    for(let i=0;i<20;i++){
+        const sx=(i*167+61)%canvas.width, sy=(i*101+37)%(canvas.height-20)+10;
+        const tw=Math.sin(frameCount*0.055+i*2.4);
+        if(tw>0){
+            const a=0.6+tw*0.4;
+            ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fillRect(sx-2,sy,8,4); ctx.fillRect(sx,sy-2,4,8);
+            ctx.fillStyle=`rgba(160,200,255,${a*0.55})`; ctx.fillRect(sx-6,sy,4,4); ctx.fillRect(sx+6,sy,4,4); ctx.fillRect(sx,sy-6,4,4); ctx.fillRect(sx,sy+6,4,4);
+            // Diagonal sparkle kecil
+            ctx.fillStyle=`rgba(200,220,255,${a*0.3})`; ctx.fillRect(sx-4,sy-4,4,4); ctx.fillRect(sx+4,sy+4,4,4); ctx.fillRect(sx+4,sy-4,4,4); ctx.fillRect(sx-4,sy+4,4,4);
+        } else { ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fillRect(sx,sy,4,4); }
+    }
+    // ── BINTANG BERWARNA (red giant, blue giant, dll) ────────────
+    const scols=['#ffcc88','#88bbff','#ffaaee','#88ffdd','#ffee88'];
+    for(let i=0;i<10;i++){
+        const sx=(i*241+91)%canvas.width, sy=(i*137+49)%(canvas.height-40)+20;
+        const tw=Math.sin(frameCount*0.04+i*1.8)*0.4+0.6;
+        ctx.fillStyle=scols[i%5]; ctx.globalAlpha=tw;
+        ctx.fillRect(sx,sy,4,4); ctx.fillRect(sx-2,sy,2,4); ctx.fillRect(sx+4,sy,2,4); ctx.fillRect(sx,sy-2,4,2); ctx.fillRect(sx,sy+4,4,2);
+        ctx.globalAlpha=1;
+    }
+
+    // ── PLANET SATURN BESAR (lebih besar, detail, jelas) ─────────
+    const pX=Math.floor(((frameCount*0.06+canvas.width*0.70)%(canvas.width+340))/4)*4;
+    const pY=68, pr=42; // lebih besar
+    // Glow planet
+    const pglow=0.12+0.05*Math.sin(frameCount*0.01);
+    ctx.fillStyle=`rgba(100,70,255,${pglow})`;
+    for(let px=-pr-30;px<=pr+30;px+=4) for(let py=-pr-20;py<=pr+20;py+=4){
+        const d=(px/(pr+30))*(px/(pr+30))+(py/(pr+20))*(py/(pr+20));
+        if(d<1&&d>0.5) ctx.fillRect(pX+px,pY+py,4,4);
+    }
+    // Ring belakang (lebih lebar, lebih detail)
+    const ringC=[
+        'rgba(80,50,160,0.70)','rgba(100,70,200,0.60)','rgba(130,100,220,0.50)',
+        'rgba(90,60,180,0.65)','rgba(60,35,140,0.55)','rgba(110,80,210,0.45)'
+    ];
+    for(let ri=0;ri<6;ri++){
+        ctx.fillStyle=ringC[ri];
+        const rw=pr+28+ri*7;
+        ctx.fillRect(pX-rw,pY+2+ri*2,rw*2,4);
+    }
+    // Bright ring streak
+    ctx.fillStyle='rgba(200,180,255,0.30)';
+    ctx.fillRect(pX-(pr+55),pY+6,pr*2+110,2);
+    // Planet body
+    const pCols=[
+        '#150844','#220e66','#301888','#4020aa','#5030cc','#6040dd','#7050ee',
+        '#8060ff','#9070ff','#8060ee','#7050dd','#5030cc','#3018aa','#220e88'
+    ];
+    for(let row=0;row<14;row++){
+        const hw=Math.round(Math.sqrt(Math.max(0,pr*pr-(row-6.5)*(row-6.5)*pr*pr/42.25)));
+        if(hw>0){ctx.fillStyle=pCols[row]; ctx.fillRect(pX-hw*4,pY+(row-6)*4,hw*8,4);}
+    }
+    // Atmosphere bands (garis warna di planet)
+    ctx.fillStyle='rgba(180,140,255,0.35)'; ctx.fillRect(pX-pr*3,pY-6,pr*6,4); ctx.fillRect(pX-pr*3-6,pY+10,pr*6+12,4);
+    ctx.fillStyle='rgba(100,70,220,0.25)'; ctx.fillRect(pX-pr*3-10,pY+18,pr*6+20,4);
+    ctx.fillStyle='rgba(220,200,255,0.20)'; ctx.fillRect(pX-pr*3-4,pY+24,pr*6+8,2);
+    // Storm spot (bintik badai seperti Jupiter)
+    ctx.fillStyle='rgba(160,100,255,0.55)';
+    ctx.fillRect(pX-10,pY+4,20,8); ctx.fillRect(pX-8,pY+2,16,12);
+    ctx.fillStyle='rgba(220,180,255,0.35)'; ctx.fillRect(pX-6,pY+4,12,6);
+    // Highlight terang
+    ctx.fillStyle='rgba(230,215,255,0.40)'; ctx.fillRect(pX-pr+6,pY-pr+6,pr-6,pr/2-4);
+    ctx.fillStyle='rgba(255,245,255,0.20)'; ctx.fillRect(pX-pr/2,pY-pr+8,pr/3,4);
+    // Ring depan (tutup bawah planet)
+    for(let ri=0;ri<6;ri++){
+        const rw=pr+28+ri*7;
+        ctx.fillStyle=ringC[ri];
+        ctx.fillRect(pX-rw,pY+6+ri*2,pr-14,4);
+        ctx.fillRect(pX+pr-12,pY+6+ri*2,rw-pr+14,4);
+    }
+    // Bulan kecil mengorbit
+    const maOff=frameCount*0.018;
+    const mox=pX+Math.cos(maOff)*76, moy=pY+Math.sin(maOff)*28;
+    // Shadow bulan
+    ctx.fillStyle='rgba(0,0,20,0.4)'; ctx.fillRect(mox-4,moy+6,12,4);
+    ctx.fillStyle='#9898bc'; ctx.fillRect(mox-6,moy-4,12,4); ctx.fillRect(mox-8,moy,16,4); ctx.fillRect(mox-6,moy+4,12,4);
+    ctx.fillStyle='#6a6a90'; ctx.fillRect(mox-2,moy,4,4); ctx.fillRect(mox+2,moy-4,4,4);
+    ctx.fillStyle='rgba(200,210,255,0.5)'; ctx.fillRect(mox-4,moy-4,8,2);
+
+    // ── PLANET MERAH (Mars-style, lebih jelas) ────────────────────
+    const rp2X=Math.floor(((frameCount*0.04+110)%(canvas.width+150))/4)*4, rp2Y=35, rpr=24;
+    // Glow merah
+    ctx.fillStyle='rgba(200,60,30,0.15)';
+    for(let px=-rpr-10;px<=rpr+10;px+=4) for(let py=-rpr-8;py<=rpr+8;py+=4){
+        const d=(px/(rpr+10))*(px/(rpr+10))+(py/(rpr+8))*(py/(rpr+8));
+        if(d<1&&d>0.6) ctx.fillRect(rp2X+px,rp2Y+py,4,4);
+    }
+    const rpc=['#3a0505','#581010','#781818','#962020','#b02828','#c43030','#b02828','#962020','#781818','#581010','#3a0505'];
+    for(let row=0;row<11;row++){
+        const hw=Math.round(Math.sqrt(Math.max(0,rpr*rpr-(row-5)*(row-5)*rpr*rpr/25)));
+        if(hw>0){ctx.fillStyle=rpc[row]; ctx.fillRect(rp2X-hw*4,rp2Y+(row-5)*4,hw*8,4);}
+    }
+    // Polar ice cap
+    ctx.fillStyle='rgba(255,240,240,0.55)'; ctx.fillRect(rp2X-8,rp2Y-rpr+4,16,4); ctx.fillRect(rp2X-6,rp2Y-rpr,12,4);
+    // Canyon/surface detail
+    ctx.fillStyle='rgba(80,20,10,0.45)'; ctx.fillRect(rp2X-rpr*2,rp2Y-2,rpr*4,2); ctx.fillRect(rp2X-rpr*2+6,rp2Y+4,rpr*4-8,2);
+    ctx.fillStyle='rgba(255,120,60,0.28)'; ctx.fillRect(rp2X-rpr*2,rp2Y+6,rpr*4,2);
+    // Highlight
+    ctx.fillStyle='rgba(255,180,150,0.25)'; ctx.fillRect(rp2X-8,rp2Y-rpr+6,12,4);
+
+    // ── PLANET BIRU KECIL (Neptune-style, di bawah tengah) ───────
+    const bp3X=Math.floor(((frameCount*0.035+canvas.width*0.35)%(canvas.width+180))/4)*4;
+    const bp3Y=Math.floor(canvas.height*0.62), bpr=16;
+    ctx.fillStyle='rgba(30,100,200,0.18)';
+    for(let px=-bpr-8;px<=bpr+8;px+=4) for(let py=-bpr-6;py<=bpr+6;py+=4){
+        const d=(px/(bpr+8))*(px/(bpr+8))+(py/(bpr+6))*(py/(bpr+6));
+        if(d<1&&d>0.5) ctx.fillRect(bp3X+px,bp3Y+py,4,4);
+    }
+    const bpc=['#0a1a60','#1428a0','#1e3cc0','#2850d8','#3060e8','#2850d8','#1e3cc0','#1428a0','#0a1a60'];
+    for(let row=0;row<9;row++){
+        const hw=Math.round(Math.sqrt(Math.max(0,bpr*bpr-(row-4)*(row-4)*bpr*bpr/16)));
+        if(hw>0){ctx.fillStyle=bpc[row]; ctx.fillRect(bp3X-hw*4,bp3Y+(row-4)*4,hw*8,4);}
+    }
+    ctx.fillStyle='rgba(100,180,255,0.30)'; ctx.fillRect(bp3X-bpr*2,bp3Y-2,bpr*4,2);
+    ctx.fillStyle='rgba(200,230,255,0.25)'; ctx.fillRect(bp3X-6,bp3Y-bpr+4,10,2);
+
+    // ── GALACTIC DUST PARTICLES (partikel debu antar bintang) ────
+    for(let i=0;i<40;i++){
+        const dx2=(i*97+frameCount*0.08+i*31)%canvas.width;
+        const dy2=(i*67+13)%(canvas.height-40)+20;
+        const da=0.12+((i*23)%8)*0.02;
+        ctx.fillStyle=`rgba(200,180,255,${da})`; ctx.fillRect(dx2,dy2,2,2);
+    }
+
+    // ── KOMET (lebih cepat, lebih dramatis) ───────────────────────
+    const cX=Math.floor(((frameCount*2.5+canvas.width*1.5)%(canvas.width+500)-450)/4)*4;
+    const cY2=22+Math.round(Math.sin(frameCount*0.025)*8);
+    if(cX>-460&&cX<canvas.width+40){
+        // Ekor panjang
+        for(let t=1;t<=18;t++){
+            const ta=0.70-t*0.037;
+            ctx.fillStyle=`rgba(140,195,255,${ta})`; ctx.fillRect(cX-t*16,cY2+t*2,12,4);
+            if(t<10){ctx.fillStyle=`rgba(200,230,255,${ta*0.35})`; ctx.fillRect(cX-t*16-4,cY2+t*2-2,6,2); ctx.fillRect(cX-t*16-4,cY2+t*2+4,6,2);}
+            if(t<5){ctx.fillStyle=`rgba(220,240,255,${ta*0.2})`; ctx.fillRect(cX-t*16+2,cY2+t*2-4,4,2);}
+        }
+        // Kepala
+        ctx.fillStyle='#bbdeff'; ctx.fillRect(cX-8,cY2-4,8,4); ctx.fillRect(cX-12,cY2,16,4); ctx.fillRect(cX-8,cY2+4,8,4);
+        ctx.fillStyle='#ddeeff'; ctx.fillRect(cX-8,cY2,8,4);
+        ctx.fillStyle='#ffffff'; ctx.fillRect(cX-6,cY2,6,4);
+        ctx.fillStyle='rgba(180,220,255,0.40)'; ctx.fillRect(cX-12,cY2-6,20,12);
+    }
+
+    // ── KOMET KEDUA (arah berbeda, lebih kecil) ──────────────────
+    const c2X=Math.floor(((frameCount*1.8+canvas.width*0.5)%(canvas.width+350))/4)*4;
+    const c2Y=Math.floor(canvas.height*0.55)+Math.round(Math.sin(frameCount*0.018)*5);
+    if(c2X>-360&&c2X<canvas.width+20){
+        for(let t=1;t<=10;t++){
+            ctx.fillStyle=`rgba(180,220,150,${0.55-t*0.05})`; ctx.fillRect(c2X-t*12,c2Y+t,8,2);
+        }
+        ctx.fillStyle='#ccff99'; ctx.fillRect(c2X-6,c2Y-2,6,2); ctx.fillRect(c2X-8,c2Y,10,2); ctx.fillRect(c2X-6,c2Y+2,6,2);
+        ctx.fillStyle='#ffffff'; ctx.fillRect(c2X-6,c2Y,4,2);
+    }
+
+    // ── ASTEROID BELT (sabuk asteroid kecil-kecil di latar) ──────
+    for(let i=0;i<18;i++){
+        const abx=((i*137+frameCount*0.12+i*43)%( canvas.width+80))-40;
+        const aby=Math.floor(canvas.height*0.72)+(i%5-2)*20+Math.sin(i*0.8)*10;
+        const abs2=4+i%3*2;
+        const aba=0.30+i%4*0.07;
+        ctx.fillStyle=`rgba(120,110,100,${aba})`;
+        ctx.fillRect(abx,aby,abs2,abs2);
+        if(abs2>4) ctx.fillRect(abx+2,aby-2,abs2-2,abs2-2);
+    }
+
+    // ── SPACE STATION KECIL (identik space) ──────────────────────
+    const ssX=Math.floor(((frameCount*0.25+canvas.width*0.4)%(canvas.width+200))/4)*4;
+    const ssY=Math.floor(canvas.height*0.18);
+    const ssb=frameCount*0.02; // sudut rotasi panel surya
+    // Body utama
+    ctx.fillStyle='#ccccdd'; ctx.fillRect(ssX-8,ssY-4,16,8);
+    ctx.fillStyle='#aaaacc'; ctx.fillRect(ssX-6,ssY-6,12,2); ctx.fillRect(ssX-6,ssY+4,12,2);
+    ctx.fillStyle='#8888aa'; ctx.fillRect(ssX-4,ssY-2,8,4);
+    // Panel surya kiri (berputar sedikit)
+    const pLen=20, pOff=Math.round(Math.sin(ssb)*3);
+    ctx.fillStyle='#4488ff'; ctx.fillRect(ssX-8-pLen,ssY-3+pOff,pLen,6);
+    ctx.fillStyle='#2266dd'; ctx.fillRect(ssX-8-pLen,ssY-1+pOff,pLen,2);
+    ctx.fillStyle='#66aaff'; ctx.fillRect(ssX-8-pLen,ssY-3+pOff,pLen,2);
+    // Panel surya kanan
+    ctx.fillStyle='#4488ff'; ctx.fillRect(ssX+8,ssY-3-pOff,pLen,6);
+    ctx.fillStyle='#2266dd'; ctx.fillRect(ssX+8,ssY-1-pOff,pLen,2);
+    ctx.fillStyle='#66aaff'; ctx.fillRect(ssX+8,ssY-3-pOff,pLen,2);
+    // Antenna
+    ctx.fillStyle='#ddddee'; ctx.fillRect(ssX-1,ssY-8,2,4); ctx.fillRect(ssX+3,ssY+4,2,4);
+    // Lampu status berkedip
+    const ssbl=frameCount%40<20;
+    ctx.fillStyle=ssbl?'#ff4444':'#440000'; ctx.fillRect(ssX-2,ssY-2,2,2);
+    ctx.fillStyle=ssbl?'#440000':'#44ff44'; ctx.fillRect(ssX+2,ssY,2,2);
+
+    // Shooting star sesekali (via particles)
+    if(frameCount%110===0) particles.push({type:'space_shooting',x:Math.random()*canvas.width*0.8+80,y:Math.random()*60+10,vx:7+Math.random()*4,vy:2.5+Math.random()*2,life:60});
+
+    ctx.restore(); // end parallax
+
+    // Shooting star particles + filter non-space particles
+    particles=particles.filter(p=>{
+        if(p.type==='space_shooting'){
+            ctx.fillStyle='#ffffff'; ctx.fillRect(Math.floor(p.x/4)*4,Math.floor(p.y/4)*4,4,4);
+            for(let t=1;t<=8;t++){ctx.fillStyle=`rgba(195,215,255,${0.7-t*0.08})`; ctx.fillRect(Math.floor((p.x-p.vx*t)/4)*4,Math.floor((p.y-p.vy*t)/4)*4,4,4);}
+            p.x+=p.vx; p.y+=p.vy; p.life--; return p.life>0&&p.y<canvas.height;
+        }
+        if(p.life!==undefined&&!p.type){
+            const c=p.color||'';
+            if(/FF[0-9A-F]{4}(C5|AB|E0|B4|CB|C9|DC|B5|88)/i.test(c)) return false;
+            ctx.fillStyle=c; ctx.fillRect(Math.floor(p.x/4)*4,Math.floor(p.y/4)*4,4,4);
+            p.x+=p.vx; p.y+=p.vy; p.life--; return p.life>0;
+        }
+        return true;
+    });
 }
           
             if (currentMode === 'ramadan') {
-                // Ground handled in drawBackground for ramadan (dynamic grass)
                 ctx.fillStyle = '#3A6028';
                 ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
                 ctx.fillStyle = '#2A4818';
                 for (let i = 0; i < canvas.width; i += 6) {
                     for (let j = 0; j < 2; j++) ctx.fillRect(i + j * 3, groundY + j * 6, 3, 3);
                 }
+            } else if (currentMode === 'space') {
+                // Space: no ground — bebas terbang
             } else {
-            ctx.fillStyle = currentMode === 'snow' ? '#F0F8FF' : currentMode === 'sakura' ? '#CD853F' : '#8B4513';
+            ctx.fillStyle = currentMode === 'snow' ? '#F0F8FF' : currentMode === 'sakura' ? '#CD853F' : currentMode === 'space' ? '#0a0c1a' : '#8B4513';
             ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
             
-            ctx.fillStyle = currentMode === 'snow' ? '#E0F0FF' : currentMode === 'sakura' ? '#BC7642' : '#654321';
+            ctx.fillStyle = currentMode === 'snow' ? '#E0F0FF' : currentMode === 'sakura' ? '#BC7642' : currentMode === 'space' ? '#14162a' : '#654321';
             for (let i = 0; i < canvas.width; i += 6) {
                 for (let j = 0; j < 2; j++) {
                     ctx.fillRect(i + j * 3, groundY + j * 6, 3, 3);
@@ -16220,6 +16915,8 @@ if (waveActive) {
         types = ['torii', 'lantern', 'bamboo'];
     } else if (currentMode === 'ramadan') {
         types = ['lampu_hias', 'ketupat_pole', 'bedug'];
+    } else if (currentMode === 'space') {
+        types = ['ufo_alien','ufo_alien','space_rock','space_rock','space_mine'];
     }
             
             const type = types[Math.floor(Math.random() * types.length)];
@@ -16236,10 +16933,249 @@ if (waveActive) {
     document.getElementById('coinIcon').textContent = icons[currentMode];
 }
 
+
+// ════════════════════════════════════════════════════════
+// MENU BACKGROUND SYSTEM
+// ════════════════════════════════════════════════════════
+
+const MENU_BGS = {
+    egypt: {
+        id: 'egypt', name: '🏜️ MESIR', price: 500,
+        coinMode: 'egypt', coinClass: 'coin-egypt',
+        themeClass: 'theme-egypt',
+        desc: 'Sunset Piramida Pixel'
+    }
+};
+
+let _menuBgRaf = null;
+let _menuBgFrame = 0;
+
+function applyMenuBg() {
+    const canvas = document.getElementById('menuBgCanvas');
+    const menu   = document.getElementById('menu');
+    if (!canvas || !menu) return;
+
+    // Reset tema
+    Object.values(MENU_BGS).forEach(b => menu.classList.remove(b.themeClass));
+
+    const bgId = playerData.equippedBg || 'none';
+    if (_menuBgRaf) { cancelAnimationFrame(_menuBgRaf); _menuBgRaf = null; }
+
+    if (bgId === 'none') {
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        return;
+    }
+
+    const def = MENU_BGS[bgId];
+    if (!def) return;
+    menu.classList.add(def.themeClass);
+
+    function resizeCanvas() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+
+    function loop() {
+        _menuBgFrame++;
+        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) resizeCanvas();
+        const ctx = canvas.getContext('2d');
+        if (bgId === 'egypt') drawMenuEgypt(ctx, canvas.width, canvas.height, _menuBgFrame);
+        _menuBgRaf = requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+
+function switchShopTab(tab) {
+    const packSec = document.getElementById('shopSectionPack');
+    const bgSec   = document.getElementById('shopSectionBg');
+    const packBtn = document.getElementById('shopTabPack');
+    const bgBtn   = document.getElementById('shopTabBg');
+    if (tab === 'pack') {
+        packSec.style.display = '';
+        bgSec.style.display   = 'none';
+        packBtn.style.cssText = 'flex:1;padding:12px 8px;font-family:\'Press Start 2P\',monospace;font-size:clamp(7px,1.8vw,9px);background:#00ff88;color:#000;border:none;cursor:pointer;letter-spacing:1px;box-shadow:inset -2px -2px 0 rgba(0,0,0,.2);';
+        bgBtn.style.cssText   = 'flex:1;padding:12px 8px;font-family:\'Press Start 2P\',monospace;font-size:clamp(7px,1.8vw,9px);background:#1a1a1a;color:#555;border:none;cursor:pointer;letter-spacing:1px;';
+    } else {
+        packSec.style.display = 'none';
+        bgSec.style.display   = '';
+        bgBtn.style.cssText   = 'flex:1;padding:12px 8px;font-family:\'Press Start 2P\',monospace;font-size:clamp(7px,1.8vw,9px);background:#00ff88;color:#000;border:none;cursor:pointer;letter-spacing:1px;box-shadow:inset -2px -2px 0 rgba(0,0,0,.2);';
+        packBtn.style.cssText = 'flex:1;padding:12px 8px;font-family:\'Press Start 2P\',monospace;font-size:clamp(7px,1.8vw,9px);background:#1a1a1a;color:#555;border:none;cursor:pointer;letter-spacing:1px;';
+        renderBgShopCard();
+    }
+}
+
+function drawMenuEgypt(ctx, W, H, fc) {
+    // Sky gradient pixel
+    const bands = [
+        ['#FF6B6B', .15], ['#FF8E53', .20],
+        ['#FFA94D', .25], ['#FFD93D', .20], ['#F4C2A0', .20]
+    ];
+    let y = 0;
+    bands.forEach(([c, h]) => {
+        ctx.fillStyle = c;
+        ctx.fillRect(0, y, W, H * h);
+        y += H * h;
+    });
+    // Dithering
+    y = 0;
+    for (let i = 0; i < bands.length - 1; i++) {
+        y += H * bands[i][1];
+        ctx.fillStyle = bands[i + 1][0];
+        for (let x = 0; x < W; x += 4)
+            for (let dy = -8; dy < 0; dy += 4)
+                if ((x/4 + dy/4) % 2 === 0) ctx.fillRect(x, y + dy, 4, 4);
+    }
+    // Sun
+    const sx = W * 0.82, sy = H * 0.14;
+    ctx.fillStyle = 'rgba(255,107,107,.18)';
+    for (let px = -36; px <= 36; px += 4) for (let py = -36; py <= 36; py += 4)
+        if (px*px+py*py < 1296 && px*px+py*py >= 784) ctx.fillRect(sx+px, sy+py, 4, 4);
+    ctx.fillStyle = '#FF6347';
+    for (let px = -28; px <= 28; px += 4) for (let py = -28; py <= 28; py += 4)
+        if (px*px+py*py < 784) ctx.fillRect(sx+px, sy+py, 4, 4);
+    ctx.fillStyle = '#FF8C00';
+    for (let px = -16; px <= 16; px += 4) for (let py = -16; py <= 16; py += 4)
+        if (px*px+py*py < 256) ctx.fillRect(sx+px, sy+py, 4, 4);
+    ctx.fillStyle = '#FFD700';
+    for (let px = -8; px <= 8; px += 4) for (let py = -8; py <= 8; py += 4)
+        if (px*px+py*py < 64) ctx.fillRect(sx+px, sy+py, 4, 4);
+    // Sun rays
+    for (let i = 0; i < 8; i++) {
+        const ang = (i * 45 + fc * 0.3) * Math.PI / 180;
+        ctx.fillStyle = 'rgba(255,150,60,.35)';
+        for (let r = 32; r < 58; r += 8) {
+            const rx = Math.round(sx + Math.cos(ang) * r / 4) * 4;
+            const ry = Math.round(sy + Math.sin(ang) * r / 4) * 4;
+            ctx.fillRect(rx, ry, 4, 4);
+        }
+    }
+    // Clouds
+    [[.08, .12, 80], [.38, .18, 100], [.62, .10, 75]].forEach(([xf, yf, cw], idx) => {
+        const cx = ((xf * W + fc * 0.3 + idx * 80) % (W + 120)) - 20;
+        const cy = yf * H;
+        ctx.fillStyle = '#FFB380';
+        ctx.fillRect(cx, cy, cw, 16);
+        ctx.fillRect(cx + 8, cy - 8, cw - 16, 16);
+        ctx.fillStyle = 'rgba(255,240,200,.5)';
+        ctx.fillRect(cx + 12, cy, cw - 24, 6);
+    });
+    // Ground Y
+    const gY = Math.floor(H * 0.70);
+    // Pyramids (3 layers, different speeds + sizes)
+    [[.15, 0.40, W*.28, W*.15], [.25, 0.25, W*.62, W*.20], [.10, 0.55, W*.08, W*.12]].forEach(([spd, sc, baseX, pw]) => {
+        const px = ((baseX + fc * spd) % (W + pw * 1.5)) - pw * .25;
+        const ph = pw * 0.65;
+        ctx.fillStyle = '#E8B86D';
+        for (let row = 0; row <= ph; row += 4) {
+            const rw = Math.floor(pw / 2 * (1 - row / ph) / 4) * 4;
+            ctx.fillRect(px + pw/2 - rw, gY - row, rw, 4);
+        }
+        ctx.fillStyle = '#B8956A';
+        for (let row = 0; row <= ph; row += 4) {
+            const rw = Math.floor(pw / 2 * (1 - row / ph) / 4) * 4;
+            ctx.fillRect(px + pw/2, gY - row, rw, 4);
+        }
+        ctx.fillStyle = '#F4D19B';
+        for (let row = 0; row <= ph; row += 12) {
+            const rw = Math.floor(pw / 2 * (1 - row / ph) / 4) * 4;
+            ctx.fillRect(px + pw/2 - rw, gY - row, 4, 4);
+        }
+    });
+    // Sand
+    ctx.fillStyle = '#D4A574';
+    for (let x = 0; x < W; x += 4) {
+        const wave = Math.sin(x * .015 + fc * .01) * 18;
+        for (let dy = 0; dy < gY - (gY - 45 + wave) + H - gY + 50; dy += 4)
+            ctx.fillRect(x, gY - 45 + wave + dy, 4, 4);
+    }
+    ctx.fillStyle = '#C9985F';
+    for (let x = 0; x < W; x += 4) {
+        const wave = Math.sin(x * .02 + fc * .015) * 12;
+        for (let dy = 0; dy < H - (gY - 20 + wave) + 10; dy += 4)
+            ctx.fillRect(x, gY - 20 + wave + dy, 4, 4);
+    }
+    // Scanline
+    ctx.fillStyle = 'rgba(0,0,0,.05)';
+    for (let sy2 = 0; sy2 < H; sy2 += 4) ctx.fillRect(0, sy2, W, 2);
+}
+
+// Gambar thumbnail kecil untuk preview di shop
+function drawBgThumb(canvas, bgId) {
+    canvas.width  = canvas.offsetWidth  || 400;
+    canvas.height = canvas.offsetHeight || 100;
+    if (bgId === 'egypt') drawMenuEgypt(canvas.getContext('2d'), canvas.width, canvas.height, 120);
+}
+
+// Render aksi card BG di shop (beli / equip)
+function renderBgShopCard() {
+    // Thumbnail
+    const thumb = document.getElementById('bgThumbEgypt');
+    if (thumb) setTimeout(() => drawBgThumb(thumb, 'egypt'), 50);
+
+    const actions = document.getElementById('bgActionsEgypt');
+    const card    = document.getElementById('bgCardEgypt');
+    if (!actions || !card) return;
+
+    const owned    = (playerData.ownedBgs || []).includes('egypt');
+    const equipped = playerData.equippedBg === 'egypt';
+    const coins    = playerData.coins.egypt || 0;
+    const canBuy   = coins >= 500;
+
+    card.className = 'bg-card' + (equipped ? ' equipped-bg' : owned ? ' owned' : '');
+
+    if (!owned) {
+        actions.innerHTML = `
+            <button class="gacha-btn" style="flex:2;${canBuy?'':'opacity:.5;cursor:not-allowed;'}"
+                onclick="${canBuy?'buyMenuBg(\'egypt\')':''}">${canBuy?'🪙 BELI':'🔒 TERKUNCI'}<br>
+                <span class="coin-small coin-egypt" style="margin:3px auto;width:14px;height:14px;display:block;"></span>500
+            </button>
+            <div style="flex:1;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);color:#C19A6B;text-align:center;line-height:1.8;">
+                KAMU<br><span style="color:${canBuy?'#00ff88':'#ff4444'};">${coins}</span>
+            </div>`;
+    } else {
+        actions.innerHTML = `
+            <button class="gacha-btn" style="flex:1;${equipped?'background:#FFD700;border-color:#8B6914;':''}"
+                onclick="equipMenuBg('egypt')">
+                ${equipped ? '✓ TERPASANG' : '▶ PASANG'}
+            </button>
+            ${equipped ? '<button class="gacha-btn" style="flex:1;background:#333;color:#aaa;border-color:#555;" onclick="equipMenuBg(\'none\')">LEPAS</button>' : ''}`;
+    }
+}
+
+function buyMenuBg(bgId) {
+    const def = MENU_BGS[bgId];
+    if (!def) return;
+    const coins = playerData.coins[def.coinMode] || 0;
+    if (coins < def.price) { showToast('❌ Koin ' + def.coinMode.toUpperCase() + ' kurang!', '#ff4444'); return; }
+    playerData.coins[def.coinMode] -= def.price;
+    if (!playerData.ownedBgs) playerData.ownedBgs = [];
+    playerData.ownedBgs.push(bgId);
+    playerData.equippedBg = bgId;
+    saveData();
+    updateAllCoinDisplays();
+    applyMenuBg();
+    renderBgShopCard();
+    showToast('✅ BG ' + def.name + ' dibeli & dipasang!', '#FFD700');
+}
+
+function equipMenuBg(bgId) {
+    playerData.equippedBg = bgId;
+    saveData();
+    applyMenuBg();
+    renderBgShopCard();
+    const msg = bgId === 'none' ? '🖼️ BG dilepas' : '🖼️ BG ' + MENU_BGS[bgId]?.name + ' dipasang!';
+    showToast(msg, '#00ff88');
+}
+
 function updateAllCoinDisplays() {
     ['egypt','day','night','snow','ocean','sakura','ramadan'].forEach(m => {
         const el = document.getElementById(m + 'CoinsView');
-        if (el) el.textContent = playerData.coins[m] || 0;
+        if (el) {
+            const v = playerData.coins[m] || 0;
+            el.textContent = v >= 1000000 ? (v/1000000).toFixed(1)+'M' : v >= 10000 ? (v/1000).toFixed(1)+'K' : v;
+        }
     });
     const egyptCoinsSkin = document.getElementById('egyptCoinsSkin');
     if (egyptCoinsSkin) egyptCoinsSkin.textContent = playerData.coins.egypt;
@@ -16302,7 +17238,7 @@ function updateAllCoinDisplays() {
             }
             
             const livesDisplay = document.getElementById('livesDisplay');
-            if (maxLives > 1) {
+            if (maxLives > 1 || currentMode === 'space') {
                 livesDisplay.style.display = 'block';
                 document.getElementById('livesCount').textContent = playerLives;
             } else {
@@ -16468,6 +17404,95 @@ if (meteorShowerActive && currentMode === 'night') {
     player.x = playerDodgeX;
 }
 
+// === SPACE MODE: zero-gravity flight + camera ===
+if (currentMode === 'space') {
+    if (jumpPressed)  spaceVY += SPACE_THRUST * 0.18;
+    if (duckPressed)  spaceVY -= SPACE_THRUST * 0.18;
+    spaceVY *= SPACE_INERTIA;
+    player.y += spaceVY;
+    if (player.y < SPACE_WORLD_TOP)  { player.y = SPACE_WORLD_TOP;  spaceVY = 0; }
+    if (player.y > SPACE_WORLD_BOTTOM){ player.y = SPACE_WORLD_BOTTOM; spaceVY = 0; }
+    // Camera lerp
+    cameraTargetY = player.y - (canvas.height/2 - player.height/2);
+    cameraY += (cameraTargetY - cameraY) * 0.1;
+    // Draw semua dalam world space
+    ctx.save(); ctx.translate(0, -cameraY);
+    player.draw();
+    // Coins (draw dalam camera space)
+    for(let i=coins.length-1;i>=0;i--){
+        const c=coins[i]; c.update(); c.draw();
+        if(c.x+c.width<-50) coins.splice(i,1);
+    }
+    // Obstacles (draw dalam camera space)
+    for(let i=obstacles.length-1;i>=0;i--){
+        const obs=obstacles[i]; obs.update(); obs.draw();
+        if(!obs.passed&&obs.x+obs.width<player.x){ obs.passed=true; scoreJump+=10; document.getElementById('scoreJump').textContent='JUMP: '+scoreJump; }
+        if(obs.x+obs.width<-50) obstacles.splice(i,1);
+    }
+    ctx.restore(); // SELALU restore sebelum collision/endGame
+
+    // Coin collision (world space, after restore)
+    for(let i=coins.length-1;i>=0;i--){
+        const c=coins[i];
+        if(c.collidesWith(player)){
+            c.collected=true;
+            const am=(getCurrentSkin().coinMultiplier||1);
+            sessionCoins+=am; document.getElementById('coinCount').textContent=sessionCoins;
+            coins.splice(i,1); playSound('coin'); vibrate(20);
+        }
+    }
+    // Obstacle collision (world space, setelah ctx.restore() — aman untuk endGame)
+    for(let i=obstacles.length-1;i>=0;i--){
+        const obs=obstacles[i];
+        if(obs.collidesWith(player)){
+            if(playerLives>1){
+                playerLives-=obs.type==='ufo_alien'?2:1;
+                updateAbilityButton(); playSound('hit'); vibrate([100,50,100]);
+                obstacles.splice(i,1);
+                if(playerLives<=0){endGame();return;}
+            } else { playSound('hit'); vibrate([100,50,100]); endGame(); return; }
+        }
+    }
+    // Thrust trail
+    if((jumpPressed||duckPressed)&&frameCount%3===0){
+        const sy=player.y+player.height/2-cameraY;
+        particles.push({x:player.x+player.width/2+(Math.random()-0.5)*10,y:sy,vx:(Math.random()-0.5)*1.5,vy:spaceVY>0?-1-Math.random()*2:1+Math.random()*2,life:18,color:Math.random()>0.5?'#4466ff':'#aaccff'});
+    }
+    // Alien lasers
+    alienLasers=alienLasers.filter(laser=>{
+        if(laser.hit) return false;
+        laser.x+=laser.vx; laser.y+=laser.vy; laser.life--;
+        const sY=laser.y-cameraY;
+        for(let t=1;t<=4;t++){ctx.fillStyle=`rgba(0,255,120,${0.5-t*0.1})`;ctx.fillRect(Math.floor((laser.x-laser.vx*t)/4)*4,Math.floor((sY-laser.vy*t)/4)*4,6,4);}
+        const ph=frameCount%8<4;
+        ctx.fillStyle=ph?'#ffffff':'#00ff88'; ctx.fillRect(Math.floor(laser.x/4)*4,Math.floor(sY/4)*4,8,4);
+        ctx.fillStyle='#00ff88'; ctx.fillRect(Math.floor(laser.x/4)*4-2,Math.floor(sY/4)*4,12,4);
+        ctx.fillStyle='rgba(0,255,100,0.22)'; ctx.fillRect(Math.floor(laser.x/4)*4-4,Math.floor(sY/4)*4-4,20,12);
+        const hx=laser.x>player.x-8&&laser.x<player.x+player.width+8;
+        const hy=laser.y>player.y-8&&laser.y<player.y+player.height+8;
+        if(hx&&hy){
+            laser.hit=true;
+            for(let j=0;j<12;j++) particles.push({x:laser.x,y:sY,vx:(Math.random()-0.5)*6,vy:(Math.random()-0.5)*6,life:20,color:Math.random()>0.5?'#00ff88':'#ffffff'});
+            playerLives-=2; updateAbilityButton(); playSound('hit'); vibrate([100,50,100]);
+            if(playerLives<=0){endGame();return false;}
+            return false;
+        }
+        return laser.life>0;
+    });
+    // Thrust particles (screen space)
+    particles=particles.filter(p=>{
+        if(p.life!==undefined){ctx.fillStyle=p.color; ctx.fillRect(Math.floor(p.x/4)*4,Math.floor(p.y/4)*4,4,4); p.x+=p.vx;p.y+=p.vy;p.life--; return p.life>0;} return true;
+    });
+    // Spawn obstacles & coins
+    const ssr=graphicsQuality==='low'?160:(graphicsQuality==='high'?100:130);
+    if(frameCount%ssr===0) spawnObstacle();
+    const csr=graphicsQuality==='low'?80:(graphicsQuality==='high'?50:60);
+    if(frameCount%csr===0&&Math.random()>0.3) spawnCoin();
+    // Lives display
+    document.getElementById('livesDisplay').style.display='block';
+    document.getElementById('livesCount').textContent=playerLives;
+} else {
+// === NORMAL PHYSICS ===
 player.update();
 player.draw();
 
@@ -16494,14 +17519,15 @@ drawKatanaSlash();
             
             // Stop spawning obstacles during heatwave (Day mode) and meteor shower (Night mode)
             // Spawn rate controlled by graphics quality
+            if (currentMode !== 'space') {
             const obstacleSpawnRate = graphicsQuality === 'low' ? 120 : (graphicsQuality === 'high' ? 75 : 90);
             if (frameCount % obstacleSpawnRate === 0) {
                 if ((currentMode === 'day' && heatwaveActive) || (currentMode === 'night' && meteorShowerActive)) {
-                    // Don't spawn obstacles during heatwave or meteor shower
+                    // Don't spawn during heatwave or meteor shower
                 } else {
                     spawnObstacle();
                 }
-            }
+            }}
 
             // Spawn quicksand (Egypt only)
             if (currentMode === 'egypt' && frameCount % 240 === 0) {
@@ -16514,42 +17540,34 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
 }
 
             
+            if (currentMode !== 'space') {
             const coinSpawnRate = graphicsQuality === 'low' ? 80 : (graphicsQuality === 'high' ? 50 : 60);
             if (frameCount % coinSpawnRate === 0 && Math.random() > 0.3) {
-                // Don't spawn coins during meteor shower
                 if (!(currentMode === 'night' && meteorShowerActive)) {
                     spawnCoin();
                 }
-            }
+            }}
             
+            if (currentMode !== 'space') {
             for (let i = coins.length - 1; i >= 0; i--) {
                 const coin = coins[i];
-                coin.update();
-                coin.draw();
-                
+                coin.update(); coin.draw();
                 if (coin.collidesWith(player)) {
                     coin.collected = true;
                     const activeSkin = getCurrentSkin();
                     const coinAmount = (activeSkin && activeSkin.coinMultiplier) ? activeSkin.coinMultiplier : 1;
                     sessionCoins += coinAmount;
                     document.getElementById('coinCount').textContent = sessionCoins;
-                    coins.splice(i, 1);
-
-                    playSound('coin');
-                    vibrate(20);
+                    coins.splice(i, 1); playSound('coin'); vibrate(20);
                 }
-                
-                if (coin.x + coin.width < -50) {
-                    coins.splice(i, 1);
-                }
-            }
+                if (coin.x + coin.width < -50) coins.splice(i, 1);
+            }}
             
+            if (currentMode !== 'space') {
             for (let i = obstacles.length - 1; i >= 0; i--) {
     const obs = obstacles[i];
     obs.update();
     obs.draw();
-    
-    // Skip collision check jika solar blaster aktif dan obstacle sudah dihancurkan
     if (!solarBlasterActive || frameCount % 2 !== 0) {
     // Special collision for seagull (harus duck)
     let collided = false;
@@ -16643,7 +17661,7 @@ if (currentMode === 'day' && heatwaveActive && frameCount % 40 === 0) {
                 if (obs.x + obs.width < -50) {
                     obstacles.splice(i, 1);
                 }
-            }
+            }} // end obstacle loop + space guard
 
             // === QUICKSAND SYSTEM (Egypt mode) ===
             if (currentMode === 'egypt') {
@@ -17200,6 +18218,8 @@ if (currentMode === 'night' && gameMode === 'minigame') {
     }
 }
             
+} // end else (normal mode)
+
             if (frameCount % 300 === 0 && gameSpeed < 14) {
                 gameSpeed += 0.8;
             }
@@ -17254,7 +18274,7 @@ if (currentMode === 'night' && gameMode === 'minigame') {
             // Mode label
             const modeNames = {
                 egypt: 'MESIR', day: 'SIANG', night: 'MALAM',
-                snow: 'SALJU', ocean: 'PANTAI', sakura: 'SAKURA', ramadan: 'RAMADAN'
+                snow: 'SALJU', ocean: 'PANTAI', sakura: 'SAKURA', ramadan: 'RAMADAN', space: 'LUAR ANGKASA'
             };
             label.textContent = modeNames[mode] || mode.toUpperCase();
 
@@ -17267,6 +18287,7 @@ if (currentMode === 'night' && gameMode === 'minigame') {
                 ocean:   { colors: ['#00B4D8','#0077B6','#90E0EF'], bg: '#000810' },
                 sakura:  { colors: ['#FF69B4','#FFB7C5','#FF1493'], bg: '#08000a' },
                 ramadan: { colors: ['#FFD700','#FFA500','#FFE033'], bg: '#050300' },
+                space:   { colors: ['#4466ff','#aa44ff','#aaccff'], bg: '#010208' },
             };
             const pal = modePalettes[mode] || modePalettes['day'];
 
@@ -17462,6 +18483,13 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
             player.velocityY = 0;
             player.isJumping = false;
             player.isDucking = false;
+            // Space mode init
+            cameraY = 0; cameraTargetY = 0; spaceVY = 0; alienLasers = [];
+            if (mode === 'space') {
+                player.y = canvas.height / 2 - 20;
+                particles = []; dustParticles = []; playerSnowTrail = []; playerLoveTrail = [];
+                if (maxLives < 3) { maxLives = 3; playerLives = 3; }
+            }
             abilityCooldown = 0;
             abilityCooldown = 0;
             solarBlasterActive = false;
