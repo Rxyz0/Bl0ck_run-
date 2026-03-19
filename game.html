@@ -245,7 +245,117 @@
     font-size: clamp(10px, 2.5vw, 14px);
     z-index: 99;
     font-family: 'Press Start 2P', monospace;
+    height: clamp(36px, 8vw, 44px);
+    box-sizing: border-box;
 }
+
+/* ═══════════════════════════════════════
+   PLAYER CARD — pojok kiri bawah coin
+   ═══════════════════════════════════════ */
+.menu-player-card {
+    position: fixed;
+    top: calc(12px + clamp(36px,8vw,44px) + 6px); /* tepat di bawah coin viewer */
+    left: 12px;
+    z-index: 99;
+    cursor: pointer;
+    transition: transform 0.1s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.menu-player-card:active { transform: translate(2px,2px); }
+
+.mpc-inner {
+    background: #0d0d0d;
+    border: 3px solid #00ff88;
+    box-shadow: 4px 4px 0 #006644;
+    padding: 6px 10px 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: clamp(110px,28vw,160px);
+    max-width: clamp(130px,32vw,190px);
+    position: relative;
+    overflow: hidden;
+}
+
+/* accent strip kiri — warna bisa di-override per card type */
+.mpc-inner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: #00ff88;
+}
+
+/* avatar pixel box */
+.mpc-avatar {
+    width: clamp(22px,5.5vw,28px);
+    height: clamp(22px,5.5vw,28px);
+    background: #111;
+    border: 2px solid #00ff88;
+    box-shadow: 2px 2px 0 #006644;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(11px,2.8vw,14px);
+    flex-shrink: 0;
+    margin-left: 4px; /* space for accent strip */
+}
+
+.mpc-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.mpc-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px,1.5vw,8px);
+    color: #00ff88;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px 0 #006644;
+    /* extensible: bisa diganti via JS untuk special name color */
+}
+
+.mpc-tag {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(4px,1vw,5px);
+    color: #333;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* Theme overrides — ikut menu theme */
+#menu.theme-egypt  .mpc-inner { border-color:#C19A6B; box-shadow:4px 4px 0 #8B6914; }
+#menu.theme-egypt  .mpc-inner::before { background:#C19A6B; }
+#menu.theme-egypt  .mpc-avatar { border-color:#C19A6B; box-shadow:2px 2px 0 #8B6914; }
+#menu.theme-egypt  .mpc-name { color:#C19A6B; text-shadow:1px 1px 0 #8B6914; }
+
+#menu.theme-day    .mpc-inner { border-color:#42A5F5; box-shadow:4px 4px 0 #1565C0; }
+#menu.theme-day    .mpc-inner::before { background:#42A5F5; }
+#menu.theme-day    .mpc-avatar { border-color:#42A5F5; box-shadow:2px 2px 0 #1565C0; }
+#menu.theme-day    .mpc-name { color:#42A5F5; text-shadow:1px 1px 0 #1565C0; }
+
+#menu.theme-night  .mpc-inner { border-color:#C8A8FF; box-shadow:4px 4px 0 #6633cc; }
+#menu.theme-night  .mpc-inner::before { background:#C8A8FF; }
+#menu.theme-night  .mpc-avatar { border-color:#C8A8FF; box-shadow:2px 2px 0 #6633cc; }
+#menu.theme-night  .mpc-name { color:#C8A8FF; text-shadow:1px 1px 0 #6633cc; }
+
+#menu.theme-ocean  .mpc-inner { border-color:#00E5FF; box-shadow:4px 4px 0 #0096C7; }
+#menu.theme-ocean  .mpc-inner::before { background:#00E5FF; }
+#menu.theme-ocean  .mpc-avatar { border-color:#00E5FF; box-shadow:2px 2px 0 #0096C7; }
+#menu.theme-ocean  .mpc-name { color:#00E5FF; text-shadow:1px 1px 0 #0096C7; }
+
+/* Guest / not logged in */
+.mpc-inner.guest { border-color:#444; box-shadow:4px 4px 0 #222; }
+.mpc-inner.guest::before { background:#444; }
+.mpc-inner.guest .mpc-avatar { border-color:#333; box-shadow:2px 2px 0 #111; }
+.mpc-inner.guest .mpc-name { color:#555; text-shadow:none; }
 
 .cycling-coin {
     width: 20px;
@@ -1299,20 +1409,139 @@
         #gameOver {
             background: #0a0a0a;
             color: #fff;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            /* center secara vertical tapi izinkan scroll kalau kepotong */
+            align-items: center;
+            justify-content: safe center;
+            padding: clamp(12px, 3vw, 24px) 0;
+        }
+        .game-over-container {
+            width: 90%;
+            max-width: 480px;
+            background: #0d0d0d;
+            border: 4px solid #ff3333;
+            box-shadow:
+                8px 8px 0 #880000,
+                0 0 30px rgba(255, 51, 51, 0.2);
+            padding: clamp(14px, 3.5vw, 26px);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        /* Strip merah atas */
+        .game-over-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ff3333 0px, #ff3333 8px,
+                #880000 8px, #880000 16px
+            );
         }
         .game-over-text {
-            font-size: clamp(18px, 6vw, 30px);
-            margin-bottom: clamp(16px, 3vh, 20px);
-            text-shadow: 
-                2px 2px 0 #cc0000,
-                4px 4px 0 #880000;
+            font-size: clamp(14px, 4vw, 26px);
+            margin-bottom: clamp(10px, 2vh, 20px);
+            text-shadow:
+                3px 3px 0 #880000,
+                6px 6px 0 #440000;
             color: #ff3333;
             font-family: 'Press Start 2P', monospace;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        /* Divider pixel */
+        .game-over-divider {
+            width: 100%;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ff3333 0px, #ff3333 4px,
+                transparent 4px, transparent 8px
+            );
+            margin: clamp(8px, 1.8vh, 14px) 0;
         }
         .score-display {
-            font-size: clamp(12px, 3.5vw, 18px);
-            margin-bottom: clamp(16px, 3vh, 22px);
             font-family: 'Press Start 2P', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: clamp(7px, 1.6vh, 11px) clamp(10px, 2.5vw, 14px);
+            margin-bottom: 4px;
+            border: 3px solid #1a1a1a;
+            background: #111;
+            box-shadow: 3px 3px 0 #000;
+            font-size: clamp(9px, 2.2vw, 12px);
+        }
+        .score-display .score-label {
+            color: #555;
+            font-size: clamp(7px, 1.8vw, 9px);
+        }
+        .score-display .score-value { color: #fff; }
+        .score-display.score-run   .score-value { color: #00ff88; text-shadow: 1px 1px 0 #006644; }
+        .score-display.score-jump  .score-value { color: #FFD700; text-shadow: 1px 1px 0 #8B6914; }
+        .score-display.score-coins .score-value { color: #FFD700; text-shadow: 1px 1px 0 #8B6914; }
+        .score-display.score-run   { border-color: #00ff8833; }
+        .score-display.score-jump  { border-color: #FFD70033; }
+        .score-display.score-coins { border-color: #FFD70033; background: #130f00; }
+        .game-over-btns {
+            display: flex;
+            gap: clamp(8px, 2vw, 12px);
+            margin-top: clamp(10px, 2vh, 18px);
+        }
+        .game-over-btns .btn {
+            flex: 1;
+            margin: 0;
+            padding: clamp(10px, 2.5vh, 16px) 8px;
+        }
+
+        /* ── LANDSCAPE: 2-col grid, scores kiri buttons kanan ── */
+        @media (max-height: 500px) {
+            #gameOver {
+                padding: 8px 0;
+            }
+            .game-over-container {
+                width: 95%;
+                max-width: 700px;
+                padding: 10px 16px 14px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                column-gap: 14px;
+                align-items: center;
+            }
+            .game-over-text {
+                grid-column: 1 / -1;
+                font-size: clamp(12px, 3.5vw, 18px);
+                margin-bottom: 5px;
+            }
+            .game-over-divider {
+                grid-column: 1 / -1;
+                margin: 3px 0 6px;
+            }
+            .go-scores {
+                grid-column: 1;
+            }
+            .score-display {
+                padding: 7px 10px;
+                margin-bottom: 3px;
+                font-size: clamp(8px, 2vw, 10px);
+            }
+            .game-over-btns {
+                grid-column: 2;
+                flex-direction: column;
+                margin-top: 0;
+                gap: 7px;
+                align-self: stretch;
+                justify-content: center;
+            }
+            .game-over-btns .btn {
+                padding: clamp(10px, 2.5vh, 14px) 8px;
+                font-size: clamp(8px, 2vw, 11px);
+                width: 100%;
+                max-width: 100%;
+            }
         }
         .gacha-result {
             position: fixed;
@@ -1473,146 +1702,252 @@
         }
 /* === SETTINGS MENU STYLES === */
 #settings {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    --mc:  #00ff88;
+    --mcs: #006644;
+    --mc2: #003322;
+    --mct: #000;
+    overflow: hidden;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    background: #0a0a0a;
 }
+#settings[data-theme="egypt"]  { --mc:#FFD700; --mcs:#8B6914; --mc2:#4a3800; --mct:#000; }
+#settings[data-theme="day"]    { --mc:#42A5F5; --mcs:#1565C0; --mc2:#0a2a60; --mct:#000; }
+#settings[data-theme="night"]  { --mc:#C8A8FF; --mcs:#6633cc; --mc2:#2a1a5e; --mct:#000; }
+#settings[data-theme="ocean"]  { --mc:#00E5FF; --mcs:#0096C7; --mc2:#003344; --mct:#000; }
 
+/* ─ shared (statsScreen & adminPanel juga pakai ini) ─ */
 .settings-container {
-    width: 90%;
+    width: 92%;
     max-width: 500px;
-    margin: clamp(10px, 2vh, 20px) auto;
-    padding-bottom: 80px;
+    margin: 0 auto;
+    padding-bottom: 60px;
 }
-
-/* ── SETTINGS SECTION — pixel tebal, kotak, retro ── */
 .settings-section {
     background: #0d0d0d;
     border: 4px solid #00ff88;
     box-shadow: 6px 6px 0 #006644;
-    padding: clamp(15px, 4vw, 24px);
-    margin-bottom: clamp(16px, 3.5vh, 24px);
+    padding: clamp(12px,3vw,18px);
+    margin-bottom: clamp(10px,2vh,14px);
+    overflow: hidden;
 }
-
 .settings-section h3 {
     color: #00ff88;
-    font-size: clamp(12px, 3.2vw, 16px);
-    margin-bottom: clamp(15px, 3vh, 20px);
-    text-align: center;
+    font-size: clamp(8px,2vw,11px);
+    margin: 0 0 clamp(12px,2.5vh,16px) 0;
+    padding-bottom: clamp(8px,1.8vh,12px);
     border-bottom: 3px solid #00ff88;
-    padding-bottom: clamp(10px, 2.2vh, 13px);
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     font-family: 'Press Start 2P', monospace;
     text-shadow: 2px 2px 0 #006644;
+    text-transform: uppercase;
+    text-align: center;
 }
 
-/* ── SETTING ROW ── */
+/* ─ header bar ─ */
+.s-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: clamp(48px,9vh,60px);
+    background: #0d0d0d;
+    border-bottom: 4px solid var(--mc);
+    box-shadow: 0 4px 0 var(--mcs);
+    flex-shrink: 0;
+}
+.s-header-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(11px,2.8vw,16px);
+    color: var(--mc);
+    letter-spacing: 4px;
+    text-shadow: 3px 3px 0 var(--mcs), 5px 5px 0 var(--mc2);
+}
+.s-header-close {
+    position: absolute;
+    right: 12px;
+    width: clamp(34px,8vw,42px);
+    height: clamp(34px,8vw,42px);
+    background: #ff6b6b;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 #cc5555;
+    font-size: clamp(14px,3.5vw,18px);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-weight: bold;
+    transition: all 0.1s;
+}
+.s-header-close:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 #cc5555; }
+
+/* ─ tab nav ─ */
+.s-tabs {
+    display: flex;
+    flex-shrink: 0;
+    border-bottom: 3px solid var(--mc);
+    background: #080808;
+}
+.s-tab {
+    flex: 1;
+    padding: clamp(10px,2.2vh,14px) 4px;
+    background: #080808;
+    border: none;
+    border-right: 2px solid var(--mc);
+    color: #2a4433;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px,1.4vw,8px);
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.1s;
+}
+.s-tab:last-child { border-right: none; }
+.s-tab.active {
+    background: var(--mc);
+    color: var(--mct);
+    text-shadow: none;
+}
+.s-tab:active { opacity: 0.75; }
+
+/* ─ scrollable body ─ */
+.s-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: clamp(12px,2.5vw,18px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px,2vh,14px);
+}
+.s-body::-webkit-scrollbar { width: 4px; }
+.s-body::-webkit-scrollbar-thumb { background: #00ff88; }
+.s-body::-webkit-scrollbar-track { background: #000; }
+
+/* ─ pane ─ */
+.s-pane { display: none; flex-direction: column; gap: clamp(10px,2vh,14px); }
+.s-pane.active { display: flex; }
+
+/* ─ setting row ─ */
 .setting-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: clamp(12px, 3vh, 16px) 0;
-    border-bottom: 2px solid rgba(0, 255, 136, 0.2);
-    color: #fff;
-    font-size: clamp(9px, 2.5vw, 13px);
+    padding: clamp(11px,2.5vh,15px) 0;
+    border-bottom: 2px solid rgba(0,255,136,0.12);
+    color: #ddd;
+    font-size: clamp(8px,2vw,11px);
     font-family: 'Press Start 2P', monospace;
 }
-
 .setting-row:last-child { border-bottom: none; }
-
-.setting-label {
+.setting-label { display: flex; align-items: center; gap: clamp(10px,2.5vw,14px); }
+.setting-icon {
+    width: clamp(28px,6.5vw,36px);
+    height: clamp(28px,6.5vw,36px);
+    background: #111;
+    border: 3px solid var(--mc);
+    box-shadow: 3px 3px 0 var(--mcs);
     display: flex;
     align-items: center;
-    gap: clamp(8px, 2.5vw, 14px);
-}
-
-.setting-icon { font-size: clamp(20px, 5.5vw, 26px); }
-
-/* ── TOGGLE — kotak, solid, tidak ada radius ── */
-.toggle-btn {
-    width: clamp(58px, 14vw, 72px);
-    height: clamp(30px, 7.5vw, 38px);
-    background: #444;
-    border: 3px solid #000;
-    box-shadow: 4px 4px 0 #000;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.15s;
+    justify-content: center;
+    font-size: clamp(13px,3.2vw,17px);
     flex-shrink: 0;
 }
 
-.toggle-btn.active {
-    background: #4CAF50;
-    box-shadow: 4px 4px 0 #388E3C;
+/* ─ toggle ─ */
+.toggle-btn {
+    width: clamp(52px,12vw,64px);
+    height: clamp(26px,6vw,32px);
+    background: #222;
+    border: 3px solid #444;
+    box-shadow: 4px 4px 0 #000;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.12s;
+    flex-shrink: 0;
 }
-
+.toggle-btn.active { background: var(--mc); filter:brightness(0.85); border-color: var(--mc); box-shadow: 4px 4px 0 var(--mcs); }
 .toggle-slider {
-    width: clamp(22px, 5.5vw, 28px);
-    height: clamp(22px, 5.5vw, 28px);
-    background: #fff;
+    width: clamp(18px,4.2vw,22px);
+    height: clamp(18px,4.2vw,22px);
+    background: #555;
     border: 2px solid #000;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
     position: absolute;
-    top: 1px;
-    left: 2px;
-    transition: left 0.15s;
+    top: 1px; left: 1px;
+    transition: left 0.12s, background 0.12s;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
 }
-
 .toggle-btn.active .toggle-slider {
-    left: calc(100% - clamp(22px, 5.5vw, 28px) - 5px);
+    left: calc(100% - clamp(18px,4.2vw,22px) - 4px);
+    background: #fff;
 }
 
-/* ── QUALITY SELECTOR — kotak pixel, no border-radius ── */
-.quality-selector {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
+/* ─ quality ─ */
+.quality-selector { display: flex; gap: 6px; margin-top: 10px; }
 .quality-option {
-    flex: 1;
-    min-width: 0;
-    padding: clamp(13px, 3.2vw, 18px) 4px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 3px solid rgba(255, 255, 255, 0.2);
-    color: #888;
+    flex: 1; min-width: 0;
+    padding: clamp(10px,2.5vw,14px) 3px;
+    background: #111;
+    border: 3px solid #222;
+    color: #555;
     text-align: center;
     cursor: pointer;
     font-family: 'Press Start 2P', monospace;
+    box-shadow: 4px 4px 0 #000;
     transition: all 0.1s;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
 }
-
-.quality-option:active {
-    transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-}
-
+.quality-option:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #000; }
 .quality-option.active {
-    background: #00ff88;
-    color: #000;
-    border-color: #00ff88;
-    box-shadow: 4px 4px 0 #006644;
+    background: var(--mc);
+    color: var(--mct);
+    border-color: var(--mc);
+    box-shadow: 4px 4px 0 var(--mcs);
+}
+.quality-label { font-size: clamp(8px,2vw,10px); margin-bottom: 5px; letter-spacing: 1px; }
+.quality-desc  { font-size: clamp(5px,1.2vw,7px); opacity: 0.7; line-height: 1.6; }
+
+/* ─ redeem input ─ */
+.s-redeem-input {
+    width: 100%;
+    padding: clamp(12px,3vw,15px);
+    font-size: clamp(9px,2.2vw,12px);
+    font-family: 'Press Start 2P', monospace;
+    background: #1a1a1a;
+    border: 4px solid var(--mc);
+    color: #fff;
+    text-align: center;
+    box-shadow: 6px 6px 0 var(--mcs), inset 0 0 0 1px var(--mc2);
+    margin-bottom: 12px;
+    letter-spacing: 3px;
+    outline: none;
+}
+.s-redeem-input:focus {
+    box-shadow: 6px 6px 0 var(--mc), inset 0 0 0 1px var(--mc);
 }
 
-.quality-label {
-    font-size: clamp(9px, 2.3vw, 12px);
-    font-weight: bold;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
+/* ─ akun info box ─ */
+.s-acct-box {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(8px,2vw,10px);
+    color: #00ff88;
+    padding: clamp(12px,3vw,16px);
+    background: #111;
+    border: 4px solid var(--mc);
+    box-shadow: 6px 6px 0 var(--mcs);
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0 var(--mcs);
+    margin-bottom: 0;
 }
 
-.quality-desc {
-    font-size: clamp(6px, 1.5vw, 8px);
-    opacity: 0.85;
-    line-height: 1.5;
-}
-
-/* ── LANDSCAPE COMPACT ── */
-@media (max-height: 600px) {
-    #settings { padding: 0; }
-    .settings-container { padding-bottom: 60px; }
-    .settings-section { padding: 12px; margin-bottom: 12px; }
-    .setting-row { padding: 10px 0; font-size: 11px; }
+/* ─ landscape ─ */
+@media (max-height: 560px) {
+    .s-header { height: 40px; }
+    .s-tab { padding: 7px 4px; }
+    .setting-row { padding: 9px 0; }
+    .s-body { padding: 10px 12px; gap: 8px; }
 }
 
 /* === STATS SECTION === */
@@ -1714,269 +2049,284 @@
 }
 
 /* Tab bar horizontal atas */
+/* ═══════════════════════════════════════
+   MISSION SCREEN — REDESIGN
+   ═══════════════════════════════════════ */
+
+/* ── CSS custom-property theming ──
+   Set via JS on #dailyMission when opened.
+   Default = green (no menu theme active). */
+#dailyMission {
+    --mc:  #00ff88;
+    --mcs: #006644;
+    --mc2: #003322;
+    --mca: rgba(0,255,136,0.12);
+    --mct: #000;
+}
+/* theme overrides applied by JS (data-theme attr) */
+#dailyMission[data-theme="egypt"]  { --mc:#FFD700; --mcs:#8B6914; --mc2:#4a3800; --mca:rgba(255,215,0,.12); --mct:#000; }
+#dailyMission[data-theme="day"]    { --mc:#42A5F5; --mcs:#1565C0; --mc2:#0a2a60; --mca:rgba(66,165,245,.12); --mct:#000; }
+#dailyMission[data-theme="night"]  { --mc:#C8A8FF; --mcs:#6633cc; --mc2:#2a1a5e; --mca:rgba(200,168,255,.12); --mct:#000; }
+#dailyMission[data-theme="ocean"]  { --mc:#00E5FF; --mcs:#0096C7; --mc2:#003344; --mca:rgba(0,229,255,.12); --mct:#000; }
+#dailyMission[data-theme="snow"]   { --mc:#87CEEB; --mcs:#4682B4; --mc2:#1a3a5e; --mca:rgba(135,206,235,.12); --mct:#000; }
+#dailyMission[data-theme="sakura"] { --mc:#FF5588; --mcs:#cc2255; --mc2:#4a0a22; --mca:rgba(255,85,136,.12); --mct:#fff; }
+#dailyMission[data-theme="ramadan"]{ --mc:#FFE033; --mcs:#cc9900; --mc2:#4a3800; --mca:rgba(255,224,51,.12); --mct:#000; }
+
+/* ── Tab bar ── */
 .mission-tab-bar {
     display: flex;
-    flex-direction: row;
     width: 100%;
-    background: #0d0d0d;
-    border-bottom: 3px solid #1a1a1a;
-    padding-top: clamp(44px, 10vh, 56px);
+    background: #0a0a0a;
+    border-bottom: 4px solid var(--mc);
+    box-shadow: 0 4px 0 var(--mcs);
+    padding-top: clamp(44px,10vh,56px);
     flex-shrink: 0;
-    gap: 0;
 }
 
 .mission-tab {
+    flex: 1;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: clamp(8px, 2vh, 12px) clamp(8px, 2vw, 16px);
+    gap: 4px;
+    padding: clamp(8px,2vh,12px) 4px;
     font-family: 'Press Start 2P', monospace;
-    background: #111;
-    color: #444;
+    background: #0a0a0a;
+    color: #333;
     border: none;
-    border-bottom: 3px solid transparent;
     border-right: 2px solid #1a1a1a;
+    border-bottom: 4px solid transparent;
     cursor: pointer;
     transition: all 0.1s;
-    flex: 1;
-    text-align: center;
-    margin-bottom: -3px;
+    margin-bottom: -4px;
 }
-
-.tab-icon {
-    font-size: clamp(12px, 3vw, 16px);
-    line-height: 1;
-}
-
-.tab-label {
-    font-size: clamp(5px, 1.2vw, 7px);
-    letter-spacing: 0.5px;
-}
-
+.mission-tab:last-child { border-right: none; }
 .mission-tab.active {
-    background: #1a1a1a;
-    color: #00ff88;
-    border-bottom: 3px solid #00ff88;
-    box-shadow: inset 0 -2px 8px rgba(0,255,136,0.05);
+    background: #111;
+    color: var(--mc);
+    border-bottom-color: var(--mc);
+    text-shadow: 0 0 8px var(--mca);
 }
+.mission-tab:active { opacity: 0.7; }
 
-.mission-tab:active {
-    background: #222;
-}
+.tab-icon  { font-size: clamp(14px,3.5vw,20px); line-height: 1; }
+.tab-label { font-size: clamp(5px,1.2vw,7px); letter-spacing: 1px; }
 
+/* ── Mission header ── */
 .mission-header {
-    padding: 0 0 clamp(10px, 2vh, 14px) 0;
-    margin-bottom: clamp(8px, 1.5vh, 12px);
+    padding: 0 0 clamp(10px,2vh,16px) 0;
+    margin-bottom: clamp(8px,1.5vh,14px);
+    border-bottom: 3px solid var(--mc);
+    box-shadow: 0 3px 0 var(--mcs);
+}
+
+.mission-header .page-title {
+    color: var(--mc);
+    text-shadow: 2px 2px 0 var(--mcs), 4px 4px 0 var(--mc2);
+    margin-bottom: 0;
 }
 
 .mission-timer {
-    font-size: clamp(8px, 2vw, 12px);
+    font-size: clamp(7px,1.8vw,10px);
     color: #FFD700;
-    margin-top: clamp(8px, 1.5vh, 12px);
-    letter-spacing: 0.5px;
+    margin-top: clamp(6px,1.2vh,10px);
+    letter-spacing: 1px;
     font-family: 'Press Start 2P', monospace;
+    opacity: 0.85;
 }
 
+/* ── Mission list ── */
 .mission-list {
-    width: 90%;
+    width: 92%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 10px 100px 10px;
+    padding: 0 0 80px;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: clamp(10px,2vh,14px);
 }
-
 @media (orientation: landscape) and (min-width: 768px) {
-    .mission-list {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
+    .mission-list { grid-template-columns: repeat(2,1fr); gap: 12px; }
 }
-
 @media (orientation: landscape) and (min-width: 1024px) {
-    .mission-list {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    .mission-list { grid-template-columns: repeat(3,1fr); }
 }
 
-/* Achievement Card */
+/* ── Achievement Card ── */
 .achievement-card {
-    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+    background: #0d0d0d;
     border: 3px solid #222;
-    box-shadow: 5px 5px 0 #111;
-    padding: clamp(14px, 3.5vw, 18px);
+    box-shadow: 4px 4px 0 #000;
+    padding: clamp(12px,3vw,16px);
     position: relative;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
-
-.achievement-card.locked {
-    opacity: 0.5;
-}
-
+.achievement-card.locked { opacity: 0.45; }
 .achievement-card.unlocked {
     border-color: #FFD700;
-    box-shadow: 5px 5px 0 #4a3800;
+    box-shadow: 4px 4px 0 #4a3800;
 }
-
 .achievement-icon {
-    font-size: clamp(24px, 6vw, 32px);
+    font-size: clamp(22px,5.5vw,30px);
     filter: grayscale(100%);
     flex-shrink: 0;
 }
-
-.achievement-card.unlocked .achievement-icon {
-    filter: grayscale(0%);
-}
+.achievement-card.unlocked .achievement-icon { filter: grayscale(0%); }
 
 @keyframes unlockPulse {
-    0%, 100% { transform: scale(1); }
+    0%,100% { transform: scale(1); }
     50% { transform: scale(1.08); }
 }
 
 .achievement-title {
-    font-size: clamp(9px, 2.3vw, 12px);
-    color: #00ff88;
+    font-size: clamp(8px,2vw,11px);
+    color: var(--mc);
     font-family: 'Press Start 2P', monospace;
+    text-shadow: 1px 1px 0 var(--mcs);
 }
-
 .achievement-desc {
-    font-size: clamp(6px, 1.5vw, 8px);
+    font-size: clamp(6px,1.4vw,8px);
     color: #555;
-    line-height: 1.8;
+    line-height: 1.9;
     font-family: 'Press Start 2P', monospace;
 }
-
 .achievement-progress {
-    font-size: clamp(7px, 1.8vw, 9px);
-    color: #888;
+    font-size: clamp(6px,1.5vw,8px);
+    color: #666;
     font-family: 'Press Start 2P', monospace;
 }
 
-/* Tier Navigation */
+/* ── Tier Navigation ── */
 .tier-navigation {
     text-align: center;
-    margin: 16px auto;
+    margin: 14px auto;
     padding: clamp(12px,3vw,16px);
-    background: linear-gradient(135deg, #111, #1a1a1a);
-    border: 3px solid #FFD700;
-    box-shadow: 5px 5px 0 #4a3800;
+    background: #0d0d0d;
+    border: 4px solid #FFD700;
+    box-shadow: 6px 6px 0 #4a3800;
     max-width: 400px;
 }
-
 .tier-title {
-    font-size: clamp(9px, 2.3vw, 12px);
+    font-size: clamp(9px,2.3vw,12px);
     color: #FFD700;
     margin-bottom: 8px;
     font-family: 'Press Start 2P', monospace;
+    text-shadow: 2px 2px 0 #4a3800;
 }
-
 .tier-requirement {
-    font-size: clamp(6px, 1.5vw, 8px);
+    font-size: clamp(6px,1.4vw,8px);
     color: #555;
     margin-bottom: 12px;
-    line-height: 1.8;
+    line-height: 1.9;
     font-family: 'Press Start 2P', monospace;
 }
-
 .tier-nav-btn {
     padding: clamp(8px,2vh,10px) clamp(14px,3.5vw,18px);
-    background: linear-gradient(135deg, #FFD700, #FFA500);
+    background: #FFD700;
     border: 3px solid #000;
     color: #000;
-    font-size: clamp(7px, 1.8vw, 9px);
+    font-size: clamp(7px,1.8vw,9px);
     font-family: 'Press Start 2P', monospace;
     cursor: pointer;
-    box-shadow: 3px 3px 0 #8B6914;
+    box-shadow: 4px 4px 0 #8B6914;
     transition: all 0.1s;
     letter-spacing: 1px;
 }
-
-.tier-nav-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0 #8B6914;
-}
-
-.tier-nav-btn:disabled {
-    background: #222;
-    border-color: #333;
-    color: #444;
-    box-shadow: 3px 3px 0 #111;
-    cursor: not-allowed;
-}
-
+.tier-nav-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #8B6914; }
+.tier-nav-btn:disabled { background:#222; border-color:#333; color:#444; box-shadow:3px 3px 0 #111; cursor:not-allowed; }
 .tier-locked-overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(24px, 6vw, 32px);
+    position: absolute; top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.88);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(24px,6vw,32px);
 }
-
 .tier-section { display: none; }
 .tier-section.active { display: block; }
 
-/* Daily Check-in */
+
+/* ── Tab notification badge ── */
+.mission-tab { position: relative; }
+.tab-badge {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    min-width: 14px;
+    height: 14px;
+    background: #FF3333;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 #880000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+    animation: badgePop 0.3s ease;
+    pointer-events: none;
+}
+@keyframes badgePop {
+    0%   { transform: scale(0); }
+    70%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+/* ══════════════════════════════════════
+   DAILY CHECK-IN — Redesign
+   ══════════════════════════════════════ */
 .checkin-container {
     width: 100%;
     max-width: 700px;
     margin: 0 auto;
-    padding: 0;
 }
 
-/* === CHECK-IN — pixel konsisten dengan UI lain === */
 .checkin-card {
     background: #0d0d0d;
-    border: 4px solid #00ff88;
-    box-shadow: 6px 6px 0 #006644;
-    padding: clamp(14px, 3.5vw, 22px);
-    margin-bottom: clamp(16px, 3.5vh, 24px);
+    border: 4px solid var(--mc);
+    box-shadow: 6px 6px 0 var(--mcs);
+    padding: clamp(14px,3.5vw,20px);
+    margin-bottom: clamp(14px,3vh,20px);
     position: relative;
 }
 
 .checkin-card-title {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(9px, 2.3vw, 12px);
-    color: #00ff88;
+    font-size: clamp(9px,2.3vw,12px);
+    color: var(--mc);
     letter-spacing: 2px;
-    text-shadow: 2px 2px 0 #006644;
-    border-bottom: 3px solid #00ff88;
-    padding-bottom: clamp(8px, 2vh, 12px);
-    margin-bottom: clamp(14px, 3vh, 18px);
+    text-shadow: 2px 2px 0 var(--mcs);
+    border-bottom: 3px solid var(--mc);
+    padding-bottom: clamp(8px,2vh,12px);
+    margin-bottom: clamp(12px,2.5vh,16px);
     text-align: center;
 }
 
 .checkin-section-label {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(5px, 1.2vw, 7px);
-    color: #00ff88;
-    margin-bottom: clamp(8px, 1.8vh, 12px);
+    font-size: clamp(5px,1.2vw,7px);
+    color: var(--mc);
+    margin-bottom: clamp(8px,1.8vh,12px);
     letter-spacing: 2px;
     opacity: 0.5;
 }
 
 .checkin-mode-strip {
     display: flex;
-    flex-direction: row;
     gap: 5px;
-    margin-bottom: clamp(14px, 3vh, 20px);
+    margin-bottom: clamp(12px,2.5vh,18px);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 4px;
 }
-
 .checkin-mode-strip::-webkit-scrollbar { height: 3px; }
 .checkin-mode-strip::-webkit-scrollbar-track { background: #111; }
-.checkin-mode-strip::-webkit-scrollbar-thumb { background: #444; }
+.checkin-mode-strip::-webkit-scrollbar-thumb { background: var(--mc); }
 
 .mode-selector-btn {
-    padding: clamp(7px, 1.8vh, 10px) clamp(10px, 2.5vw, 14px);
+    padding: clamp(7px,1.8vh,10px) clamp(10px,2.5vw,14px);
     border: 3px solid #222;
-    color: #444;
-    font-size: clamp(5px, 1.1vw, 7px);
+    color: #555;
+    font-size: clamp(5px,1.1vw,7px);
     font-family: 'Press Start 2P', monospace;
     cursor: pointer;
     background: #111;
@@ -1986,94 +2336,80 @@
     flex-shrink: 0;
     transition: all 0.1s;
 }
-
 .mode-selector-btn.active {
-    background: #0d0d0d;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.6);
+    background: var(--mc);
+    color: var(--mct);
+    border-color: var(--mc);
+    box-shadow: 3px 3px 0 var(--mcs);
 }
-
-.mode-selector-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0 #000;
-}
+.mode-selector-btn:active { transform: translate(2px,2px); box-shadow:1px 1px 0 #000; }
 
 .checkin-days {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: clamp(4px, 1vw, 6px);
-    margin-bottom: clamp(14px, 3vh, 18px);
+    grid-template-columns: repeat(7,1fr);
+    gap: clamp(4px,1vw,6px);
+    margin-bottom: clamp(12px,2.5vh,16px);
 }
 
 .checkin-day {
     background: #111;
-    border: 3px solid #1a1a1a;
-    padding: clamp(6px, 1.5vw, 10px) 2px;
+    border: 3px solid #1e1e1e;
+    padding: clamp(6px,1.5vw,10px) 2px;
     text-align: center;
     position: relative;
     box-shadow: 3px 3px 0 #000;
+    transition: border-color 0.1s;
 }
-
 .checkin-day.claimed {
     background: #0a1a0a;
-    border-color: #1a4a1a;
-    box-shadow: 3px 3px 0 #003300;
+    border-color: var(--mcs);
+    box-shadow: 3px 3px 0 var(--mc2);
 }
-
 .checkin-day.current {
     border-color: #FFD700;
-    background: #111000;
+    background: #111500;
     box-shadow: 3px 3px 0 #4a3800;
 }
-
 .checkin-day-num {
-    font-size: clamp(5px, 1.1vw, 7px);
+    font-size: clamp(5px,1.1vw,7px);
     color: #333;
     margin-bottom: 5px;
     font-family: 'Press Start 2P', monospace;
 }
-
 .checkin-day.current .checkin-day-num { color: #FFD700; }
-.checkin-day.claimed .checkin-day-num { color: #1a6a1a; }
+.checkin-day.claimed .checkin-day-num { color: var(--mc); opacity: 0.5; }
 
 .checkin-day-coins {
-    font-size: clamp(4px, 0.9vw, 6px);
+    font-size: clamp(4px,0.9vw,6px);
     color: #333;
     font-family: 'Press Start 2P', monospace;
     line-height: 1.4;
 }
-
 .checkin-day.current .checkin-day-coins { color: #FFD700; }
-.checkin-day.claimed .checkin-day-coins { color: #1a6a1a; }
+.checkin-day.claimed .checkin-day-coins { color: var(--mc); opacity: 0.4; }
 
 .checkin-day-check {
-    font-size: clamp(7px, 1.8vw, 10px);
-    color: #00ff88;
+    font-size: clamp(7px,1.8vw,10px);
+    color: var(--mc);
     font-family: 'Press Start 2P', monospace;
     margin-top: 3px;
-    text-shadow: 1px 1px 0 #006644;
+    text-shadow: 1px 1px 0 var(--mcs);
 }
 
 .checkin-streak-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: clamp(14px, 3vh, 18px);
+    margin-bottom: clamp(12px,2.5vh,16px);
 }
-
 .checkin-streak-label {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(5px, 1.1vw, 7px);
+    font-size: clamp(5px,1.1vw,7px);
     color: #555;
     letter-spacing: 1px;
     white-space: nowrap;
 }
-
-.checkin-streak-bar {
-    display: flex;
-    gap: 4px;
-    flex: 1;
-}
-
+.checkin-streak-bar { display: flex; gap: 4px; flex: 1; }
 .streak-block {
     flex: 1;
     height: 12px;
@@ -2081,13 +2417,11 @@
     border: 2px solid #222;
     box-shadow: 2px 2px 0 #000;
 }
-
 .streak-block.filled {
-    background: #00ff88;
-    border-color: #006644;
-    box-shadow: 2px 2px 0 #003322;
+    background: var(--mc);
+    border-color: var(--mcs);
+    box-shadow: 2px 2px 0 var(--mc2);
 }
-
 .streak-block.current-block {
     background: #FFD700;
     border-color: #8B6914;
@@ -2096,25 +2430,21 @@
 
 .checkin-btn {
     width: 100%;
-    padding: clamp(12px, 3vh, 16px);
-    background: #00ff88;
+    padding: clamp(13px,3.2vh,17px);
+    background: var(--mc);
     border: 4px solid #000;
-    color: #000;
-    font-size: clamp(7px, 1.8vw, 10px);
+    color: var(--mct);
+    font-size: clamp(8px,2vw,11px);
     font-family: 'Press Start 2P', monospace;
     cursor: pointer;
-    box-shadow: 5px 5px 0 #006644;
+    box-shadow: 6px 6px 0 var(--mcs);
     transition: all 0.1s;
     letter-spacing: 1px;
-    margin-bottom: clamp(10px, 2.5vh, 14px);
+    margin-bottom: clamp(10px,2.5vh,14px);
     text-align: center;
+    text-shadow: none;
 }
-
-.checkin-btn:active {
-    transform: translate(3px, 3px);
-    box-shadow: 2px 2px 0 #006644;
-}
-
+.checkin-btn:active { transform: translate(3px,3px); box-shadow: 3px 3px 0 var(--mcs); }
 .checkin-btn:disabled {
     background: #1a1a1a;
     border-color: #222;
@@ -2125,12 +2455,90 @@
 
 .checkin-info {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(5px, 1.1vw, 7px);
+    font-size: clamp(5px,1.1vw,7px);
     color: #444;
     text-align: center;
     letter-spacing: 1px;
-    padding-top: clamp(8px, 2vh, 10px);
+    padding-top: clamp(8px,2vh,10px);
     border-top: 2px solid #1a1a1a;
+}
+
+/* ── new checkin day tile internals ── */
+.checkin-day-icon {
+    font-size: clamp(11px,2.8vw,15px);
+    color: #333;
+    margin-bottom: 4px;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1;
+}
+.checkin-day.claimed .checkin-day-icon { color: var(--mc); opacity: 0.7; }
+.checkin-day.current .checkin-day-icon { color: #FFD700; animation: badgePop 0.4s ease; }
+
+.checkin-day-reward { display: flex; justify-content: center; }
+.checkin-day-coins {
+    font-size: clamp(5px,1.1vw,6px);
+    color: #333;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.5;
+    text-align: center;
+}
+.checkin-day.current .checkin-day-coins { color: #FFD700; }
+.checkin-day.claimed .checkin-day-coins { color: var(--mc); opacity: 0.35; }
+
+.checkin-day.day-seven {
+    border-color: #FFD700;
+    box-shadow: 3px 3px 0 #4a3800;
+}
+.checkin-day.day-seven .checkin-day-icon { font-size: clamp(13px,3.2vw,17px); }
+
+.checkin-day-bonus {
+    font-size: clamp(4px,0.9vw,5px);
+    color: #FFD700;
+    font-family: 'Press Start 2P', monospace;
+    letter-spacing: 1px;
+    margin-top: 2px;
+    text-shadow: 1px 1px 0 #4a3800;
+}
+
+/* ── Next reward highlight ── */
+.checkin-next-reward {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(10px,2.5vw,13px) clamp(12px,3vw,16px);
+    background: var(--mca);
+    border: 3px solid var(--mc);
+    box-shadow: 4px 4px 0 var(--mcs);
+    margin-bottom: 12px;
+}
+.checkin-next-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px,1.4vw,8px);
+    color: #888;
+    letter-spacing: 1px;
+}
+.checkin-next-amount {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(11px,2.8vw,15px);
+    color: #FFD700;
+    text-shadow: 2px 2px 0 #4a3800;
+    letter-spacing: 1px;
+}
+
+/* ── Mode grid ── */
+.checkin-mode-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 14px;
+}
+@media (max-width: 360px) {
+    .checkin-mode-grid { grid-template-columns: repeat(3,1fr); }
+}
+.checkin-mode-grid .mode-selector-btn {
+    padding: clamp(7px,1.8vh,10px) 3px;
+    font-size: clamp(5px,1vw,6px);
+    text-align: center;
 }
 
 
@@ -2938,9 +3346,12 @@
 .name-field {
     width:100%; background:#111; border:3px solid #00ff88;
     box-shadow:3px 3px 0 #005533; color:#00ff88;
-    font-size:clamp(13px,3vw,17px); padding:12px 14px;
+    font-size:clamp(11px,2.5vw,14px); padding:12px 14px;
     text-align:center; outline:none; letter-spacing:3px; margin-bottom:8px;
     font-family:'Press Start 2P','Courier New',monospace;
+    border-radius: 0;
+    -webkit-appearance: none;
+    appearance: none;
 }
 .name-field::placeholder{color:#1a4433}
 .name-err { font-size:clamp(6px,1.4vw,8px); color:#ff6b6b; margin-bottom:14px; min-height:14px; display:none; }
@@ -3060,6 +3471,73 @@
 #menu.theme-egypt .mission-icon  { background: linear-gradient(180deg,#FFD700,#CD853F); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
 #menu.theme-egypt .stats-icon    { background: linear-gradient(180deg,#CD853F,#8B6914); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
 
+/* Tema Siang */
+#menu.theme-day { background: #0a1a2e; }
+#menu.theme-day .title {
+    color: #87CEEB;
+    text-shadow: 3px 3px 0 #1565C0, 6px 6px 0 #0a2d5e;
+}
+#menu.theme-day .btn {
+    background: #42A5F5;
+    color: #001530;
+    box-shadow: 6px 6px 0 #1565C0, inset -2px -2px 0 rgba(0,0,0,0.2);
+}
+#menu.theme-day .btn:active {
+    box-shadow: 3px 3px 0 #1565C0, inset -2px -2px 0 rgba(0,0,0,0.2);
+}
+#menu.theme-day .menu-coin-viewer {
+    border-color: #42A5F5; box-shadow: 3px 3px 0 #1565C0; color: #87CEEB;
+}
+#menu.theme-day .settings-icon { background: #42A5F5; box-shadow: 4px 4px 0 #1565C0; }
+#menu.theme-day .mission-icon  { background: linear-gradient(180deg,#FFD700,#42A5F5); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
+#menu.theme-day .stats-icon    { background: linear-gradient(180deg,#42A5F5,#1565C0); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
+
+/* Tema Malam */
+#menu.theme-night { background: #04060f; }
+#menu.theme-night .title {
+    color: #C8A8FF;
+    text-shadow: 3px 3px 0 #6633cc, 6px 6px 0 #2a0066;
+}
+#menu.theme-night .btn {
+    background: #2a1a5e;
+    color: #C8A8FF;
+    border-color: #6633cc;
+    box-shadow: 6px 6px 0 #110033, inset -2px -2px 0 rgba(0,0,0,0.3);
+}
+#menu.theme-night .btn:active {
+    box-shadow: 3px 3px 0 #110033, inset -2px -2px 0 rgba(0,0,0,0.3);
+}
+#menu.theme-night .menu-coin-viewer {
+    border-color: #6633cc; box-shadow: 3px 3px 0 #2a0066;
+    color: #C8A8FF; background: #0d0820;
+}
+#menu.theme-night .settings-icon { background: #2a1a5e; color: #C8A8FF; border-color: #6633cc; box-shadow: 4px 4px 0 #110033; }
+#menu.theme-night .mission-icon  { background: linear-gradient(180deg,#C8A8FF,#6633cc); box-shadow: 4px 4px 0 rgba(0,0,0,.6); }
+#menu.theme-night .stats-icon    { background: linear-gradient(180deg,#6633cc,#2a1a5e); box-shadow: 4px 4px 0 rgba(0,0,0,.6); }
+
+/* Tema Pantai */
+#menu.theme-ocean { background: #051e2e; }
+#menu.theme-ocean .title {
+    color: #00E5FF;
+    text-shadow: 3px 3px 0 #006688, 6px 6px 0 #003344;
+}
+#menu.theme-ocean .btn {
+    background: #0096C7;
+    color: #fff;
+    border-color: #007099;
+    box-shadow: 6px 6px 0 #004466, inset -2px -2px 0 rgba(0,0,0,0.2);
+}
+#menu.theme-ocean .btn:active {
+    box-shadow: 3px 3px 0 #004466, inset -2px -2px 0 rgba(0,0,0,0.2);
+}
+#menu.theme-ocean .menu-coin-viewer {
+    border-color: #00B4D8; box-shadow: 3px 3px 0 #006688;
+    color: #00E5FF; background: #051e2e;
+}
+#menu.theme-ocean .settings-icon { background: #0096C7; color: #fff; border-color: #007099; box-shadow: 4px 4px 0 #004466; }
+#menu.theme-ocean .mission-icon  { background: linear-gradient(180deg,#00E5FF,#0096C7); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
+#menu.theme-ocean .stats-icon    { background: linear-gradient(180deg,#0096C7,#004466); box-shadow: 4px 4px 0 rgba(0,0,0,.5); }
+
 /* BG card di shop */
 .bg-section-title {
     font-family: 'Press Start 2P', monospace;
@@ -3069,6 +3547,99 @@
     letter-spacing: 2px;
     margin: 24px 0 16px;
     text-align: center;
+}
+/* ── BG GRID 2 KOLOM ── */
+.bg-grid-2col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(8px,2vw,12px);
+    margin-bottom: 12px;
+}
+.bg-grid-card {
+    background: #111;
+    border: 4px solid #222;
+    box-shadow: 5px 5px 0 #000;
+    cursor: pointer;
+    overflow: hidden;
+    transition: none;
+}
+.bg-grid-card:hover  { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #000; }
+.bg-grid-card:active { transform: translate(3px,3px);  box-shadow: 2px 2px 0 #000; }
+.bg-grid-card.bg-owned    { border-color: #00ff88; box-shadow: 5px 5px 0 #005533; }
+.bg-grid-card.bg-equipped { border-color: #FFD700; box-shadow: 5px 5px 0 #664400; }
+.bg-grid-thumb {
+    width: 100%;
+    height: clamp(68px,18vw,96px);
+    overflow: hidden;
+}
+.bg-grid-footer {
+    padding: 7px 9px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 2px solid #1a1a1a;
+    background: #0d0d0d;
+}
+.bg-grid-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px,1.5vw,8px);
+    color: #ccc;
+}
+.bg-grid-badge {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(5px,1.2vw,7px);
+    padding: 3px 6px;
+    border: 2px solid #333;
+    box-shadow: 2px 2px 0 #000;
+    background: #111;
+    color: #555;
+}
+.bg-grid-badge.badge-owned    { color:#00ff88; border-color:#00ff88; background:#001a0d; }
+.bg-grid-badge.badge-equipped { color:#FFD700; border-color:#FFD700; background:#1a1200; }
+/* ── BG DETAIL PANEL ── */
+.bg-detail-panel {
+    background: #0d0d0d;
+    border: 4px solid #FFD700;
+    box-shadow: 6px 6px 0 #664400;
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+}
+.bg-detail-panel::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height:4px;
+    background: repeating-linear-gradient(90deg,#FFD700 0,#FFD700 8px,#664400 8px,#664400 16px);
+}
+.bg-detail-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 14px 10px; margin-top: 4px;
+}
+.bg-detail-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(9px,2.3vw,12px);
+    color: #FFD700; text-shadow: 2px 2px 0 #664400; letter-spacing: 1px;
+}
+.bg-detail-close {
+    width:28px; height:28px; background:#ff6b6b; border:3px solid #000;
+    box-shadow:3px 3px 0 #cc5555; font-size:14px; color:#000; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-family:Arial,sans-serif; font-weight:bold;
+}
+.bg-detail-close:active { transform:translate(2px,2px); box-shadow:1px 1px 0 #cc5555; }
+.bg-detail-features {
+    font-family:'Press Start 2P',monospace; font-size:clamp(7px,1.8vw,9px);
+    color:#aaa; line-height:2;
+    background:#111; border-top:2px solid #1a1a1a; padding:10px 14px;
+}
+.bg-detail-features div { margin:3px 0; }
+.bg-detail-coininfo {
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    padding:8px 14px; font-family:'Press Start 2P',monospace;
+    font-size:clamp(7px,1.8vw,9px); color:#aaa;
+    background:#111; border-top:2px solid #1a1a1a;
+}
+.bg-detail-actions {
+    padding:12px 14px; display:flex; gap:8px; border-top:2px solid #1a1a1a;
 }
 .bg-card {
     background: #1a1a1a;
@@ -3313,54 +3884,32 @@
     <div id="menu" class="screen">
     <canvas id="menuBgCanvas"></canvas>
         <div class="menu-container">
+            <!-- Coin viewer -->
             <div class="menu-coin-viewer">
                 <span class="cycling-coin" id="cyclingCoinIcon"></span>
                 <span id="cyclingCoinText">0</span>
             </div>
+
+            <!-- Player card — di bawah coin viewer, klik buka account menu -->
+            <div class="menu-player-card" id="menuPlayerCard" onclick="showAccountMenu()">
+                <div class="mpc-inner guest" id="mpcInner">
+                    <div class="mpc-avatar" id="mpcAvatar">👤</div>
+                    <div class="mpc-info">
+                        <div class="mpc-name" id="menuPlayerName">—</div>
+                        <div class="mpc-tag" id="mpcTag">TAP UNTUK AKUN</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Icons kanan atas -->
             <div class="settings-icon" onclick="showSettings()">☰</div>
             <div class="mission-icon" onclick="showDailyMission()">
                 📋
-                <span id="missionNotifIcon" style="display: none; position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; background: #FF4444; border-radius: 50%; border: 2px solid #fff; font-size: 10px; font-weight: bold; color: #fff; line-height: 20px;">!</span>
+                <span id="missionNotifIcon" style="display:none;position:absolute;top:-5px;right:-5px;width:20px;height:20px;background:#FF4444;border-radius:50%;border:2px solid #fff;font-size:10px;font-weight:bold;color:#fff;line-height:20px;">!</span>
             </div>
-            <div class="stats-icon" onclick="showStats()" title="Statistik">
-                📊
-            </div>
-            <div class="title">bL0CK RUN</div>
+            <div class="stats-icon" onclick="showStats()" title="Statistik">📊</div>
 
-            <!-- Player name + account bar -->
-            <div id="menuPlayerBar" style="
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                margin-bottom: clamp(10px,2.5vh,18px);
-                margin-top: -8px;
-            ">
-                <div id="menuPlayerName" style="
-                    font-family:'Press Start 2P',monospace;
-                    font-size:clamp(6px,1.5vw,9px);
-                    color:rgba(0,255,136,0.7);
-                    letter-spacing:1px;
-                    max-width:160px;
-                    overflow:hidden;
-                    text-overflow:ellipsis;
-                    white-space:nowrap;
-                ">—</div>
-                <button onclick="showAccountMenu()" style="
-                    font-family:'Press Start 2P',monospace;
-                    font-size:clamp(5px,1.2vw,7px);
-                    background:transparent;
-                    border:2px solid rgba(0,255,136,0.3);
-                    color:rgba(0,255,136,0.5);
-                    padding:4px 8px;
-                    cursor:pointer;
-                    letter-spacing:1px;
-                    transition:all 0.1s;
-                " onmouseover="this.style.borderColor='rgba(0,255,136,0.7)';this.style.color='rgba(0,255,136,0.9)'"
-                   onmouseout="this.style.borderColor='rgba(0,255,136,0.3)';this.style.color='rgba(0,255,136,0.5)'">
-                    👤 AKUN
-                </button>
-            </div>
+            <div class="title">bL0CK RUN</div>
 
 <div class="pixel-line"></div>
 <button class="btn" onclick="showGameTypeSelect()">PLAY</button>
@@ -3384,48 +3933,53 @@
     </div>
 
 <div id="dailyMission" class="screen">
-    <button class="close-btn" onclick="showMenu()">×</button>
 
     <!-- Layout: tab atas + konten bawah -->
     <div style="display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden;">
 
-        <!-- Tab bar horizontal atas -->
+        <!-- Tab bar — includes top padding for close-btn space -->
         <div class="mission-tab-bar">
             <button class="mission-tab active" onclick="switchMissionTab('daily')" id="tabDaily">
                 <span class="tab-icon">📋</span>
                 <span class="tab-label">DAILY</span>
+                <span class="tab-badge" id="badgeDaily" style="display:none;">!</span>
             </button>
             <button class="mission-tab" onclick="switchMissionTab('achievement')" id="tabAchievement">
                 <span class="tab-icon">🏆</span>
                 <span class="tab-label">ACHV</span>
+                <span class="tab-badge" id="badgeAchievement" style="display:none;">!</span>
             </button>
             <button class="mission-tab" onclick="switchMissionTab('checkin')" id="tabCheckin">
                 <span class="tab-icon">📅</span>
                 <span class="tab-label">CHECK-IN</span>
+                <span class="tab-badge" id="badgeCheckin" style="display:none;">!</span>
             </button>
         </div>
 
+        <!-- Close button — positioned over tab bar -->
+        <button class="close-btn" onclick="showMenu()" style="top:8px;right:10px;">×</button>
+
         <!-- Konten -->
-        <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:clamp(10px,2vh,18px) clamp(10px,2vw,18px) 80px;">
+        <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:clamp(12px,2.5vh,20px) clamp(12px,3vw,20px) 80px;">
 
             <div id="dailyTab" class="tab-content">
                 <div class="mission-header">
-                    <div class="page-title">DAILY MISSION</div>
-                    <div class="mission-timer" id="missionTimer">Reset in: --:--:--</div>
+                    <div class="page-title">📋 DAILY MISSION</div>
+                    <div class="mission-timer" id="missionTimer">⏱ Reset in: --:--:--</div>
                 </div>
                 <div class="mission-list" id="missionList"></div>
             </div>
 
             <div id="achievementTab" class="tab-content" style="display:none;">
                 <div class="mission-header">
-                    <div class="page-title">ACHIEVEMENT</div>
+                    <div class="page-title">🏆 ACHIEVEMENT</div>
                 </div>
                 <div class="mission-list" id="achievementList"></div>
             </div>
 
             <div id="checkinTab" class="tab-content" style="display:none;">
                 <div class="mission-header">
-                    <div class="page-title">DAILY CHECK-IN</div>
+                    <div class="page-title">📅 DAILY CHECK-IN</div>
                 </div>
                 <div class="checkin-container" id="checkinContainer"></div>
             </div>
@@ -3783,23 +4337,52 @@
             <!-- BG MENU section -->
             <div id="shopSectionBg" style="display:none;">
             <div class="shop-content">
-<div class="bg-section-title" style="display:none;"></div>
 
-<!-- BG Mesir -->
-<div class="pack-card" id="bgCardEgypt">
-    <div class="pack-header">🏜️ MESIR BACKGROUND</div>
-    <div class="pack-image" style="overflow:hidden;padding:0;">
-        <canvas id="bgThumbEgypt" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas>
-    </div>
-    <div class="pack-features">
-        <div>🌅 Langit sunset pixel animasi</div>
-        <div>🏛️ Piramida scrolling berlapis</div>
-        <div>🎨 Tema warna tombol & teks berubah</div>
-    </div>
-    <div id="bgActionsEgypt" style="padding:14px 0 4px;display:flex;gap:10px;"></div>
-</div>
+            <!-- Grid 2 kolom -->
+            <div class="bg-grid-2col">
+                <div class="bg-grid-card" id="bgCardEgypt" onclick="openBgDetail('egypt')">
+                    <div class="bg-grid-thumb"><canvas id="bgThumbEgypt" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
+                    <div class="bg-grid-footer">
+                        <span class="bg-grid-name">🏜️ MESIR</span>
+                        <span class="bg-grid-badge" id="bgBadgeEgypt">500🪙</span>
+                    </div>
+                </div>
+                <div class="bg-grid-card" id="bgCardDay" onclick="openBgDetail('day')">
+                    <div class="bg-grid-thumb"><canvas id="bgThumbDay" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
+                    <div class="bg-grid-footer">
+                        <span class="bg-grid-name">☀️ SIANG</span>
+                        <span class="bg-grid-badge" id="bgBadgeDay">500🪙</span>
+                    </div>
+                </div>
+                <div class="bg-grid-card" id="bgCardNight" onclick="openBgDetail('night')">
+                    <div class="bg-grid-thumb" style="background:#04060f;"><canvas id="bgThumbNight" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
+                    <div class="bg-grid-footer">
+                        <span class="bg-grid-name">🌙 MALAM</span>
+                        <span class="bg-grid-badge" id="bgBadgeNight">500🪙</span>
+                    </div>
+                </div>
+                <div class="bg-grid-card" id="bgCardOcean" onclick="openBgDetail('ocean')">
+                    <div class="bg-grid-thumb" style="background:#051e2e;"><canvas id="bgThumbOcean" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
+                    <div class="bg-grid-footer">
+                        <span class="bg-grid-name">🏖️ PANTAI</span>
+                        <span class="bg-grid-badge" id="bgBadgeOcean">500🪙</span>
+                    </div>
+                </div>
             </div>
-        </div></div><!-- end shopSectionBg -->
+
+            <!-- Detail panel (muncul saat card diklik) -->
+            <div class="bg-detail-panel" id="bgDetailPanel" style="display:none;">
+                <div class="bg-detail-header">
+                    <span class="bg-detail-title" id="bgDetailTitle"></span>
+                    <button class="bg-detail-close" onclick="closeBgDetail()">×</button>
+                </div>
+                <div class="bg-detail-features" id="bgDetailFeatures"></div>
+                <div class="bg-detail-coininfo" id="bgDetailCoinInfo"></div>
+                <div class="bg-detail-actions" id="bgDetailActions"></div>
+            </div>
+
+            </div>
+            </div></div><!-- end shopSectionBg -->
     </div>
 
     <div id="skinSelector" class="screen">
@@ -3917,151 +4500,129 @@
     </div>
 
     <div id="settings" class="screen">
-    <button class="close-btn" onclick="showMenu()">×</button>
-    
-    <div style="width: 100%; padding: clamp(15px, 3vh, 25px) 0; overflow-y: auto; flex: 1;">
-        <div class="page-title">SETTINGS</div>
-        
-        <div class="settings-container">
 
-        <!-- === CONTROLS === -->
-        <div class="settings-section">
-            <h3>🎛️ KONTROL</h3>
+    <!-- HEADER -->
+    <div class="s-header">
+        <div class="s-header-title">⚙ SETTINGS</div>
+        <div class="s-header-close" onclick="showMenu()">✕</div>
+    </div>
 
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span class="setting-icon">🔊</span>
-                    <span>Efek Suara</span>
-                </div>
-                <div class="toggle-btn active" id="audioToggle" onclick="toggleAudio()">
-                    <div class="toggle-slider"></div>
-                </div>
-            </div>
+    <!-- TAB NAV -->
+    <div class="s-tabs">
+        <button class="s-tab active" onclick="switchSettingsTab('umum',this)">🎛 UMUM</button>
+        <button class="s-tab" onclick="switchSettingsTab('redeem',this)">🎁 REDEEM</button>
+        <button class="s-tab" onclick="switchSettingsTab('akun',this)">👤 AKUN</button>
+    </div>
 
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span class="setting-icon">📳</span>
-                    <span>Getaran</span>
-                </div>
-                <div class="toggle-btn active" id="vibrationToggle" onclick="toggleVibration()">
-                    <div class="toggle-slider"></div>
-                </div>
-            </div>
+    <!-- BODY -->
+    <div class="s-body">
 
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span class="setting-icon">📊</span>
-                    <span>Tampilan FPS</span>
-                </div>
-                <div class="toggle-btn" id="fpsToggle" onclick="toggleFPS()">
-                    <div class="toggle-slider"></div>
-                </div>
-            </div>
+        <!-- ═══════ PANE: UMUM ═══════ -->
+        <div class="s-pane active" id="s-pane-umum">
 
-            <div class="setting-row" style="flex-direction: column; align-items: stretch; padding: 18px 0 10px;">
-                <div class="setting-label" style="margin-bottom: 14px;">
-                    <span class="setting-icon">🎨</span>
-                    <span>Kualitas Grafis</span>
-                </div>
-                <div class="quality-selector">
-                    <div class="quality-option" id="qualityLow" onclick="setGraphicsQuality('low')">
-                        <div class="quality-label">LOW</div>
-                        <div class="quality-desc">Performa<br>Terbaik</div>
+            <div class="settings-section">
+                <h3>🔊 AUDIO &amp; HAPTIC</h3>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="setting-icon">🔊</span>
+                        <span>Efek Suara</span>
                     </div>
-                    <div class="quality-option active" id="qualityMedium" onclick="setGraphicsQuality('medium')">
-                        <div class="quality-label">MEDIUM</div>
-                        <div class="quality-desc">Seimbang<br>★ Saran</div>
+                    <div class="toggle-btn active" id="audioToggle" onclick="toggleAudio()">
+                        <div class="toggle-slider"></div>
                     </div>
-                    <div class="quality-option" id="qualityHigh" onclick="setGraphicsQuality('high')">
-                        <div class="quality-label">HIGH</div>
-                        <div class="quality-desc">Kualitas<br>Terbaik</div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="setting-icon">📳</span>
+                        <span>Getaran</span>
+                    </div>
+                    <div class="toggle-btn active" id="vibrationToggle" onclick="toggleVibration()">
+                        <div class="toggle-slider"></div>
                     </div>
                 </div>
             </div>
+
+            <div class="settings-section">
+                <h3>🎨 GRAFIS</h3>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="setting-icon">📊</span>
+                        <span>Tampilan FPS</span>
+                    </div>
+                    <div class="toggle-btn" id="fpsToggle" onclick="toggleFPS()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="setting-row" style="flex-direction:column;align-items:stretch;">
+                    <div class="setting-label" style="margin-bottom:12px;">
+                        <span class="setting-icon">🖥</span>
+                        <span>Kualitas Grafis</span>
+                    </div>
+                    <div class="quality-selector">
+                        <div class="quality-option" id="qualityLow" onclick="setGraphicsQuality('low')">
+                            <div class="quality-label">LOW</div>
+                            <div class="quality-desc">Performa<br>Terbaik</div>
+                        </div>
+                        <div class="quality-option active" id="qualityMedium" onclick="setGraphicsQuality('medium')">
+                            <div class="quality-label">MEDIUM</div>
+                            <div class="quality-desc">Seimbang<br>★ Saran</div>
+                        </div>
+                        <div class="quality-option" id="qualityHigh" onclick="setGraphicsQuality('high')">
+                            <div class="quality-label">HIGH</div>
+                            <div class="quality-desc">Kualitas<br>Terbaik</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- === REDEEM CODE === -->
-        <div class="settings-section">
-            <h3>🎁 REDEEM CODE</h3>
-            <div style="padding: 8px 0;">
-                <input
-                    type="text"
-                    id="redeemInput"
-                    placeholder="Masukkan kode..."
-                    style="
-                        width: 100%;
-                        padding: clamp(12px,3vw,15px);
-                        font-size: clamp(9px, 2.2vw, 12px);
-                        font-family: 'Press Start 2P', monospace;
-                        background: #1a1a1a;
-                        border: 3px solid #00ff88;
-                        color: #fff;
-                        text-align: center;
-                        box-shadow: 4px 4px 0 #006644;
-                        margin-bottom: 12px;
-                        letter-spacing: 2px;
-                        outline: none;
-                    "
-                >
-                <button class="btn" onclick="redeemCode()" style="width: 100%; margin: 0;">
+        <!-- ═══════ PANE: REDEEM ═══════ -->
+        <div class="s-pane" id="s-pane-redeem">
+            <div class="settings-section">
+                <h3>🎁 KODE REDEEM</h3>
+                <input type="text" id="redeemInput" placeholder="MASUKKAN KODE..." class="s-redeem-input">
+                <button class="btn" onclick="redeemCode()" style="width:100%;max-width:100%;margin:0;font-size:clamp(9px,2.2vw,13px);padding:clamp(13px,3.2vw,16px);">
                     🎁 REDEEM
                 </button>
-                <div id="redeemMessage" style="
-                    margin-top: 12px;
-                    padding: 10px;
-                    font-size: clamp(7px, 1.8vw, 10px);
-                    text-align: center;
-                    display: none;
-                    font-family: 'Press Start 2P', monospace;
-                    border: 2px solid transparent;
-                "></div>
+                <div id="redeemMessage" style="margin-top:12px;padding:10px;font-size:clamp(6px,1.5vw,8px);text-align:center;display:none;font-family:'Press Start 2P',monospace;border:3px solid transparent;box-shadow:4px 4px 0 transparent;"></div>
             </div>
         </div>
 
-        <!-- === AKUN === -->
-        <div class="settings-section">
-            <h3>👤 AKUN</h3>
-            <div style="padding: 6px 0;">
+        <!-- ═══════ PANE: AKUN ═══════ -->
+        <div class="s-pane" id="s-pane-akun">
 
-                <!-- Info login -->
-                <div id="accountInfoRow" style="
-                    font-family: 'Press Start 2P', monospace;
-                    font-size: clamp(7px, 1.8vw, 9px);
-                    color: #00ff88;
-                    margin-bottom: 16px;
-                    padding: clamp(10px,2.5vw,14px);
-                    background: #1a1a1a;
-                    border: 3px solid #00ff88;
-                    box-shadow: 4px 4px 0 #006644;
-                    text-align: center;
-                    letter-spacing: 1px;
-                "></div>
+            <div class="settings-section">
+                <h3>👤 STATUS LOGIN</h3>
+                <div id="accountInfoRow" class="s-acct-box"></div>
+            </div>
 
-                <!-- Ganti password -->
-                <div id="changePwSection" style="margin-bottom: 12px;">
+            <div class="settings-section">
+                <h3>🔑 GANTI PASSWORD</h3>
+                <div id="changePwSection">
                     <input id="cpOld"  type="password" maxlength="32" placeholder="Password lama" class="name-field" style="margin-bottom:8px;">
                     <input id="cpNew"  type="password" maxlength="32" placeholder="Password baru (min 6)" class="name-field" style="margin-bottom:8px;">
                     <input id="cpNew2" type="password" maxlength="32" placeholder="Ulangi password baru" class="name-field" style="margin-bottom:12px;">
-                    <button class="btn" onclick="doChangePassword()" style="width:100%;margin:0;">🔑 GANTI PASSWORD</button>
-                    <div id="cpMsg" style="display:none;margin-top:10px;font-size:clamp(6px,1.5vw,8px);text-align:center;font-family:'Press Start 2P',monospace;"></div>
+                    <button class="btn" onclick="doChangePassword()" style="width:100%;max-width:100%;margin:0;font-size:clamp(8px,2vw,11px);">🔑 SIMPAN PASSWORD</button>
+                    <div id="cpMsg" style="display:none;margin-top:10px;font-size:clamp(6px,1.5vw,8px);text-align:center;font-family:'Press Start 2P',monospace;padding:8px;border:2px solid transparent;"></div>
                 </div>
+            </div>
 
-                <button class="btn" onclick="confirmLogout()" style="width:100%;margin:0;background:#cc2222;border-color:#ff4444;box-shadow:4px 4px 0 #660000;">
+            <div class="settings-section">
+                <h3>⚠ BAHAYA</h3>
+                <button class="btn secondary" onclick="confirmLogout()" style="width:100%;max-width:100%;margin:0;font-size:clamp(9px,2.2vw,12px);">
                     🚪 LOGOUT
                 </button>
             </div>
-        </div>
 
-        <!-- === ADMIN === -->
-        <div style="text-align: center; margin: 20px 0 10px;">
-            <button class="btn tertiary" id="adminPanelBtn" onclick="showAdminPanel()" style="display: none;">
-                🔐 ADMIN PANEL
-            </button>
-        </div>
+            <div style="text-align:center;padding-bottom:4px;">
+                <button class="btn tertiary" id="adminPanelBtn" onclick="showAdminPanel()" style="display:none;width:100%;max-width:100%;margin:0;">🔐 ADMIN PANEL</button>
+            </div>
 
         </div>
-    </div>
-</div>
+
+    </div><!-- end s-body -->
+</div><!-- end #settings -->
 
     <!-- === STATISTIK SCREEN === -->
     <div id="statsScreen" class="screen">
@@ -4329,7 +4890,7 @@
                         <span id="coinIcon">🔺</span>
                         <span id="coinCount">0</span>
                     </div>
-                    <div id="livesDisplay" style="display: none; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 10px; margin-top: 4px; font-size: 11px; font-family: 'Press Start 2P', monospace; color: #ff6b6b;">
+                    <div id="livesDisplay" style="display: none; background: #1a0000; padding: 3px 8px; border: 2px solid #ff6b6b; box-shadow: 2px 2px 0 #880000; margin-top: 4px; font-size: 11px; font-family: 'Press Start 2P', monospace; color: #ff6b6b;">
                         ❤️ <span id="livesCount">1</span>
                     </div>
                 </div>
@@ -4354,36 +4915,48 @@
     <!-- Mode Selection Screen (Normal / Mini Game) -->
     <div id="modeSelection" class="screen">
         <div class="menu-container">
-            <h2 class="title" style="font-size: clamp(16px, 4vw, 24px); margin-bottom: 20px;">
+            <h2 class="title" style="font-size: clamp(16px, 4vw, 22px); margin-bottom: clamp(10px,2vh,16px);">
                 PILIH MODE
             </h2>
             <p id="modeDescription" style="
-                font-size: clamp(10px, 2.5vw, 14px);
+                font-size: clamp(8px, 2vw, 11px);
                 color: #00ff88;
-                margin-bottom: 30px;
+                margin-bottom: clamp(16px,3.5vh,26px);
                 text-align: center;
-                line-height: 1.8;
+                line-height: 2;
+                background: #111;
+                border: 3px solid #1a1a1a;
+                box-shadow: 3px 3px 0 #000;
+                padding: 10px 14px;
             "></p>
-            
+
             <button class="btn" onclick="startGameMode('normal')" style="
-                background: linear-gradient(135deg, #00ff88 0%, #00cc70 100%);
-                margin-bottom: 15px;
-                font-size: clamp(12px, 3vw, 16px);
+                background: #00ff88;
+                color: #000;
+                box-shadow: 6px 6px 0 #006644;
+                margin-bottom: clamp(8px,1.5vh,12px);
+                font-size: clamp(10px, 2.5vw, 13px);
             ">
                 🎮 NORMAL MODE
             </button>
-            
+
             <button class="btn" onclick="startGameMode('minigame')" style="
-                background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-                margin-bottom: 15px;
-                font-size: clamp(12px, 3vw, 16px);
+                background: #FFD700;
+                color: #000;
+                border-color: #000;
+                box-shadow: 6px 6px 0 #8B6914;
+                margin-bottom: clamp(8px,1.5vh,12px);
+                font-size: clamp(10px, 2.5vw, 13px);
             ">
                 ⚡ MINI GAME
             </button>
-            
+
             <button class="btn" onclick="backToMenu()" style="
-                background: rgba(255, 255, 255, 0.1);
-                font-size: clamp(10px, 2.5vw, 14px);
+                background: #222;
+                color: #555;
+                border-color: #333;
+                box-shadow: 6px 6px 0 #111;
+                font-size: clamp(9px, 2vw, 11px);
             ">
                 ← KEMBALI
             </button>
@@ -4391,30 +4964,89 @@
     </div>
 
     <div id="gameOver" class="screen">
-        <div class="game-over-text">GAME OVER</div>
-        <div class="score-display" id="finalScoreRun" style="font-size: 16px; color: #00ff88;">RUN: 0</div>
-        <div class="score-display" id="finalScoreJump" style="font-size: 13px; color: #FFD700; margin-top: -10px;">JUMP: 0</div>
-        <div class="score-display" id="coinsEarned" style="font-size: 13px; margin-top: -8px;">+0 COINS</div>
-        <button class="btn" onclick="restartGame()">Main Lagi</button>
-        <button class="btn" onclick="showMenu()">Menu</button>
+        <div class="game-over-container">
+
+            <!-- Title — span full width di landscape juga -->
+            <div class="game-over-text">GAME OVER</div>
+
+            <!-- Divider atas -->
+            <div class="game-over-divider"></div>
+
+            <!-- Scores — kolom kiri di landscape -->
+            <div class="go-scores">
+                <div class="score-display score-run">
+                    <span class="score-label">🏃 RUN</span>
+                    <span class="score-value" id="finalScoreRun">0</span>
+                </div>
+                <div class="score-display score-jump">
+                    <span class="score-label">⬆ JUMP</span>
+                    <span class="score-value" id="finalScoreJump">0</span>
+                </div>
+                <div class="score-display score-coins">
+                    <span class="score-label">🪙 COINS</span>
+                    <span class="score-value" id="coinsEarned">+0</span>
+                </div>
+            </div>
+
+            <!-- Buttons — kolom kanan di landscape, bawah di portrait -->
+            <div class="game-over-btns">
+                <button class="btn" onclick="restartGame()" style="background:#ff3333;border-color:#ff3333;box-shadow:4px 4px 0 #880000;font-size:clamp(8px,2vw,11px);">
+                    🔄 LAGI
+                </button>
+                <button class="btn secondary" onclick="showMenu()" style="font-size:clamp(8px,2vw,11px);">
+                    🏠 MENU
+                </button>
+            </div>
+
+        </div>
     </div>
 
     <!-- Pause Screen -->
-    <div id="pauseScreen" class="screen" style="background: rgba(0, 0, 0, 0.85);">
-        <div class="menu-container">
-            <h2 class="title" style="font-size: clamp(20px, 5vw, 32px); color: #00ff88; margin-bottom: 30px;">
-                PAUSED
-            </h2>
-            <div style="display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px;">
-                <button class="btn" onclick="togglePause()" style="font-size: clamp(9px, 2.5vw, 12px); width: 100%; margin: 0;">
-                    ▶️ Lanjut Main
-                </button>
-                <button class="btn secondary" onclick="restartFromPause()" style="font-size: clamp(9px, 2.5vw, 12px); width: 100%; margin: 0;">
-                    🔄 Restart
-                </button>
-                <button class="btn tertiary" onclick="quitToMenu()" style="font-size: clamp(9px, 2.5vw, 12px); width: 100%; margin: 0;">
-                    🏠 Ke Menu
-                </button>
+    <div id="pauseScreen" class="screen" style="background: rgba(0,0,0,0.88);">
+        <div style="
+            width: 90%; max-width: 340px;
+            background: #0d0d0d;
+            border: 4px solid #00ff88;
+            box-shadow: 8px 8px 0 #005533, 0 0 30px rgba(0,255,136,0.15);
+            padding: clamp(20px,5vw,30px);
+            position: relative;
+            overflow: hidden;
+        ">
+            <!-- Strip hijau atas -->
+            <div style="
+                position:absolute; top:0; left:0; right:0; height:4px;
+                background: repeating-linear-gradient(90deg, #00ff88 0px, #00ff88 8px, #005533 8px, #005533 16px);
+            "></div>
+
+            <h2 style="
+                font-family:'Press Start 2P',monospace;
+                font-size: clamp(16px,4vw,22px);
+                color: #00ff88;
+                text-shadow: 3px 3px 0 #005533, 6px 6px 0 #002211;
+                text-align: center;
+                margin-bottom: clamp(16px,3.5vh,24px);
+                letter-spacing: 2px;
+            ">⏸ PAUSED</h2>
+
+            <div style="display:flex; flex-direction:column; gap: clamp(8px,1.5vh,12px);">
+                <button class="btn" onclick="togglePause()" style="
+                    width:100%; margin:0;
+                    font-size:clamp(9px,2.2vw,12px);
+                    background:#00ff88; color:#000;
+                    box-shadow:5px 5px 0 #005533;
+                ">▶ LANJUT</button>
+
+                <button class="btn secondary" onclick="restartFromPause()" style="
+                    width:100%; margin:0;
+                    font-size:clamp(9px,2.2vw,12px);
+                ">🔄 RESTART</button>
+
+                <button class="btn" onclick="quitToMenu()" style="
+                    width:100%; margin:0;
+                    font-size:clamp(9px,2.2vw,12px);
+                    background:#222; color:#555;
+                    border-color:#333; box-shadow:5px 5px 0 #111;
+                ">🏠 KE MENU</button>
             </div>
         </div>
     </div>
@@ -5670,12 +6302,12 @@ function dontShowPopup(type) {
                 drawSkrPreview();
                 document.getElementById('sakuraPackPopup').classList.add('active');
             } else {
-                document.getElementById('menu').classList.add('active');
+                showMenuScreen();
             }
         }, 300);
     } else if (type === 'sakura') {
         document.getElementById('sakuraPackPopup').classList.remove('active');
-        document.getElementById('menu').classList.add('active');
+        showMenuScreen();
     }
 }
 
@@ -5690,7 +6322,7 @@ function onRamadanClose() {
             drawSkrPreview();
             document.getElementById('sakuraPackPopup').classList.add('active');
         } else {
-            document.getElementById('menu').classList.add('active');
+            showMenuScreen();
         }
     }, 300);
 }
@@ -5836,7 +6468,7 @@ function drawSkrPreview() {
 function onSakuraGoShop() {
     document.getElementById('sakuraPackPopup').classList.remove('active');
     afterPopup(() => {
-        document.getElementById('menu').classList.add('active');
+        showMenuScreen();
         updateAllCoinDisplays();
         checkDailyCheckin();
         // Buka shop otomatis
@@ -5855,7 +6487,7 @@ function onSakuraGoShop() {
 function onSakuraClose() {
     document.getElementById('sakuraPackPopup').classList.remove('active');
     afterPopup(() => {
-        document.getElementById('menu').classList.add('active');
+        showMenuScreen();
         updateAllCoinDisplays();
         checkDailyCheckin();
         checkShowAdminBtn();
@@ -5956,6 +6588,8 @@ function submitName() {
                         if (typeof updateMenuPlayerBar === 'function') updateMenuPlayerBar();
                         if (typeof checkShowAdminBtn === 'function') checkShowAdminBtn();
                         updateMissionNotification();
+                        // Apply bg dulu sebelum tampilin apapun
+                        if (typeof applyMenuBg === 'function') applyMenuBg();
                         // Tampilkan popup kalau belum di-hide
                         if (!localStorage.getItem('bl0ck_hide_popup_ramadan')) {
                             drawRdmPreview();
@@ -5964,7 +6598,7 @@ function submitName() {
                             drawSkrPreview();
                             document.getElementById('sakuraPackPopup').classList.add('active');
                         } else {
-                            document.getElementById('menu').classList.add('active');
+                            showMenuScreen();
                         }
                     }, 900);
                 }
@@ -6164,7 +6798,16 @@ function showDailyMission() { playSound('open');
     startMissionTimer();
     switchMissionTab('daily');
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('dailyMission').classList.add('active');
+    const missionEl = document.getElementById('dailyMission');
+    missionEl.classList.add('active');
+    // Apply theme color from active menu background
+    const menuEl = document.getElementById('menu');
+    const themeMap = { 'theme-egypt':'egypt','theme-day':'day','theme-night':'night','theme-ocean':'ocean' };
+    let activeTheme = '';
+    for (const [cls, val] of Object.entries(themeMap)) {
+        if (menuEl && menuEl.classList.contains(cls)) { activeTheme = val; break; }
+    }
+    missionEl.dataset.theme = activeTheme;
     setMenuIconsVisibility(false);
 }
 
@@ -6216,14 +6859,19 @@ function switchMissionTab(tab) { playSound('tab');
     // Update tab buttons
     document.querySelectorAll('.mission-tab').forEach(t => t.classList.remove('active'));
     const tabMap = { daily:'tabDaily', achievement:'tabAchievement', checkin:'tabCheckin' };
+    const badgeMap = { daily:'badgeDaily', achievement:'badgeAchievement', checkin:'badgeCheckin' };
     const activeBtn = document.getElementById(tabMap[tab]);
     if (activeBtn) activeBtn.classList.add('active');
-    
+
+    // Hide badge on the tab being opened
+    const badge = document.getElementById(badgeMap[tab]);
+    if (badge) badge.style.display = 'none';
+
     // Hide all tabs
     document.getElementById('dailyTab').style.display = 'none';
     document.getElementById('achievementTab').style.display = 'none';
     document.getElementById('checkinTab').style.display = 'none';
-    
+
     // Show selected tab
     if (tab === 'daily') {
         document.getElementById('dailyTab').style.display = 'block';
@@ -6433,78 +7081,99 @@ function renderDailyCheckin() {
     const streak = playerData.dailyCheckin.checkedDays.length;
 
     const rewards   = [80, 120, 160, 220, 300, 450, 750];
-    const dayLabels = ['D1','D2','D3','D4','D5','D6','D7'];
+    const dayIcons  = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣'];
 
     const modes = [
-        { id:'egypt',   label:'🏜 MESIR',   color:'#C19A6B' },
-        { id:'day',     label:'☀ SIANG',    color:'#FFA500' },
-        { id:'night',   label:'🌙 MALAM',   color:'#8B5CF6' },
-        { id:'snow',    label:'❄ SALJU',    color:'#87CEEB' },
-        { id:'ocean',   label:'🏖 PANTAI',  color:'#4682B4' },
-        { id:'sakura',  label:'🌸 SAKURA',  color:'#FF5588' },
-        { id:'ramadan', label:'☪ RAMADAN',  color:'#FFE033' },
+        { id:'egypt',   label:'🏜 MESIR',   color:'#C19A6B', shadow:'#8B6914' },
+        { id:'day',     label:'☀ SIANG',    color:'#FFA500', shadow:'#cc7700' },
+        { id:'night',   label:'🌙 MALAM',   color:'#8B5CF6', shadow:'#5522aa' },
+        { id:'snow',    label:'❄ SALJU',    color:'#87CEEB', shadow:'#4682B4' },
+        { id:'ocean',   label:'🏖 PANTAI',  color:'#00E5FF', shadow:'#0096C7' },
+        { id:'sakura',  label:'🌸 SAKURA',  color:'#FF5588', shadow:'#cc2255' },
+        { id:'ramadan', label:'☪ RAMADAN',  color:'#FFE033', shadow:'#cc9900' },
     ];
     const sel = playerData.dailyCheckin.selectedMode;
     const selMode = modes.find(m => m.id === sel) || modes[0];
+    const nextReward = rewards[Math.min(streak, rewards.length - 1)];
 
-    // Mode strip
-    const modeStripHTML = modes.map(m => `
-        <button onclick="selectCheckinMode('${m.id}')"
-            class="mode-selector-btn ${sel === m.id ? 'active' : ''}"
-            style="${sel === m.id ? `border-color:${m.color};color:${m.color};box-shadow:3px 3px 0 ${m.color}55;` : ''}"
-        >${m.label}</button>
-    `).join('');
+    // ── Mode grid (2-col) ──
+    const modeGridHTML = modes.map(m => {
+        const isActive = sel === m.id;
+        return `<button onclick="selectCheckinMode('${m.id}')"
+            class="mode-selector-btn ${isActive ? 'active' : ''}"
+            style="${isActive
+                ? `background:${m.color}22;border-color:${m.color};color:${m.color};box-shadow:3px 3px 0 ${m.shadow};`
+                : ''}"
+        >${m.label}</button>`;
+    }).join('');
 
-    // Day tiles
+    // ── Day tiles ──
     let daysHTML = '';
     for (let i = 0; i < 7; i++) {
         const isClaimed = i < streak;
         const isCurrent = i === streak && !hasCheckedToday;
+        const isDone    = hasCheckedToday && i < streak;
+        const isBig     = i === 6; // day 7 = special
+
         daysHTML += `
-            <div class="checkin-day ${isClaimed ? 'claimed' : ''} ${isCurrent ? 'current' : ''}">
-                <div class="checkin-day-num">${dayLabels[i]}</div>
-                <div class="checkin-day-coins">${isClaimed ? '' : ''}${rewards[i]}</div>
-                ${isClaimed ? '<div class="checkin-day-check">✓</div>' : ''}
+        <div class="checkin-day${isClaimed?' claimed':''}${isCurrent?' current':''}${isBig?' day-seven':''}">
+            <div class="checkin-day-icon">${isClaimed ? '✓' : (isCurrent ? '▶' : dayIcons[i])}</div>
+            <div class="checkin-day-reward">
+                <span class="checkin-day-coins">🪙${rewards[i]}</span>
             </div>
-        `;
+            ${isBig ? '<div class="checkin-day-bonus">MAX</div>' : ''}
+        </div>`;
     }
 
-    // Streak blocks
+    // ── Streak bar ──
     let streakBlocksHTML = '';
     for (let i = 0; i < 7; i++) {
         const cls = i < streak ? 'filled' : (i === streak && !hasCheckedToday ? 'current-block' : '');
-        streakBlocksHTML += `<div class="streak-block ${cls}"></div>`;
+        streakBlocksHTML += `<div class="streak-block ${cls}" title="Hari ${i+1}"></div>`;
     }
 
-    const nextReward = rewards[Math.min(streak, rewards.length - 1)];
-    const infoText = hasCheckedToday
-        ? (streak >= 7 ? '★ STREAK SEMPURNA — RESET BESOK' : `KEMBALI BESOK — HARI KE-${streak + 1}`)
-        : `HARI KE-${streak + 1} DARI 7`;
+    // ── Status text ──
+    const statusText = hasCheckedToday
+        ? (streak >= 7 ? '★ STREAK SEMPURNA! RESET BESOK ★' : `✓ DONE — BALIK BESOK HARI KE-${Math.min(streak+1,7)}`)
+        : `HARI KE-${streak+1} DARI 7 — KLAIM SEKARANG!`;
+    const statusColor = hasCheckedToday ? 'color:#555' : 'color:var(--mc)';
 
     const card = document.createElement('div');
     card.className = 'checkin-card';
     card.innerHTML = `
         <div class="checkin-card-title">📅 DAILY CHECK-IN</div>
 
-        <div class="checkin-section-label">▶ REWARD KE MODE</div>
-        <div class="checkin-mode-strip">${modeStripHTML}</div>
-
-        <div class="checkin-section-label">▶ 7-DAY STREAK</div>
-        <div class="checkin-days">${daysHTML}</div>
-
-        <div class="checkin-streak-row">
+        <!-- Streak summary bar -->
+        <div class="checkin-streak-row" style="margin-bottom:16px;">
             <div class="checkin-streak-label">STREAK</div>
             <div class="checkin-streak-bar">${streakBlocksHTML}</div>
-            <div class="checkin-streak-label">${streak}/7</div>
+            <div class="checkin-streak-label" style="color:var(--mc);min-width:28px;text-align:right;">${streak}/7</div>
         </div>
 
+        <!-- Day tiles -->
+        <div class="checkin-section-label">▶ 7-DAY REWARD</div>
+        <div class="checkin-days" style="margin-bottom:16px;">${daysHTML}</div>
+
+        <!-- Next reward highlight -->
+        ${!hasCheckedToday ? `
+        <div class="checkin-next-reward">
+            <span class="checkin-next-label">REWARD HARI INI</span>
+            <span class="checkin-next-amount">🪙 +${nextReward}</span>
+        </div>` : ''}
+
+        <!-- Mode selector -->
+        <div class="checkin-section-label" style="margin-top:${hasCheckedToday?'0':'12px'};">▶ KOIN KE MODE</div>
+        <div class="checkin-mode-grid">${modeGridHTML}</div>
+
+        <!-- Claim button -->
         <button class="checkin-btn" onclick="claimDailyCheckin()" ${hasCheckedToday ? 'disabled' : ''}>
             ${hasCheckedToday
-                ? '✓ SUDAH CHECK-IN HARI INI'
-                : `🪙 CLAIM +${nextReward} KOIN ${selMode.label}`}
+                ? (streak >= 7 ? '★ STREAK SEMPURNA!' : '✓ SUDAH CHECK-IN')
+                : `CLAIM +${nextReward} KOIN → ${selMode.label}`}
         </button>
 
-        <div class="checkin-info">${infoText}</div>
+        <!-- Status -->
+        <div class="checkin-info" style="${statusColor};">${statusText}</div>
     `;
     container.appendChild(card);
 }
@@ -6650,33 +7319,53 @@ function startMissionTimer() {
 function updateMissionNotification() {
     const notifMenu = document.getElementById('missionNotifMenu');
     const notifIcon = document.getElementById('missionNotifIcon');
-    
-    // Cek daily mission yang bisa diklaim
+
+    // ── Daily Mission claimable ──
     const hasMissionClaimable = playerData.dailyMissions?.missions?.some(m => m.completed && !m.claimed) || false;
 
-    // Cek achievement yang bisa diklaim
+    // ── Achievement claimable ──
     let hasAchievementClaimable = false;
     if (playerData.achievements) {
         for (const a of ACHIEVEMENT_LIST) {
             const progress = getAchievementProgress(a.id);
             for (const tier of a.tiers) {
-                // Tier tampil kalau tier sebelumnya sudah di-reach
                 const prevTier = a.tiers.find(t => t.tier === tier.tier - 1);
                 if (prevTier && progress < prevTier.target) continue;
                 const claimed = !!playerData.achievements[`${a.id}_tier${tier.tier}`];
-                if (!claimed && progress >= tier.target) {
-                    hasAchievementClaimable = true;
-                    break;
-                }
+                if (!claimed && progress >= tier.target) { hasAchievementClaimable = true; break; }
             }
             if (hasAchievementClaimable) break;
         }
     }
 
-    const show = hasMissionClaimable || hasAchievementClaimable;
-    const displayStyle = show ? 'inline-block' : 'none';
-    if (notifMenu) notifMenu.style.display = displayStyle;
-    if (notifIcon) notifIcon.style.display = displayStyle;
+    // ── Check-in claimable (belum check-in hari ini) ──
+    // Cek via lastCheckin date supaya akurat meski checkedDays di-reset
+    let hasCheckinClaimable = false;
+    try {
+        const now = new Date();
+        const witTime = new Date(now.getTime() + (9*60 + now.getTimezoneOffset()) * 60000);
+        const witToday = witTime.toISOString().split('T')[0];
+        const lastCheckin = playerData.dailyCheckin?.lastCheckin || null;
+        // Hanya tampilkan notif kalau lastCheckin bukan hari ini
+        // DAN checkedDays juga tidak include hari ini (double check)
+        const alreadyInArray = (playerData.dailyCheckin?.checkedDays || []).includes(witToday);
+        const alreadyByDate  = lastCheckin === witToday;
+        hasCheckinClaimable = !alreadyInArray && !alreadyByDate;
+    } catch(e) {}
+
+    // ── Update tab badges ──
+    const setBadge = (id, show) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = show ? 'flex' : 'none';
+    };
+    setBadge('badgeDaily',       hasMissionClaimable);
+    setBadge('badgeAchievement', hasAchievementClaimable);
+    setBadge('badgeCheckin',     hasCheckinClaimable);
+
+    // ── Menu icon notif (any of the three) ──
+    const show = hasMissionClaimable || hasAchievementClaimable || hasCheckinClaimable;
+    if (notifMenu) notifMenu.style.display = show ? 'inline-block' : 'none';
+    if (notifIcon) notifIcon.style.display = show ? 'inline-block' : 'none';
 }
 
 // Initialize missions on load
@@ -6697,20 +7386,68 @@ updateMissionNotification();
         }
 
         function updateMenuPlayerBar() {
-            const nameEl = document.getElementById('menuPlayerName');
+            const nameEl  = document.getElementById('menuPlayerName');
+            const tagEl   = document.getElementById('mpcTag');
+            const innerEl = document.getElementById('mpcInner');
+            const avatarEl= document.getElementById('mpcAvatar');
             if (!nameEl) return;
+
             const name = playerData.name || '';
-            if (name) {
-                nameEl.textContent = '👤 ' + name;
-                nameEl.style.color = 'rgba(0,255,136,0.8)';
+            const isGuest = !name || isGuestMode;
+
+            if (!isGuest) {
+                // ── Logged in ──
+                nameEl.textContent = name.toUpperCase();
+                if (tagEl) tagEl.textContent = '▶ LIHAT AKUN';
+                if (innerEl) innerEl.classList.remove('guest');
+                if (avatarEl) avatarEl.textContent = '👤';
+
+                // Extensible: apply custom name color / card style
+                // playerData.nameColor  → warna hex nama (misal "#FFD700")
+                // playerData.cardBorder → warna hex border card
+                // playerData.namePrefix → prefix emoji/text sebelum nama
+                if (playerData.nameColor) {
+                    nameEl.style.color = playerData.nameColor;
+                    nameEl.style.textShadow = '';
+                } else {
+                    nameEl.style.color = '';
+                    nameEl.style.textShadow = '';
+                }
+                if (playerData.cardBorder && innerEl) {
+                    innerEl.style.borderColor = playerData.cardBorder;
+                    innerEl.style.boxShadow = '4px 4px 0 ' + playerData.cardBorder + '88';
+                    const strip = innerEl;
+                    strip.style.setProperty('--card-accent', playerData.cardBorder);
+                } else if (innerEl) {
+                    innerEl.style.borderColor = '';
+                    innerEl.style.boxShadow = '';
+                }
+                if (playerData.namePrefix && avatarEl) {
+                    avatarEl.textContent = playerData.namePrefix;
+                }
+                if (playerData.cardTitle && tagEl) {
+                    tagEl.textContent = playerData.cardTitle;
+                    tagEl.style.color = playerData.nameColor || '#555';
+                }
             } else {
-                nameEl.textContent = '— belum login —';
-                nameEl.style.color = 'rgba(255,107,107,0.6)';
+                // ── Guest / not logged in ──
+                nameEl.textContent = 'BELUM LOGIN';
+                nameEl.style.color = '';
+                if (tagEl) { tagEl.textContent = 'TAP UNTUK LOGIN'; tagEl.style.color = ''; }
+                if (innerEl) innerEl.classList.add('guest');
+                if (avatarEl) avatarEl.textContent = '?';
             }
         }
 
+        // Helper: tampilkan menu + apply bg tanpa sound (untuk internal calls)
+        function showMenuScreen() {
+            if (typeof applyMenuBg === 'function') applyMenuBg();
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('menu').classList.add('active');
+        }
+
         function showMenu() { playSound('click_back');
-            applyMenuBg();
+            applyMenuBg(); // Resume/start menu bg
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('menu').classList.add('active');
             gameRunning = false;
@@ -6973,60 +7710,68 @@ if (!playerData.unlockedModes.includes('ocean')) {
         }
 
         function showSettings() {
-    playSound('open');
+    try { playSound('open'); } catch(e) {}
     setMenuIconsVisibility(false);
-    updateStatsDisplay();
-    
-    // Update account info
-    const accountInfoRow = document.getElementById('accountInfoRow');
-    if (accountInfoRow) {
-        const name = playerData.name || '';
-        if (name) {
-            accountInfoRow.innerHTML = `👤 ${name.toUpperCase()}`;
-        } else {
-            accountInfoRow.innerHTML = `<span style="color:#ff6b6b;">— Belum Login —</span>`;
-        }
-    }
-    // Reset change password form
-    ['cpOld','cpNew','cpNew2'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    const cpMsg = document.getElementById('cpMsg');
-    if (cpMsg) cpMsg.style.display='none';
-    
-    // Update toggle states
-    const audioToggle = document.getElementById('audioToggle');
-    const vibrationToggle = document.getElementById('vibrationToggle');
-    const fpsToggle = document.getElementById('fpsToggle');
-    
-    if (audioEnabled) {
-        audioToggle.classList.add('active');
-    } else {
-        audioToggle.classList.remove('active');
-    }
-    
-    if (vibrationEnabled) {
-        vibrationToggle.classList.add('active');
-    } else {
-        vibrationToggle.classList.remove('active');
-    }
 
-    if (fpsEnabled) {
-        fpsToggle.classList.add('active');
-    } else {
-        fpsToggle.classList.remove('active');
-    }
-    
-    // Update graphics quality selector
-    document.querySelectorAll('.quality-option').forEach(opt => {
-        opt.classList.remove('active');
-    });
-    const qualityId = 'quality' + graphicsQuality.charAt(0).toUpperCase() + graphicsQuality.slice(1);
-    const qualityElement = document.getElementById(qualityId);
-    if (qualityElement) {
-        qualityElement.classList.add('active');
-    }
-    
+    // Show screen FIRST
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('settings').classList.add('active');
+    const settingsEl = document.getElementById('settings');
+    settingsEl.classList.add('active');
+    // Apply theme
+    const menuEl2 = document.getElementById('menu');
+    const themeMap2 = { 'theme-egypt':'egypt','theme-day':'day','theme-night':'night','theme-ocean':'ocean' };
+    let activeTheme2 = '';
+    for (const [cls, val] of Object.entries(themeMap2)) {
+        if (menuEl2 && menuEl2.classList.contains(cls)) { activeTheme2 = val; break; }
+    }
+    settingsEl.dataset.theme = activeTheme2;
+
+    // Reset to first tab
+    switchSettingsTab('umum', document.querySelector('#settings .s-tab'));
+
+    // Account info
+    try {
+        const accountInfoRow = document.getElementById('accountInfoRow');
+        if (accountInfoRow) {
+            const name = playerData.name || '';
+            accountInfoRow.innerHTML = name
+                ? `👤 ${name.toUpperCase()}`
+                : `<span style="color:#ff6b6b;">— Belum Login —</span>`;
+        }
+    } catch(e) {}
+
+    // Reset password form
+    try {
+        ['cpOld','cpNew','cpNew2'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+        const cpMsg = document.getElementById('cpMsg');
+        if (cpMsg) cpMsg.style.display='none';
+    } catch(e) {}
+
+    // Sync toggles
+    try {
+        document.getElementById('audioToggle').classList.toggle('active', !!audioEnabled);
+        document.getElementById('vibrationToggle').classList.toggle('active', !!vibrationEnabled);
+        document.getElementById('fpsToggle').classList.toggle('active', !!fpsEnabled);
+    } catch(e) {}
+
+    // Sync quality
+    try {
+        document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('active'));
+        const qEl = document.getElementById('quality' + graphicsQuality.charAt(0).toUpperCase() + graphicsQuality.slice(1));
+        if (qEl) qEl.classList.add('active');
+    } catch(e) {}
+
+    try { updateStatsDisplay(); } catch(e) {}
+}
+
+function switchSettingsTab(tabId, clickedBtn) {
+    const root = document.getElementById('settings');
+    if (!root) return;
+    root.querySelectorAll('.s-tab').forEach(b => b.classList.remove('active'));
+    if (clickedBtn) clickedBtn.classList.add('active');
+    root.querySelectorAll('.s-pane').forEach(p => p.classList.remove('active'));
+    const pane = document.getElementById('s-pane-' + tabId);
+    if (pane) pane.classList.add('active');
 }
 
 async function doChangePassword() {
@@ -14071,15 +14816,14 @@ class Meteor {
         }
     });
     } else if (currentMode === 'day') {
-    // === PIXEL SKY - Bright Day Theme ===
-    // Langit cerah gradasi pixel
+    // === PIXEL SKY - Bright Day ===
     const skyBands = [
-        { color: '#87CEEB', height: 0.25 },      // Sky blue atas
-        { color: '#ADD8E6', height: 0.25 },      // Light blue
-        { color: '#B0E0FF', height: 0.25 },      // Powder blue
-        { color: '#C4E5FF', height: 0.25 }       // Very light blue
+        { color: '#5BA8E5', height: 0.20 },
+        { color: '#74B9F0', height: 0.22 },
+        { color: '#8ECAF5', height: 0.22 },
+        { color: '#A8D8F8', height: 0.20 },
+        { color: '#C2E6FA', height: 0.16 }
     ];
-    
     let currentY = 0;
     skyBands.forEach(band => {
         const bandHeight = canvas.height * band.height;
@@ -14087,310 +14831,240 @@ class Meteor {
         ctx.fillRect(0, currentY, canvas.width, bandHeight);
         currentY += bandHeight;
     });
-    
-    // Dithering antar warna untuk transisi pixel
+    // Dithering pixel antar layer
     currentY = 0;
     for (let i = 0; i < skyBands.length - 1; i++) {
         currentY += canvas.height * skyBands[i].height;
         ctx.fillStyle = skyBands[i + 1].color;
-        
-        for (let x = 0; x < canvas.width; x += 4) {
-            for (let dy = -12; dy < 0; dy += 4) {
-                if ((x/4 + dy/4) % 2 === 0) {
-                    ctx.fillRect(x, currentY + dy, 4, 4);
-                }
-            }
-        }
+        for (let x = 0; x < canvas.width; x += 4)
+            for (let dy = -12; dy < 0; dy += 4)
+                if ((x/4 + dy/4) % 2 === 0) ctx.fillRect(x, currentY + dy, 4, 4);
     }
-    
-    // === PIXEL SUN - Bright Midday ===
+
+    // === PIXEL SUN ===
     const sunX = canvas.width - 130;
-    const sunY = 90;
+    const sunY = 80;
     const sunRadius = 36;
-    
-    // Outer glow (kuning terang)
-    ctx.fillStyle = 'rgba(255, 255, 150, 0.25)';
-    for (let x = -sunRadius - 16; x <= sunRadius + 16; x += 4) {
-        for (let y = -sunRadius - 16; y <= sunRadius + 16; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < sunRadius + 16 && dist >= sunRadius) {
-                ctx.fillRect(sunX + x, sunY + y, 4, 4);
-            }
+    // Outer glow
+    ctx.fillStyle = 'rgba(255, 255, 150, 0.2)';
+    for (let x = -sunRadius-16; x <= sunRadius+16; x += 4)
+        for (let y = -sunRadius-16; y <= sunRadius+16; y += 4) {
+            const d = Math.sqrt(x*x+y*y);
+            if (d < sunRadius+16 && d >= sunRadius) ctx.fillRect(sunX+x, sunY+y, 4, 4);
         }
-    }
-    
-    // Middle outer (kuning cerah)
+    // Layer #FFEB3B
     ctx.fillStyle = '#FFEB3B';
-    for (let x = -sunRadius; x <= sunRadius; x += 4) {
-        for (let y = -sunRadius; y <= sunRadius; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < sunRadius) {
-                ctx.fillRect(sunX + x, sunY + y, 4, 4);
-            }
-        }
-    }
-    
-    // Middle layer (kuning emas)
+    for (let x = -sunRadius; x <= sunRadius; x += 4)
+        for (let y = -sunRadius; y <= sunRadius; y += 4)
+            if (Math.sqrt(x*x+y*y) < sunRadius) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // Layer #FFD700
     ctx.fillStyle = '#FFD700';
-    for (let x = -24; x <= 24; x += 4) {
-        for (let y = -24; y <= 24; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < 24) {
-                ctx.fillRect(sunX + x, sunY + y, 4, 4);
-            }
-        }
-    }
-    
-    // Inner layer (putih kekuningan)
+    for (let x = -24; x <= 24; x += 4)
+        for (let y = -24; y <= 24; y += 4)
+            if (Math.sqrt(x*x+y*y) < 24) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // Layer #FFFACD
     ctx.fillStyle = '#FFFACD';
-    for (let x = -16; x <= 16; x += 4) {
-        for (let y = -16; y <= 16; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < 16) {
-                ctx.fillRect(sunX + x, sunY + y, 4, 4);
-            }
-        }
-    }
-    
-    // Core (putih terang)
+    for (let x = -16; x <= 16; x += 4)
+        for (let y = -16; y <= 16; y += 4)
+            if (Math.sqrt(x*x+y*y) < 16) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // Core
     ctx.fillStyle = '#FFFEF0';
-    for (let x = -8; x <= 8; x += 4) {
-        for (let y = -8; y <= 8; y += 4) {
-            const dist = Math.sqrt(x*x + y*y);
-            if (dist < 8) {
-                ctx.fillRect(sunX + x, sunY + y, 4, 4);
-            }
-        }
-    }
-    
-    // Sun rays pixel (lebih banyak dan panjang)
+    for (let x = -8; x <= 8; x += 4)
+        for (let y = -8; y <= 8; y += 4)
+            if (Math.sqrt(x*x+y*y) < 8) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // Sun rays utama (berputar)
     const rayCount = 12;
-    const rayLength = 56;
     for (let i = 0; i < rayCount; i++) {
         const angle = (i * 360 / rayCount + frameCount * 0.4) * Math.PI / 180;
         ctx.fillStyle = '#FFE55C';
-        
-        // Ray utama
-        for (let len = sunRadius + 12; len < sunRadius + rayLength; len += 8) {
-            const x = Math.round(sunX + Math.cos(angle) * len / 4) * 4;
-            const y = Math.round(sunY + Math.sin(angle) * len / 4) * 4;
-            ctx.fillRect(x, y, 4, 4);
-            
-            // Ray detail (lebih tebal)
-            if (len % 12 === 0) {
-                ctx.fillRect(x - 4, y, 4, 4);
-                ctx.fillRect(x + 4, y, 4, 4);
-                ctx.fillRect(x, y - 4, 4, 4);
-                ctx.fillRect(x, y + 4, 4, 4);
+        for (let len = sunRadius + 12; len < sunRadius + 56; len += 8) {
+            const rx = Math.round(sunX + Math.cos(angle) * len / 4) * 4;
+            const ry = Math.round(sunY + Math.sin(angle) * len / 4) * 4;
+            ctx.fillRect(rx, ry, 4, 4);
+            if (len % 16 === 0) {
+                ctx.fillRect(rx-4, ry, 4, 4);
+                ctx.fillRect(rx+4, ry, 4, 4);
+                ctx.fillRect(rx, ry-4, 4, 4);
+                ctx.fillRect(rx, ry+4, 4, 4);
             }
         }
     }
-    
-    // Ray sekunder (lebih tipis, di antara ray utama)
+    // Ray sekunder
     for (let i = 0; i < rayCount; i++) {
         const angle = ((i + 0.5) * 360 / rayCount + frameCount * 0.4) * Math.PI / 180;
         ctx.fillStyle = '#FFF4A3';
-        
         for (let len = sunRadius + 20; len < sunRadius + 40; len += 12) {
-            const x = Math.round(sunX + Math.cos(angle) * len / 4) * 4;
-            const y = Math.round(sunY + Math.sin(angle) * len / 4) * 4;
-            ctx.fillRect(x, y, 4, 4);
+            const rx = Math.round(sunX + Math.cos(angle) * len / 4) * 4;
+            const ry = Math.round(sunY + Math.sin(angle) * len / 4) * 4;
+            ctx.fillRect(rx, ry, 4, 4);
         }
     }
-    
-    // === PIXEL CLOUDS - White Fluffy ===
-    const clouds = [
-        { x: 80, y: 55, width: 90, height: 32 },
-        { x: 300, y: 95, width: 110, height: 36 },
-        { x: 550, y: 75, width: 100, height: 34 },
-        { x: 750, y: 115, width: 95, height: 32 }
+
+    // === PIXEL CLOUDS - solid deterministik (NO Math.random) ===
+    const dayClouds = [
+        { bx: 80,  y: 52,  w: 96,  h: 32 },
+        { bx: 300, y: 88,  w: 116, h: 36 },
+        { bx: 560, y: 68,  w: 104, h: 34 },
+        { bx: 760, y: 108, w: 92,  h: 30 }
     ];
-    
-    clouds.forEach((cloud, idx) => {
-        const cloudX = ((frameCount * 0.25 + cloud.x + idx * 180) % (canvas.width + 220));
-        
-        // Shadow bawah awan (abu-abu samar)
-        ctx.fillStyle = 'rgba(180, 190, 200, 0.3)';
-        for (let x = 8; x < cloud.width - 8; x += 4) {
-            for (let y = cloud.height - 12; y < cloud.height; y += 4) {
-                if (Math.random() > 0.3) {
-                    ctx.fillRect(cloudX + x, cloud.y + y, 4, 4);
-                }
-            }
-        }
-        
-        // Badan awan (putih bersih)
+    dayClouds.forEach((cloud, idx) => {
+        const cx = ((frameCount * 0.25 + cloud.bx + idx * 180) % (canvas.width + 240));
+        const cy = cloud.y;
+        const cw = cloud.w;
+        const ch = cloud.h;
+
+        // Shadow bawah
+        ctx.fillStyle = 'rgba(160, 180, 200, 0.35)';
+        for (let x = 8; x < cw - 8; x += 4) ctx.fillRect(cx+x, cy+ch-8, 4, 8);
+
+        // Badan utama — solid pixel rect berlapis
         ctx.fillStyle = '#FFFFFF';
-        for (let x = 4; x < cloud.width - 4; x += 4) {
-            for (let y = 8; y < cloud.height - 4; y += 4) {
-                if (Math.random() > 0.15) {
-                    ctx.fillRect(cloudX + x, cloud.y + y, 4, 4);
-                }
-            }
-        }
-        
-        // Top puffs (gumpalan atas)
-        ctx.fillStyle = '#FFFFFF';
-        for (let x = 12; x < cloud.width - 12; x += 4) {
-            for (let y = 0; y < 16; y += 4) {
-                if (Math.random() > 0.25) {
-                    ctx.fillRect(cloudX + x, cloud.y + y, 4, 4);
-                }
-            }
-        }
-        
-        // Highlight super terang (kena matahari)
-        ctx.fillStyle = '#FFFEF5';
-        for (let x = 16; x < cloud.width - 16; x += 8) {
-            for (let y = 4; y < 12; y += 4) {
-                if (Math.random() > 0.5) {
-                    ctx.fillRect(cloudX + x, cloud.y + y, 4, 4);
-                }
-            }
-        }
-        
-        // Extra puffy details
-        ctx.fillStyle = '#F8F8FF';
-        const puffs = [
-            { ox: 20, oy: 2 }, { ox: 40, oy: 0 }, 
-            { ox: 60, oy: 4 }, { ox: cloud.width - 30, oy: 6 }
-        ];
-        puffs.forEach(puff => {
-            for (let px = -8; px <= 8; px += 4) {
-                for (let py = -8; py <= 8; py += 4) {
-                    const dist = Math.sqrt(px*px + py*py);
-                    if (dist < 10 && Math.random() > 0.3) {
-                        ctx.fillRect(cloudX + puff.ox + px, cloud.y + puff.oy + py, 4, 4);
-                    }
-                }
-            }
-        });
+        ctx.fillRect(cx + 4, cy + 8, cw - 8, ch - 12);
+
+        // Gumpalan atas pixel (kotak-kotak naik)
+        // Puff kiri
+        ctx.fillRect(cx + 8,       cy,      20, 16);
+        ctx.fillRect(cx + 4,       cy + 4,  12, 12);
+        // Puff tengah
+        ctx.fillRect(cx + cw/2-16, cy - 4,  32, 20);
+        ctx.fillRect(cx + cw/2-12, cy - 8,  24, 12);
+        // Puff kanan
+        ctx.fillRect(cx + cw - 32, cy,      24, 16);
+        ctx.fillRect(cx + cw - 28, cy + 4,  16, 12);
+
+        // Highlight atas (lebih putih)
+        ctx.fillStyle = '#FFFEF8';
+        ctx.fillRect(cx + 12,      cy,      8, 8);
+        ctx.fillRect(cx + cw/2-8,  cy - 4,  16, 8);
+        ctx.fillRect(cx + cw - 28, cy + 4,  8,  8);
+
+        // Shadow dalam (biru samar di bawah puff)
+        ctx.fillStyle = 'rgba(140, 170, 200, 0.25)';
+        ctx.fillRect(cx + 4, cy + ch - 12, cw - 8, 8);
     });
-    
-    // === PIXEL BIRDS ===
+
+    // === PIXEL BIRDS - solid ===
     for (let i = 0; i < 6; i++) {
-        const birdX = ((frameCount * 1.2 + i * 200) % (canvas.width + 100));
-        const birdY = 130 + Math.sin((frameCount + i * 50) * 0.05) * 25;
-        const wingFlap = Math.floor(Math.sin((frameCount + i * 30) * 0.2) * 2);
-        
-        ctx.fillStyle = '#4A4A4A';
-        
-        // Body
-        ctx.fillRect(birdX, birdY, 8, 4);
-        
-        // Head
-        ctx.fillRect(birdX + 8, birdY, 4, 4);
-        
-        // Wings
-        if (wingFlap > 0) {
-            // Up position
-            ctx.fillRect(birdX - 4, birdY - 4, 8, 4);
-            ctx.fillRect(birdX + 8, birdY - 4, 8, 4);
+        const birdX = ((frameCount * 1.2 + i * 210) % (canvas.width + 100));
+        const birdY = 120 + Math.sin((frameCount + i * 50) * 0.05) * 20;
+        const flapUp = Math.sin((frameCount + i * 30) * 0.2) > 0;
+        ctx.fillStyle = '#334455';
+        ctx.fillRect(birdX,     birdY,     8, 4); // body
+        ctx.fillRect(birdX + 8, birdY,     4, 4); // head
+        if (flapUp) {
+            ctx.fillRect(birdX - 8,  birdY - 4, 12, 4); // wing kiri atas
+            ctx.fillRect(birdX + 8,  birdY - 4, 12, 4); // wing kanan atas
         } else {
-            // Down position
-            ctx.fillRect(birdX - 4, birdY + 4, 8, 4);
-            ctx.fillRect(birdX + 8, birdY + 4, 8, 4);
+            ctx.fillRect(birdX - 8,  birdY + 4, 12, 4); // wing kiri bawah
+            ctx.fillRect(birdX + 8,  birdY + 4, 12, 4); // wing kanan bawah
         }
     }
-    
-    // === PIXEL GRASS FIELD (Padang rumput) ===
-    // Layer rumput jauh (hijau tua)
+
+    // === PIXEL HILLS - perbukitan latar ===
+    // Hill layer 1 (jauh, biru samar)
+    ctx.fillStyle = '#8FBDE8';
+    for (let i = 0; i < 3; i++) {
+        const hx = (i * 380 + frameCount * 0.08) % (canvas.width + 400) - 100;
+        const hw = 340, hh = 80;
+        for (let py = 0; py <= hh; py += 4) {
+            const rw = Math.floor(hw * Math.sin(Math.PI * py / hh) / 4) * 4;
+            ctx.fillRect(hx + hw/2 - rw/2, groundY - py, rw, 4);
+        }
+    }
+    // Hill layer 2 (tengah, hijau tua)
+    ctx.fillStyle = '#5D9C3A';
+    for (let i = 0; i < 4; i++) {
+        const hx = (i * 280 + frameCount * 0.15) % (canvas.width + 320) - 80;
+        const hw = 260, hh = 100;
+        for (let py = 0; py <= hh; py += 4) {
+            const rw = Math.floor(hw * Math.sin(Math.PI * py / hh) / 4) * 4;
+            ctx.fillRect(hx + hw/2 - rw/2, groundY - py, rw, 4);
+        }
+    }
+
+    // === PIXEL GRASS FIELD ===
+    // Layer jauh
     ctx.fillStyle = '#7CB342';
     for (let x = 0; x < canvas.width; x += 4) {
-        const wave = Math.sin((x * 0.02) + frameCount * 0.01) * 15;
-        const grassY = groundY - 70 + wave;
-        for (let y = grassY; y < groundY - 30; y += 4) {
+        const wave = Math.sin(x * 0.02 + frameCount * 0.01) * 15;
+        for (let y = groundY - 70 + wave; y < groundY - 30; y += 4)
             ctx.fillRect(x, y, 4, 4);
-        }
     }
-    
-    // Layer rumput tengah (hijau sedang)
+    // Layer tengah
     ctx.fillStyle = '#8BC34A';
     for (let x = 0; x < canvas.width; x += 4) {
-        const wave = Math.sin((x * 0.025) + frameCount * 0.015) * 12;
-        const grassY = groundY - 45 + wave;
-        for (let y = grassY; y < groundY - 10; y += 4) {
+        const wave = Math.sin(x * 0.025 + frameCount * 0.015) * 12;
+        for (let y = groundY - 45 + wave; y < groundY - 10; y += 4)
             ctx.fillRect(x, y, 4, 4);
-        }
     }
-    
-    // Layer rumput dekat (hijau terang)
+    // Layer dekat
     ctx.fillStyle = '#9CCC65';
     for (let x = 0; x < canvas.width; x += 4) {
-        const wave = Math.sin((x * 0.03) + frameCount * 0.02) * 8;
-        const grassY = groundY - 25 + wave;
-        for (let y = grassY; y < groundY; y += 4) {
+        const wave = Math.sin(x * 0.03 + frameCount * 0.02) * 8;
+        for (let y = groundY - 25 + wave; y < groundY; y += 4)
             ctx.fillRect(x, y, 4, 4);
-        }
     }
-    
-    // Highlight ujung rumput (kena cahaya)
-    ctx.fillStyle = 'rgba(200, 230, 150, 0.5)';
+    // Highlight ujung rumput — solid checkerboard
+    ctx.fillStyle = '#C5E88A';
     for (let x = 0; x < canvas.width; x += 8) {
-        const wave = Math.sin((x * 0.03) + frameCount * 0.02) * 8;
-        const grassY = groundY - 25 + wave;
-        ctx.fillRect(x, grassY, 4, 4);
-        if (Math.random() > 0.7) {
-            ctx.fillRect(x, grassY - 4, 4, 4);
+        const wave = Math.sin(x * 0.03 + frameCount * 0.02) * 8;
+        ctx.fillRect(x, groundY - 26 + wave, 4, 4);
+    }
+    // Helai rumput tinggi — deterministik
+    ctx.fillStyle = '#6EA832';
+    for (let i = 0; i < 32; i++) {
+        const bx = ((i * 131 + frameCount * 0.5) % (canvas.width + 40));
+        const bY = groundY - 14 + Math.sin(bx * 0.08) * 4;
+        const h  = 8 + (i * 7 % 12);
+        for (let dh = 0; dh < h; dh += 4) {
+            const sway = Math.round(Math.sin(frameCount * 0.05 + i) * 1) * 4;
+            ctx.fillRect(bx + sway, bY - dh, 4, 4);
         }
     }
-    
-    // Grass blades detail (helai rumput tinggi)
-    ctx.fillStyle = '#7CB342';
-    for (let i = 0; i < 30; i++) {
-        const x = ((frameCount * 0.5 + i * 40) % (canvas.width + 50));
-        const baseY = groundY - 15 + Math.sin(x * 0.1) * 5;
-        const height = 12 + Math.random() * 8;
-        
-        for (let h = 0; h < height; h += 4) {
-            const offsetX = Math.sin((frameCount * 0.05 + h) * 0.2) * 2;
-            ctx.fillRect(x + offsetX, baseY - h, 4, 4);
-        }
-    }
-    
-    // Bunga kecil pixel (decorative flowers)
-    const flowerColors = ['#FF6B9D', '#FFD93D', '#6BCB77', '#4D96FF'];
-    for (let i = 0; i < 15; i++) {
-        const x = ((frameCount * 0.3 + i * 70) % (canvas.width + 100));
-        const y = groundY - 20 - Math.random() * 15;
-        const color = flowerColors[i % flowerColors.length];
-        
+
+    // === PIXEL FLOWERS - deterministik ===
+    const flowerColors = ['#FF6B9D','#FFD93D','#FF8C42','#4D96FF'];
+    for (let i = 0; i < 16; i++) {
+        const fx = ((i * 113 + frameCount * 0.3) % (canvas.width + 80));
+        const fy = groundY - 22 - (i * 7 % 12);
+        const fc2 = flowerColors[i % 4];
         // Stem
-        ctx.fillStyle = '#7CB342';
-        ctx.fillRect(x, y, 4, 12);
-        
-        // Flower
-        ctx.fillStyle = color;
-        ctx.fillRect(x - 4, y - 4, 4, 4);
-        ctx.fillRect(x + 4, y - 4, 4, 4);
-        ctx.fillRect(x, y - 8, 4, 4);
-        ctx.fillRect(x, y, 4, 4);
-        
-        // Center
+        ctx.fillStyle = '#5D9C3A';
+        ctx.fillRect(fx, fy, 4, 12);
+        // Kelopak 4 arah
+        ctx.fillStyle = fc2;
+        ctx.fillRect(fx - 4, fy - 4, 4, 4);
+        ctx.fillRect(fx + 4, fy - 4, 4, 4);
+        ctx.fillRect(fx,     fy - 8, 4, 4);
+        ctx.fillRect(fx,     fy,     4, 4);
+        // Center kuning
         ctx.fillStyle = '#FFD700';
-        ctx.fillRect(x, y - 4, 4, 4);
+        ctx.fillRect(fx, fy - 4, 4, 4);
     }
-    
-    // Cahaya matahari subtle di ground
-    ctx.fillStyle = 'rgba(255, 255, 200, 0.08)';
-    for (let x = 0; x < canvas.width; x += 12) {
-        for (let y = groundY - 60; y < groundY; y += 12) {
-            if (Math.random() > 0.7) {
-                ctx.fillRect(x, y, 4, 4);
-            }
+
+    // === PIXEL BUTTERFLY - kupu-kupu kecil ===
+    for (let i = 0; i < 3; i++) {
+        const bfx = ((i * 277 + frameCount * 0.8) % (canvas.width + 60));
+        const bfy = groundY - 40 - Math.sin(frameCount * 0.06 + i * 2.1) * 20;
+        const wing = Math.sin(frameCount * 0.25 + i) > 0;
+        ctx.fillStyle = ['#FF6B9D','#FFD93D','#4D96FF'][i];
+        if (wing) {
+            ctx.fillRect(bfx - 8, bfy - 4, 8, 8);
+            ctx.fillRect(bfx + 4, bfy - 4, 8, 8);
+        } else {
+            ctx.fillRect(bfx - 6, bfy, 6, 4);
+            ctx.fillRect(bfx + 4, bfy, 6, 4);
         }
+        ctx.fillStyle = '#333';
+        ctx.fillRect(bfx, bfy, 4, 8); // badan
     }
-    
+
     // Game particles
     particles.forEach((p, i) => {
         if (p.life !== undefined) {
             ctx.fillStyle = p.color;
-            const px = Math.floor(p.x / 4) * 4;
-            const py = Math.floor(p.y / 4) * 4;
-            ctx.fillRect(px, py, 4, 4);
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life--;
+            ctx.fillRect(Math.floor(p.x/4)*4, Math.floor(p.y/4)*4, 4, 4);
+            p.x += p.vx; p.y += p.vy; p.life--;
             if (p.life <= 0) particles.splice(i, 1);
         }
     });
@@ -16887,10 +17561,10 @@ if (waveActive) {
             } else if (currentMode === 'space') {
                 // Space: no ground — bebas terbang
             } else {
-            ctx.fillStyle = currentMode === 'snow' ? '#F0F8FF' : currentMode === 'sakura' ? '#CD853F' : currentMode === 'space' ? '#0a0c1a' : '#8B4513';
+            ctx.fillStyle = currentMode === 'snow' ? '#F0F8FF' : currentMode === 'sakura' ? '#CD853F' : currentMode === 'space' ? '#0a0c1a' : currentMode === 'day' ? '#5D9C3A' : '#8B4513';
             ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
             
-            ctx.fillStyle = currentMode === 'snow' ? '#E0F0FF' : currentMode === 'sakura' ? '#BC7642' : currentMode === 'space' ? '#14162a' : '#654321';
+            ctx.fillStyle = currentMode === 'snow' ? '#E0F0FF' : currentMode === 'sakura' ? '#BC7642' : currentMode === 'space' ? '#14162a' : currentMode === 'day' ? '#4A7D2E' : '#654321';
             for (let i = 0; i < canvas.width; i += 6) {
                 for (let j = 0; j < 2; j++) {
                     ctx.fillRect(i + j * 3, groundY + j * 6, 3, 3);
@@ -16944,22 +17618,43 @@ const MENU_BGS = {
         coinMode: 'egypt', coinClass: 'coin-egypt',
         themeClass: 'theme-egypt',
         desc: 'Sunset Piramida Pixel'
+    },
+    day: {
+        id: 'day', name: '☀️ SIANG', price: 500,
+        coinMode: 'day', coinClass: 'coin-day',
+        themeClass: 'theme-day',
+        desc: 'Langit Biru & Awan Pixel'
+    },
+    night: {
+        id: 'night', name: '🌙 MALAM', price: 500,
+        coinMode: 'night', coinClass: 'coin-night',
+        themeClass: 'theme-night',
+        desc: 'Langit Malam Berbintang'
+    },
+    ocean: {
+        id: 'ocean', name: '🏖️ PANTAI', price: 500,
+        coinMode: 'ocean', coinClass: 'coin-ocean',
+        themeClass: 'theme-ocean',
+        desc: 'Pantai Tropis Pixel Art'
     }
 };
 
 let _menuBgRaf = null;
 let _menuBgFrame = 0;
 
+function stopMenuBg() {
+    if (_menuBgRaf) { clearInterval(_menuBgRaf); _menuBgRaf = null; }
+}
+
 function applyMenuBg() {
     const canvas = document.getElementById('menuBgCanvas');
     const menu   = document.getElementById('menu');
     if (!canvas || !menu) return;
 
-    // Reset tema
     Object.values(MENU_BGS).forEach(b => menu.classList.remove(b.themeClass));
 
     const bgId = playerData.equippedBg || 'none';
-    if (_menuBgRaf) { cancelAnimationFrame(_menuBgRaf); _menuBgRaf = null; }
+    stopMenuBg();
 
     if (bgId === 'none') {
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
@@ -16970,20 +17665,24 @@ function applyMenuBg() {
     if (!def) return;
     menu.classList.add(def.themeClass);
 
-    function resizeCanvas() {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    function loop() {
+    // Pakai setInterval ~24fps — jauh lebih hemat dari rAF
+    // Sama seperti pola drawBackground di game yang dipanggil per frameCount
+    _menuBgRaf = setInterval(() => {
+        if (gameRunning) { stopMenuBg(); return; } // Stop saat game berjalan
+        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
         _menuBgFrame++;
-        if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) resizeCanvas();
         const ctx = canvas.getContext('2d');
         if (bgId === 'egypt') drawMenuEgypt(ctx, canvas.width, canvas.height, _menuBgFrame);
-        _menuBgRaf = requestAnimationFrame(loop);
-    }
-    loop();
+        if (bgId === 'day')   drawMenuDay(ctx, canvas.width, canvas.height, _menuBgFrame);
+        if (bgId === 'night') drawMenuNight(ctx, canvas.width, canvas.height, _menuBgFrame);
+        if (bgId === 'ocean') drawMenuOcean(ctx, canvas.width, canvas.height, _menuBgFrame);
+    }, 42); // ~24fps
 }
 
 
@@ -17101,47 +17800,861 @@ function drawMenuEgypt(ctx, W, H, fc) {
     for (let sy2 = 0; sy2 < H; sy2 += 4) ctx.fillRect(0, sy2, W, 2);
 }
 
+// ═══ SIANG BACKGROUND (menu) — nyontek persis gameplay ═══
+function drawMenuDay(ctx, W, H, fc) {
+    const groundY = Math.floor(H * 0.78);
+
+    // === PIXEL SKY - Bright Day ===
+    const skyBands = [
+        { color: '#5BA8E5', height: 0.20 },
+        { color: '#74B9F0', height: 0.22 },
+        { color: '#8ECAF5', height: 0.22 },
+        { color: '#A8D8F8', height: 0.20 },
+        { color: '#C2E6FA', height: 0.16 }
+    ];
+    let currentY = 0;
+    skyBands.forEach(band => {
+        const bandHeight = H * band.height;
+        ctx.fillStyle = band.color;
+        ctx.fillRect(0, currentY, W, bandHeight);
+        currentY += bandHeight;
+    });
+    // Dithering pixel antar layer
+    currentY = 0;
+    for (let i = 0; i < skyBands.length - 1; i++) {
+        currentY += H * skyBands[i].height;
+        ctx.fillStyle = skyBands[i + 1].color;
+        for (let x = 0; x < W; x += 4)
+            for (let dy = -12; dy < 0; dy += 4)
+                if ((x/4 + dy/4) % 2 === 0) ctx.fillRect(x, currentY + dy, 4, 4);
+    }
+
+    // === PIXEL SUN ===
+    const sunX = W - Math.min(130, W * 0.20);
+    const sunY = 80;
+    const sunRadius = 36;
+    // Outer glow
+    ctx.fillStyle = 'rgba(255, 255, 150, 0.2)';
+    for (let x = -sunRadius-16; x <= sunRadius+16; x += 4)
+        for (let y = -sunRadius-16; y <= sunRadius+16; y += 4) {
+            const d = Math.sqrt(x*x+y*y);
+            if (d < sunRadius+16 && d >= sunRadius) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+        }
+    // FFEB3B layer
+    ctx.fillStyle = '#FFEB3B';
+    for (let x = -sunRadius; x <= sunRadius; x += 4)
+        for (let y = -sunRadius; y <= sunRadius; y += 4)
+            if (Math.sqrt(x*x+y*y) < sunRadius) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // FFD700 layer
+    ctx.fillStyle = '#FFD700';
+    for (let x = -24; x <= 24; x += 4)
+        for (let y = -24; y <= 24; y += 4)
+            if (Math.sqrt(x*x+y*y) < 24) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // FFFACD layer
+    ctx.fillStyle = '#FFFACD';
+    for (let x = -16; x <= 16; x += 4)
+        for (let y = -16; y <= 16; y += 4)
+            if (Math.sqrt(x*x+y*y) < 16) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // Core
+    ctx.fillStyle = '#FFFEF0';
+    for (let x = -8; x <= 8; x += 4)
+        for (let y = -8; y <= 8; y += 4)
+            if (Math.sqrt(x*x+y*y) < 8) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // Ray utama berputar
+    const rayCount = 12;
+    for (let i = 0; i < rayCount; i++) {
+        const angle = (i * 360 / rayCount + fc * 0.4) * Math.PI / 180;
+        ctx.fillStyle = '#FFE55C';
+        for (let len = sunRadius + 12; len < sunRadius + 56; len += 8) {
+            const rx = Math.round(sunX + Math.cos(angle) * len / 4) * 4;
+            const ry = Math.round(sunY + Math.sin(angle) * len / 4) * 4;
+            ctx.fillRect(rx, ry, 4, 4);
+            if (len % 16 === 0) {
+                ctx.fillRect(rx-4, ry, 4, 4); ctx.fillRect(rx+4, ry, 4, 4);
+                ctx.fillRect(rx, ry-4, 4, 4); ctx.fillRect(rx, ry+4, 4, 4);
+            }
+        }
+    }
+    // Ray sekunder
+    for (let i = 0; i < rayCount; i++) {
+        const angle = ((i + 0.5) * 360 / rayCount + fc * 0.4) * Math.PI / 180;
+        ctx.fillStyle = '#FFF4A3';
+        for (let len = sunRadius + 20; len < sunRadius + 40; len += 12) {
+            const rx = Math.round(sunX + Math.cos(angle) * len / 4) * 4;
+            const ry = Math.round(sunY + Math.sin(angle) * len / 4) * 4;
+            ctx.fillRect(rx, ry, 4, 4);
+        }
+    }
+
+    // === PIXEL CLOUDS - solid deterministik ===
+    const dayClouds = [
+        { bx: 80,  y: 52,  w: 96,  h: 32 },
+        { bx: 300, y: 88,  w: 116, h: 36 },
+        { bx: 560, y: 68,  w: 104, h: 34 },
+        { bx: 760, y: 108, w: 92,  h: 30 }
+    ];
+    dayClouds.forEach((cloud, idx) => {
+        const cx = ((fc * 0.25 + cloud.bx + idx * 180) % (W + 240));
+        const cy = cloud.y, cw = cloud.w, ch = cloud.h;
+        // Shadow bawah
+        ctx.fillStyle = 'rgba(160, 180, 200, 0.35)';
+        for (let x = 8; x < cw - 8; x += 4) ctx.fillRect(cx+x, cy+ch-8, 4, 8);
+        // Badan utama solid
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(cx + 4, cy + 8, cw - 8, ch - 12);
+        // Puff pixel atas
+        ctx.fillRect(cx + 8,        cy,      20, 16);
+        ctx.fillRect(cx + 4,        cy + 4,  12, 12);
+        ctx.fillRect(cx + cw/2-16,  cy - 4,  32, 20);
+        ctx.fillRect(cx + cw/2-12,  cy - 8,  24, 12);
+        ctx.fillRect(cx + cw - 32,  cy,      24, 16);
+        ctx.fillRect(cx + cw - 28,  cy + 4,  16, 12);
+        // Highlight
+        ctx.fillStyle = '#FFFEF8';
+        ctx.fillRect(cx + 12,       cy,      8, 8);
+        ctx.fillRect(cx + cw/2-8,   cy - 4,  16, 8);
+        ctx.fillRect(cx + cw - 28,  cy + 4,  8,  8);
+        // Shadow dalam
+        ctx.fillStyle = 'rgba(140, 170, 200, 0.25)';
+        ctx.fillRect(cx + 4, cy + ch - 12, cw - 8, 8);
+    });
+
+    // === PIXEL BIRDS ===
+    for (let i = 0; i < 6; i++) {
+        const birdX = ((fc * 1.2 + i * 210) % (W + 100));
+        const birdY = 120 + Math.sin((fc + i * 50) * 0.05) * 20;
+        const flapUp = Math.sin((fc + i * 30) * 0.2) > 0;
+        ctx.fillStyle = '#334455';
+        ctx.fillRect(birdX,     birdY,     8, 4);
+        ctx.fillRect(birdX + 8, birdY,     4, 4);
+        if (flapUp) {
+            ctx.fillRect(birdX - 8,  birdY - 4, 12, 4);
+            ctx.fillRect(birdX + 8,  birdY - 4, 12, 4);
+        } else {
+            ctx.fillRect(birdX - 8,  birdY + 4, 12, 4);
+            ctx.fillRect(birdX + 8,  birdY + 4, 12, 4);
+        }
+    }
+
+    // === PIXEL HILLS ===
+    // Layer jauh (biru samar)
+    ctx.fillStyle = '#8FBDE8';
+    for (let i = 0; i < 3; i++) {
+        const hx = (i * 380 + fc * 0.08) % (W + 400) - 100;
+        const hw = 340, hh = 80;
+        for (let py = 0; py <= hh; py += 4) {
+            const rw = Math.floor(hw * Math.sin(Math.PI * py / hh) / 4) * 4;
+            ctx.fillRect(hx + hw/2 - rw/2, groundY - py, rw, 4);
+        }
+    }
+    // Layer tengah (hijau tua)
+    ctx.fillStyle = '#5D9C3A';
+    for (let i = 0; i < 4; i++) {
+        const hx = (i * 280 + fc * 0.15) % (W + 320) - 80;
+        const hw = 260, hh = 100;
+        for (let py = 0; py <= hh; py += 4) {
+            const rw = Math.floor(hw * Math.sin(Math.PI * py / hh) / 4) * 4;
+            ctx.fillRect(hx + hw/2 - rw/2, groundY - py, rw, 4);
+        }
+    }
+
+    // === PIXEL GRASS FIELD ===
+    ctx.fillStyle = '#7CB342';
+    for (let x = 0; x < W; x += 4) {
+        const wave = Math.sin(x * 0.02 + fc * 0.01) * 15;
+        for (let y = groundY - 70 + wave; y < groundY - 30; y += 4) ctx.fillRect(x, y, 4, 4);
+    }
+    ctx.fillStyle = '#8BC34A';
+    for (let x = 0; x < W; x += 4) {
+        const wave = Math.sin(x * 0.025 + fc * 0.015) * 12;
+        for (let y = groundY - 45 + wave; y < groundY - 10; y += 4) ctx.fillRect(x, y, 4, 4);
+    }
+    ctx.fillStyle = '#9CCC65';
+    for (let x = 0; x < W; x += 4) {
+        const wave = Math.sin(x * 0.03 + fc * 0.02) * 8;
+        for (let y = groundY - 25 + wave; y < groundY; y += 4) ctx.fillRect(x, y, 4, 4);
+    }
+    // Highlight ujung rumput
+    ctx.fillStyle = '#C5E88A';
+    for (let x = 0; x < W; x += 8) {
+        const wave = Math.sin(x * 0.03 + fc * 0.02) * 8;
+        ctx.fillRect(x, groundY - 26 + wave, 4, 4);
+    }
+    // Helai rumput tinggi deterministik
+    ctx.fillStyle = '#6EA832';
+    for (let i = 0; i < 32; i++) {
+        const bx = ((i * 131 + fc * 0.5) % (W + 40));
+        const bY = groundY - 14 + Math.sin(bx * 0.08) * 4;
+        const h  = 8 + (i * 7 % 12);
+        for (let dh = 0; dh < h; dh += 4) {
+            const sway = Math.round(Math.sin(fc * 0.05 + i) * 1) * 4;
+            ctx.fillRect(bx + sway, bY - dh, 4, 4);
+        }
+    }
+
+    // === PIXEL FLOWERS deterministik ===
+    const flowerColors = ['#FF6B9D','#FFD93D','#FF8C42','#4D96FF'];
+    for (let i = 0; i < 16; i++) {
+        const fx = ((i * 113 + fc * 0.3) % (W + 80));
+        const fy = groundY - 22 - (i * 7 % 12);
+        ctx.fillStyle = '#5D9C3A';
+        ctx.fillRect(fx, fy, 4, 12);
+        ctx.fillStyle = flowerColors[i % 4];
+        ctx.fillRect(fx - 4, fy - 4, 4, 4);
+        ctx.fillRect(fx + 4, fy - 4, 4, 4);
+        ctx.fillRect(fx,     fy - 8, 4, 4);
+        ctx.fillRect(fx,     fy,     4, 4);
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(fx, fy - 4, 4, 4);
+    }
+
+    // === PIXEL BUTTERFLY ===
+    for (let i = 0; i < 3; i++) {
+        const bfx = ((i * 277 + fc * 0.8) % (W + 60));
+        const bfy = groundY - 40 - Math.sin(fc * 0.06 + i * 2.1) * 20;
+        const wing = Math.sin(fc * 0.25 + i) > 0;
+        ctx.fillStyle = ['#FF6B9D','#FFD93D','#4D96FF'][i];
+        if (wing) {
+            ctx.fillRect(bfx - 8, bfy - 4, 8, 8);
+            ctx.fillRect(bfx + 4, bfy - 4, 8, 8);
+        } else {
+            ctx.fillRect(bfx - 6, bfy, 6, 4);
+            ctx.fillRect(bfx + 4, bfy, 6, 4);
+        }
+        ctx.fillStyle = '#333';
+        ctx.fillRect(bfx, bfy, 4, 8);
+    }
+
+    // Ground platform
+    ctx.fillStyle = '#5D9C3A';
+    ctx.fillRect(0, groundY, W, H - groundY + 40);
+    ctx.fillStyle = '#4A7D2E';
+    for (let i = 0; i < W; i += 6) {
+        for (let j = 0; j < 2; j++) ctx.fillRect(i + j * 3, groundY + j * 6, 3, 3);
+    }
+
+    // Scanline retro
+    ctx.fillStyle = 'rgba(0,0,0,.04)';
+    for (let sy2 = 0; sy2 < H; sy2 += 4) ctx.fillRect(0, sy2, W, 2);
+}
+
+// ═══ MALAM BACKGROUND ═══
+function drawMenuNight(ctx, W, H, fc) {
+    const groundY = Math.floor(H * 0.78);
+
+    // === PIXEL SKY - Deep Night (sama persis dengan game) ===
+    const skyBands = [
+        { color: '#0A0E27', height: 0.20 },
+        { color: '#141B3D', height: 0.25 },
+        { color: '#1F2855', height: 0.25 },
+        { color: '#2A3570', height: 0.30 }
+    ];
+    let currentY = 0;
+    skyBands.forEach(band => {
+        const bandHeight = H * band.height;
+        ctx.fillStyle = band.color;
+        ctx.fillRect(0, currentY, W, bandHeight);
+        currentY += bandHeight;
+    });
+    // Dithering antar warna
+    currentY = 0;
+    for (let i = 0; i < skyBands.length - 1; i++) {
+        currentY += H * skyBands[i].height;
+        ctx.fillStyle = skyBands[i + 1].color;
+        for (let x = 0; x < W; x += 4) {
+            for (let dy = -12; dy < 0; dy += 4) {
+                if ((x/4 + dy/4) % 2 === 0) {
+                    ctx.fillRect(x, currentY + dy, 4, 4);
+                }
+            }
+        }
+    }
+
+    // === PIXEL STARS - Multiple Types (sama persis game) ===
+    // Big stars berkedip
+    ctx.fillStyle = '#FFFFFF';
+    for (let i = 0; i < 25; i++) {
+        const x = (i * 147 + fc * 0.05) % W;
+        const y = (i * 83) % 200 + 20;
+        const twinkle = Math.sin((fc + i * 20) * 0.1);
+        if (twinkle > 0.3) {
+            ctx.fillRect(x, y, 4, 4);
+            ctx.fillRect(x - 4, y, 4, 4);
+            ctx.fillRect(x + 4, y, 4, 4);
+            ctx.fillRect(x, y - 4, 4, 4);
+            ctx.fillRect(x, y + 4, 4, 4);
+        } else {
+            ctx.fillRect(x, y, 4, 4);
+        }
+    }
+    // Small stars
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    for (let i = 0; i < 50; i++) {
+        const x = (i * 97) % W;
+        const y = (i * 67) % 220 + 15;
+        ctx.fillRect(x, y, 4, 4);
+    }
+    // Tiny stars
+    ctx.fillStyle = 'rgba(200, 220, 255, 0.5)';
+    for (let i = 0; i < 80; i++) {
+        const x = (i * 73) % W;
+        const y = (i * 53) % 240 + 10;
+        if (i % 3 === 0) ctx.fillRect(x, y, 4, 4);
+    }
+
+    // === SHOOTING STAR sesekali ===
+    const shootCycle = fc % 240;
+    if (shootCycle < 50) {
+        const sx = (shootCycle / 50) * W * 0.6 + W * 0.1;
+        const sy = (shootCycle / 50) * H * 0.15 + H * 0.05;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillRect(Math.floor(sx/4)*4, Math.floor(sy/4)*4, 4, 4);
+        ctx.fillStyle = 'rgba(200, 220, 255, 0.5)';
+        for (let t = 1; t < 5; t++) {
+            ctx.fillRect(Math.floor((sx - t*6)/4)*4, Math.floor((sy - t*3)/4)*4, 4, 4);
+        }
+    }
+
+    // === PIXEL MOON - sama persis game ===
+    const moonX = W - Math.min(140, W * 0.22);
+    const moonY = 95;
+    const moonRadius = 32;
+    // Moon glow
+    ctx.fillStyle = 'rgba(200, 220, 255, 0.15)';
+    for (let x = -moonRadius - 20; x <= moonRadius + 20; x += 4) {
+        for (let y = -moonRadius - 20; y <= moonRadius + 20; y += 4) {
+            const dist = Math.sqrt(x*x + y*y);
+            if (dist < moonRadius + 20 && dist >= moonRadius) ctx.fillRect(moonX + x, moonY + y, 4, 4);
+        }
+    }
+    // Outer glow
+    ctx.fillStyle = 'rgba(220, 230, 255, 0.3)';
+    for (let x = -moonRadius - 8; x <= moonRadius + 8; x += 4) {
+        for (let y = -moonRadius - 8; y <= moonRadius + 8; y += 4) {
+            const dist = Math.sqrt(x*x + y*y);
+            if (dist < moonRadius + 8 && dist >= moonRadius) ctx.fillRect(moonX + x, moonY + y, 4, 4);
+        }
+    }
+    // Moon body
+    ctx.fillStyle = '#E8EFF7';
+    for (let x = -moonRadius; x <= moonRadius; x += 4) {
+        for (let y = -moonRadius; y <= moonRadius; y += 4) {
+            if (Math.sqrt(x*x + y*y) < moonRadius) ctx.fillRect(moonX + x, moonY + y, 4, 4);
+        }
+    }
+    // Craters
+    const craters = [
+        { x: -12, y: -8, r: 8 }, { x: 8, y: -12, r: 6 },
+        { x: -8, y: 8, r: 10 }, { x: 12, y: 12, r: 6 }, { x: 4, y: 0, r: 4 }
+    ];
+    ctx.fillStyle = '#D0D8E0';
+    craters.forEach(crater => {
+        for (let x = -crater.r; x <= crater.r; x += 4) {
+            for (let y = -crater.r; y <= crater.r; y += 4) {
+                if (Math.sqrt(x*x + y*y) < crater.r) ctx.fillRect(moonX + crater.x + x, moonY + crater.y + y, 4, 4);
+            }
+        }
+    });
+    // Moon highlight
+    ctx.fillStyle = '#F5F8FF';
+    for (let x = -20; x <= 8; x += 4) {
+        for (let y = -20; y <= 8; y += 4) {
+            if (Math.sqrt(x*x + y*y) < 16) ctx.fillRect(moonX + x - 8, moonY + y - 8, 4, 4);
+        }
+    }
+
+    // === DARK CLOUDS (sama persis game) ===
+    const clouds = [
+        { x: 100, y: 140, width: 80, height: 28 },
+        { x: 350, y: 170, width: 90, height: 30 },
+        { x: 600, y: 155, width: 85, height: 28 }
+    ];
+    clouds.forEach((cloud, idx) => {
+        const cloudX = ((fc * 0.2 + cloud.x + idx * 200) % (W + 250));
+        ctx.fillStyle = 'rgba(30, 40, 70, 0.6)';
+        for (let x = 8; x < cloud.width - 8; x += 4) {
+            for (let y = 4; y < cloud.height - 4; y += 4) {
+                ctx.fillRect(cloudX + x, cloud.y + y, 4, 4);
+            }
+        }
+        ctx.fillStyle = 'rgba(20, 30, 55, 0.7)';
+        for (let x = 12; x < cloud.width - 12; x += 4) {
+            for (let y = cloud.height - 12; y < cloud.height; y += 4) {
+                ctx.fillRect(cloudX + x, cloud.y + y, 4, 4);
+            }
+        }
+        if (cloudX < moonX) {
+            ctx.fillStyle = 'rgba(200, 220, 255, 0.15)';
+            for (let y = 4; y < cloud.height - 4; y += 4) {
+                ctx.fillRect(cloudX + cloud.width - 8, cloud.y + y, 4, 4);
+            }
+        }
+    });
+
+    // === PIXEL MOUNTAINS - Dark Silhouettes (sama persis game) ===
+    // Layer 1 (belakang)
+    ctx.fillStyle = '#1A2040';
+    for (let i = 0; i < 4; i++) {
+        const baseX = (i * 250 + fc * 0.1) % (W + 300) - 100;
+        const mW = 200, mH = 100;
+        for (let py = 0; py <= mH; py += 4) {
+            const rowWidth = mW * (1 - py / mH);
+            const startX = baseX + (mW - rowWidth) / 2;
+            for (let px = 0; px <= rowWidth; px += 4) ctx.fillRect(startX + px, groundY - py, 4, 4);
+        }
+    }
+    // Layer 2 (dekat)
+    ctx.fillStyle = '#0F1530';
+    for (let i = 0; i < 3; i++) {
+        const baseX = (i * 300 + fc * 0.15) % (W + 350) - 120;
+        const mW = 220, mH = 120;
+        for (let py = 0; py <= mH; py += 4) {
+            const rowWidth = mW * (1 - py / mH);
+            const startX = baseX + (mW - rowWidth) / 2;
+            for (let px = 0; px <= rowWidth; px += 4) ctx.fillRect(startX + px, groundY - py, 4, 4);
+        }
+    }
+
+    // === PIXEL GRASS - Dark Night (sama persis game) ===
+    ctx.fillStyle = '#1A3D1A';
+    for (let x = 0; x < W; x += 4) {
+        const wave = Math.sin((x * 0.02) + fc * 0.01) * 12;
+        const gY2 = groundY - 50 + wave;
+        for (let y = gY2; y < groundY - 20; y += 4) ctx.fillRect(x, y, 4, 4);
+    }
+    ctx.fillStyle = '#0F2A0F';
+    for (let x = 0; x < W; x += 4) {
+        const wave = Math.sin((x * 0.025) + fc * 0.015) * 10;
+        const gY2 = groundY - 30 + wave;
+        for (let y = gY2; y < groundY; y += 4) ctx.fillRect(x, y, 4, 4);
+    }
+    // Moonlight on grass tips
+    ctx.fillStyle = 'rgba(180, 200, 220, 0.2)';
+    for (let x = 0; x < W; x += 8) {
+        if (x < moonX + 100) {
+            const wave = Math.sin((x * 0.025) + fc * 0.015) * 10;
+            ctx.fillRect(x, groundY - 30 + wave, 4, 4);
+        }
+    }
+
+    // === FIREFLIES (kunang-kunang) ===
+    for (let i = 0; i < 8; i++) {
+        const fx = ((i * 137 + fc * (0.3 + i * 0.05)) % W);
+        const fy = groundY - 40 - (Math.sin(fc * 0.04 + i * 1.7) + 1) * 50;
+        const glow = (Math.sin(fc * 0.1 + i * 2.3) + 1) / 2;
+        if (glow > 0.4) {
+            ctx.fillStyle = `rgba(255, 255, 150, ${glow * 0.9})`;
+            ctx.fillRect(Math.floor(fx/4)*4, Math.floor(fy/4)*4, 4, 4);
+            ctx.fillStyle = `rgba(255, 255, 150, ${glow * 0.3})`;
+            ctx.fillRect(Math.floor(fx/4)*4 - 4, Math.floor(fy/4)*4, 4, 4);
+            ctx.fillRect(Math.floor(fx/4)*4 + 4, Math.floor(fy/4)*4, 4, 4);
+            ctx.fillRect(Math.floor(fx/4)*4, Math.floor(fy/4)*4 - 4, 4, 4);
+            ctx.fillRect(Math.floor(fx/4)*4, Math.floor(fy/4)*4 + 4, 4, 4);
+        }
+    }
+
+    // Scanline retro
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    for (let sy2 = 0; sy2 < H; sy2 += 4) ctx.fillRect(0, sy2, W, 2);
+}
+
+// ═══ PANTAI BACKGROUND ═══
+function drawMenuOcean(ctx, W, H, fc) {
+    const groundY = Math.floor(H * 0.75);
+
+    // === SKY - Tropical blue gradient ===
+    const skyBands = [
+        { color: '#1A90D0', height: 0.15 },
+        { color: '#2BA3E0', height: 0.20 },
+        { color: '#56B8EC', height: 0.20 },
+        { color: '#87CEEB', height: 0.20 },
+        { color: '#B8E4F9', height: 0.25 }
+    ];
+    let skyY = 0;
+    skyBands.forEach(band => {
+        const h = H * band.height;
+        ctx.fillStyle = band.color;
+        ctx.fillRect(0, skyY, W, h);
+        skyY += h;
+    });
+    // Dithering
+    skyY = 0;
+    for (let i = 0; i < skyBands.length - 1; i++) {
+        skyY += H * skyBands[i].height;
+        ctx.fillStyle = skyBands[i + 1].color;
+        for (let x = 0; x < W; x += 4)
+            for (let dy = -12; dy < 0; dy += 4)
+                if ((x/4 + dy/4) % 2 === 0) ctx.fillRect(x, skyY + dy, 4, 4);
+    }
+
+    // === SUN - Bright tropical ===
+    const sunX = W - 140, sunY = 85, sunR = 34;
+    ctx.fillStyle = 'rgba(255, 255, 180, 0.2)';
+    for (let x = -sunR-16; x <= sunR+16; x += 4)
+        for (let y = -sunR-16; y <= sunR+16; y += 4) {
+            const d = Math.sqrt(x*x+y*y);
+            if (d < sunR+16 && d >= sunR+4) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+        }
+    ctx.fillStyle = '#FFD700';
+    for (let x = -sunR; x <= sunR; x += 4)
+        for (let y = -sunR; y <= sunR; y += 4)
+            if (Math.sqrt(x*x+y*y) < sunR) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    ctx.fillStyle = '#FFEE55';
+    for (let x = -20; x <= 20; x += 4)
+        for (let y = -20; y <= 20; y += 4)
+            if (Math.sqrt(x*x+y*y) < 20) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    ctx.fillStyle = '#FFFFAA';
+    for (let x = -10; x <= 10; x += 4)
+        for (let y = -10; y <= 10; y += 4)
+            if (Math.sqrt(x*x+y*y) < 10) ctx.fillRect(sunX+x, sunY+y, 4, 4);
+    // Rays
+    for (let i = 0; i < 10; i++) {
+        const angle = (i * 36 + fc * 0.4) * Math.PI / 180;
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.7)';
+        for (let r = sunR + 6; r < sunR + 52; r += 6) {
+            const rx = Math.round((sunX + Math.cos(angle) * r) / 4) * 4;
+            const ry = Math.round((sunY + Math.sin(angle) * r) / 4) * 4;
+            ctx.fillRect(rx, ry, 4, 4);
+        }
+    }
+
+    // === DISTANT ISLANDS ===
+    ctx.fillStyle = '#4AADA8';
+    for (let i = 0; i < 4; i++) {
+        const bx = (i * 280 + fc * 0.08) % (W + 320) - 120;
+        const iw = 220, ih = 55;
+        for (let py = 0; py <= ih; py += 4) {
+            const rw = iw * (1 - (py/ih) * (py/ih));
+            ctx.fillRect(bx + (iw-rw)/2, groundY - ih - 20 + py, rw, 4);
+        }
+    }
+    ctx.fillStyle = '#2E8B7A';
+    for (let i = 0; i < 3; i++) {
+        const bx = (i * 340 + 100 + fc * 0.14) % (W + 380) - 140;
+        const iw = 180, ih = 70;
+        for (let py = 0; py <= ih; py += 4) {
+            const rw = iw * Math.sin((py/ih) * Math.PI);
+            ctx.fillRect(bx + (iw-rw)/2, groundY - ih - 10 + py, rw, 4);
+        }
+        // Palm silhouette on island
+        ctx.fillStyle = '#1A5C4A';
+        ctx.fillRect(bx + iw/2 - 2, groundY - ih - 30, 4, 20);
+        ctx.fillRect(bx + iw/2 - 14, groundY - ih - 28, 12, 4);
+        ctx.fillRect(bx + iw/2 + 2,  groundY - ih - 28, 12, 4);
+        ctx.fillRect(bx + iw/2 - 10, groundY - ih - 34, 8, 4);
+        ctx.fillStyle = '#2E8B7A';
+    }
+
+    // === CLOUDS ===
+    const oceanClouds = [
+        { baseX: 40,  y: 55,  w: 100, h: 30, speed: 0.3 },
+        { baseX: 290, y: 80,  w: 130, h: 36, speed: 0.25 },
+        { baseX: 560, y: 65,  w: 110, h: 32, speed: 0.35 },
+        { baseX: 780, y: 90,  w: 90,  h: 28, speed: 0.28 }
+    ];
+    oceanClouds.forEach((cloud, idx) => {
+        const cx = (cloud.baseX + fc * cloud.speed + idx * 190) % (W + 280) - 50;
+        ctx.fillStyle = 'rgba(100, 160, 210, 0.25)';
+        for (let x = 4; x < cloud.w; x += 4) ctx.fillRect(cx+x, cloud.y+cloud.h-4, 4, 8);
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        ctx.fillRect(cx, cloud.y, cloud.w, cloud.h);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(cx+8, cloud.y, cloud.w-16, cloud.h/2);
+        // Puff atas
+        ctx.fillRect(cx+12, cloud.y-8, cloud.w-24, 12);
+    });
+
+    // === SEAGULLS ===
+    const seagullData = [
+        { baseX: 30,  baseY: 95,  speed: 1.1, size: 1.0, flapSpeed: 0.22 },
+        { baseX: 180, baseY: 115, speed: 1.6, size: 0.8, flapSpeed: 0.31 },
+        { baseX: 310, baseY: 80,  speed: 0.9, size: 1.2, flapSpeed: 0.19 },
+        { baseX: 490, baseY: 130, speed: 1.4, size: 0.7, flapSpeed: 0.27 },
+        { baseX: 650, baseY: 100, speed: 1.2, size: 1.1, flapSpeed: 0.24 }
+    ];
+    seagullData.forEach((bird, idx) => {
+        const bx = (bird.baseX + fc * bird.speed + idx * 140) % (W + 100) - 30;
+        const by = bird.baseY + Math.sin(fc * 0.04 + idx * 1.7) * 18 + Math.sin(fc * 0.011 + idx * 0.9) * 10;
+        const flap = Math.sin(fc * bird.flapSpeed + idx * 2.1);
+        const s = bird.size;
+        ctx.fillStyle = '#EFEFEF';
+        ctx.fillRect(bx + 4*s, by + 2*s, 10*s, 4*s);
+        ctx.fillRect(bx + 12*s, by, 6*s, 5*s);
+        ctx.fillStyle = '#FFB300';
+        ctx.fillRect(bx + 18*s, by + 2*s, 4*s, 2*s);
+        ctx.fillStyle = '#222222';
+        ctx.fillRect(bx + 14*s, by + 1*s, 2*s, 2*s);
+        ctx.fillStyle = '#D8D8D8';
+        if (flap > 0.4) {
+            ctx.fillRect(bx,        by - 6*s, 8*s, 3*s);
+            ctx.fillRect(bx - 5*s,  by - 10*s, 7*s, 3*s);
+            ctx.fillRect(bx + 12*s, by - 6*s, 8*s, 3*s);
+            ctx.fillRect(bx + 18*s, by - 10*s, 7*s, 3*s);
+        } else if (flap < -0.4) {
+            ctx.fillRect(bx - 2*s,  by + 5*s, 9*s, 3*s);
+            ctx.fillRect(bx - 6*s,  by + 7*s, 6*s, 3*s);
+            ctx.fillRect(bx + 12*s, by + 5*s, 9*s, 3*s);
+            ctx.fillRect(bx + 18*s, by + 7*s, 6*s, 3*s);
+        } else {
+            ctx.fillRect(bx - 1*s,  by + 1*s, 9*s, 3*s);
+            ctx.fillRect(bx + 13*s, by + 1*s, 9*s, 3*s);
+        }
+        ctx.fillStyle = '#CCCCCC';
+        ctx.fillRect(bx, by + 3*s, 6*s, 3*s);
+    });
+
+    // === SHIPS AT HORIZON ===
+    const ships = [{ baseX: 120, scale: 1.0 }, { baseX: 500, scale: 0.75 }];
+    ships.forEach((ship, idx) => {
+        const sx = (ship.baseX + fc * 0.25 + idx * 380) % (W + 350) - 80;
+        const sy = groundY - 78;
+        const sc = ship.scale;
+        const bob = Math.sin(fc * 0.04 + idx * 1.5) * 2;
+        ctx.fillStyle = '#8B0000';
+        ctx.fillRect(sx,        sy + 16*sc + bob, 70*sc, 14*sc);
+        ctx.fillStyle = '#5C0000';
+        ctx.fillRect(sx + 2*sc, sy + 26*sc + bob, 66*sc, 6*sc);
+        ctx.fillStyle = '#EEEEEE';
+        ctx.fillRect(sx,        sy + 14*sc + bob, 70*sc, 4*sc);
+        ctx.fillStyle = '#F5F5F5';
+        ctx.fillRect(sx + 4*sc, sy + 8*sc + bob, 60*sc, 8*sc);
+        ctx.fillStyle = '#DDDDDD';
+        ctx.fillRect(sx + 10*sc, sy + 2*sc + bob, 35*sc, 8*sc);
+        ctx.fillStyle = '#4FC3F7';
+        for (let w = 0; w < 3; w++) ctx.fillRect(sx + (12 + w*10)*sc, sy + 3*sc + bob, 6*sc, 4*sc);
+        ctx.fillStyle = '#CC2200';
+        ctx.fillRect(sx + 20*sc, sy - 12*sc + bob, 8*sc, 14*sc);
+        ctx.fillStyle = 'rgba(200,200,200,0.5)';
+        const smoke = (fc * 0.3 + idx * 20) % 30;
+        ctx.fillRect(sx + 21*sc, sy - 14*sc - smoke*0.5 + bob, 6*sc, 5*sc);
+        ctx.fillRect(sx + 19*sc, sy - 18*sc - smoke*0.4 + bob, 8*sc, 5*sc);
+        ctx.fillStyle = '#555555';
+        ctx.fillRect(sx + 40*sc, sy - 20*sc + bob, 3*sc, 28*sc);
+        ctx.fillStyle = '#FF4444';
+        ctx.fillRect(sx + 43*sc, sy - 20*sc + bob, 10*sc, 6*sc);
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillRect(sx - 20*sc, sy + 28*sc + bob, 25*sc, 4*sc);
+    });
+
+    // === OCEAN WATER ===
+    const waterTop = groundY - 68;
+    ctx.fillStyle = '#0077B6';
+    ctx.fillRect(0, waterTop, W, 20);
+    ctx.fillStyle = '#0096C7';
+    ctx.fillRect(0, waterTop + 20, W, 20);
+    ctx.fillStyle = '#00B4D8';
+    ctx.fillRect(0, waterTop + 40, W, 28);
+    // Animated waves
+    for (let layer = 0; layer < 3; layer++) {
+        ctx.fillStyle = layer === 0 ? 'rgba(255,255,255,0.6)' : layer === 1 ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.25)';
+        const speed = 1.5 + layer * 0.8;
+        const spacing = 60 + layer * 20;
+        for (let x = 0; x < W + spacing; x += spacing) {
+            const wx = (x - fc * speed) % (W + spacing);
+            const wy = waterTop + layer * 8 + Math.sin(wx * 0.04 + fc * 0.05) * 5;
+            ctx.fillRect(wx, wy, 28, 4);
+            ctx.fillRect(wx + 4, wy - 4, 20, 4);
+            ctx.fillRect(wx + 8, wy - 8, 12, 4);
+        }
+    }
+
+    // === SAND ===
+    ctx.fillStyle = '#F4CC6A';
+    ctx.fillRect(0, groundY - 4, W, H - groundY + 40);
+    ctx.fillStyle = '#E8B84B';
+    ctx.fillRect(0, groundY + 8, W, H - groundY + 40);
+    ctx.fillStyle = '#F8DC88';
+    for (let x = 0; x < W; x += 8) ctx.fillRect(x, groundY - 4, 4, 4);
+
+    // === PALM TREES ===
+    const palms = [
+        { baseX: 60,  height: 85, lean: 1 },
+        { baseX: 240, height: 72, lean: -1 },
+        { baseX: 430, height: 90, lean: 1 },
+        { baseX: 620, height: 78, lean: -1 },
+        { baseX: 800, height: 86, lean: 1 }
+    ];
+    palms.forEach((palm, idx) => {
+        const px = (palm.baseX + fc * 0.5 + idx * 160) % (W + 240) - 40;
+        const py = groundY - palm.height;
+        const lean = palm.lean;
+        ctx.fillStyle = '#7B4F2E';
+        for (let y = 0; y < palm.height; y += 4) {
+            const curve = lean * Math.sin(y * 0.045) * 12;
+            const w = Math.max(4, 12 - (y / palm.height) * 4);
+            ctx.fillRect(px + curve, py + y, w, 4);
+            if (y % 14 === 0) {
+                ctx.fillStyle = '#5C3317';
+                ctx.fillRect(px + curve, py + y, w, 2);
+                ctx.fillStyle = '#7B4F2E';
+            }
+        }
+        const topCurve = lean * Math.sin(palm.height * 0.045) * 12;
+        const leafAngles = [-55, -25, 5, 30, 55];
+        leafAngles.forEach((angle, li) => {
+            const rad = (angle - 90) * Math.PI / 180;
+            const leafLen = 38 + (li % 2) * 10;
+            ctx.fillStyle = li % 2 === 0 ? '#2D6A2D' : '#3A8A3A';
+            for (let r = 0; r < leafLen; r += 5) {
+                const lx2 = px + topCurve + 6 + Math.cos(rad) * r;
+                const ly2 = py + Math.sin(rad) * r;
+                const lw = Math.max(3, 14 - r/3);
+                ctx.fillRect(lx2 - lw/2, ly2, lw, 4);
+                if (r % 10 === 0) {
+                    ctx.fillStyle = '#1A4A1A';
+                    ctx.fillRect(lx2, ly2 + 1, lw/3, 2);
+                    ctx.fillStyle = li % 2 === 0 ? '#2D6A2D' : '#3A8A3A';
+                }
+            }
+        });
+        ctx.fillStyle = '#8B5E3C';
+        ctx.fillRect(px + topCurve + 2, py + 4, 8, 8);
+        ctx.fillRect(px + topCurve + 8, py + 6, 6, 6);
+    });
+
+    // === BEACH DECORATIONS ===
+    // Rocks
+    for (let i = 0; i < 5; i++) {
+        const rx = (i * 170 + fc * 0.4) % (W + 180) - 20;
+        const rSize = 14 + (i % 3) * 8;
+        const ry = groundY - rSize + 4;
+        ctx.fillStyle = '#7A7A7A';
+        for (let y = 0; y < rSize; y += 4) {
+            const rw = rSize - Math.abs(y - rSize/2) * 0.5;
+            ctx.fillRect(rx + (rSize-rw)/2, ry + y, rw, 4);
+        }
+        ctx.fillStyle = '#A0A0A0';
+        ctx.fillRect(rx + rSize/4, ry + 4, rSize/3, 4);
+    }
+    // Shells & starfish
+    for (let i = 0; i < 8; i++) {
+        const sx = (i * 120 + fc * 0.3) % (W + 140) - 20;
+        const sy = groundY - 6 - (i % 2) * 4;
+        if (i % 3 === 0) {
+            ctx.fillStyle = '#FF6B4A';
+            ctx.fillRect(sx+4, sy+4, 8, 8);
+            ctx.fillRect(sx+6, sy, 4, 16);
+            ctx.fillRect(sx, sy+6, 16, 4);
+            ctx.fillRect(sx+2, sy+2, 4, 4);
+            ctx.fillRect(sx+10, sy+10, 4, 4);
+        } else if (i % 3 === 1) {
+            ctx.fillStyle = '#FFF0DC';
+            ctx.fillRect(sx, sy, 14, 10);
+            ctx.fillRect(sx+2, sy-2, 10, 14);
+            ctx.fillStyle = '#DEB887';
+            ctx.fillRect(sx+5, sy+2, 4, 8);
+        } else {
+            ctx.fillStyle = '#FF4500';
+            ctx.fillRect(sx, sy, 10, 6);
+            ctx.fillRect(sx-2, sy-4, 6, 6);
+            ctx.fillRect(sx+6, sy-4, 6, 6);
+        }
+    }
+
+    // Scanline retro
+    ctx.fillStyle = 'rgba(0,0,0,.04)';
+    for (let sy2 = 0; sy2 < H; sy2 += 4) ctx.fillRect(0, sy2, W, 2);
+}
+
 // Gambar thumbnail kecil untuk preview di shop
 function drawBgThumb(canvas, bgId) {
     canvas.width  = canvas.offsetWidth  || 400;
     canvas.height = canvas.offsetHeight || 100;
     if (bgId === 'egypt') drawMenuEgypt(canvas.getContext('2d'), canvas.width, canvas.height, 120);
+    if (bgId === 'day')   drawMenuDay(canvas.getContext('2d'), canvas.width, canvas.height, 120);
+    if (bgId === 'night') drawMenuNight(canvas.getContext('2d'), canvas.width, canvas.height, 120);
+    if (bgId === 'ocean') drawMenuOcean(canvas.getContext('2d'), canvas.width, canvas.height, 120);
 }
 
 // Render aksi card BG di shop (beli / equip)
+const BG_META = {
+    egypt: { name:'🏜️ MESIR',   coinMode:'egypt',  coinClass:'coin-egypt',  price:500, color:'#C19A6B',
+             features:['🌅 Langit sunset pixel animasi','🏛️ Piramida scrolling berlapis','🎨 Tema warna tombol & teks berubah'] },
+    day:   { name:'☀️ SIANG',   coinMode:'day',    coinClass:'coin-day',    price:500, color:'#FFD700',
+             features:['☀️ Matahari pixel animasi bersinar','☁️ Awan putih scrolling berlapis','🌳 Pohon & bukit hijau pixel art'] },
+    night: { name:'🌙 MALAM',   coinMode:'night',  coinClass:'coin-night',  price:500, color:'#9090FF',
+             features:['✨ Bintang pixel berkedip animasi','🌙 Bulan sabit & komet meluncur','🏙️ Siluet kota pixel scrolling'] },
+    ocean: { name:'🏖️ PANTAI',  coinMode:'ocean',  coinClass:'coin-ocean',  price:500, color:'#00CED1',
+             features:['🌊 Ombak pixel animasi berlapis','🌴 Pohon kelapa & kapal scrolling','🎨 Tema warna biru laut berubah'] },
+};
+
 function renderBgShopCard() {
-    // Thumbnail
-    const thumb = document.getElementById('bgThumbEgypt');
-    if (thumb) setTimeout(() => drawBgThumb(thumb, 'egypt'), 50);
+    // Gambar thumbnail + update badge tiap card
+    ['egypt','day','night','ocean'].forEach(bgId => {
+        const cap    = bgId.charAt(0).toUpperCase() + bgId.slice(1);
+        const canvas = document.getElementById('bgThumb' + cap);
+        const badge  = document.getElementById('bgBadge' + cap);
+        const card   = document.getElementById('bgCard'  + cap);
+        if (!canvas || !badge || !card) return;
 
-    const actions = document.getElementById('bgActionsEgypt');
-    const card    = document.getElementById('bgCardEgypt');
-    if (!actions || !card) return;
+        // Gambar thumbnail
+        setTimeout(() => drawBgThumb(canvas, bgId), 40);
 
-    const owned    = (playerData.ownedBgs || []).includes('egypt');
-    const equipped = playerData.equippedBg === 'egypt';
-    const coins    = playerData.coins.egypt || 0;
-    const canBuy   = coins >= 500;
+        const owned    = (playerData.ownedBgs || []).includes(bgId);
+        const equipped = playerData.equippedBg === bgId;
 
-    card.className = 'bg-card' + (equipped ? ' equipped-bg' : owned ? ' owned' : '');
+        // Border card
+        card.classList.toggle('bg-owned',    owned && !equipped);
+        card.classList.toggle('bg-equipped', equipped);
+
+        // Badge
+        if (equipped) {
+            badge.className = 'bg-grid-badge badge-equipped';
+            badge.textContent = '✓ ON';
+        } else if (owned) {
+            badge.className = 'bg-grid-badge badge-owned';
+            badge.textContent = 'OWNED';
+        } else {
+            badge.className = 'bg-grid-badge';
+            badge.textContent = BG_META[bgId].price + '🪙';
+        }
+    });
+}
+
+let _bgDetailId = null;
+function openBgDetail(bgId) {
+    const d = BG_META[bgId];
+    if (!d) return;
+    playSound('open');
+
+    // Tutup dulu kalau klik yang sama → toggle
+    if (_bgDetailId === bgId) { closeBgDetail(); return; }
+    _bgDetailId = bgId;
+
+    const owned    = (playerData.ownedBgs || []).includes(bgId);
+    const equipped = playerData.equippedBg === bgId;
+    const coins    = playerData.coins[d.coinMode] || 0;
+    const canBuy   = coins >= d.price;
+
+    document.getElementById('bgDetailTitle').textContent   = d.name + ' BG';
+    document.getElementById('bgDetailFeatures').innerHTML  = d.features.map(f => `<div>${f}</div>`).join('');
+    document.getElementById('bgDetailCoinInfo').innerHTML  =
+        `<span class="coin-small ${d.coinClass}" style="width:12px;height:12px;"></span>
+         <span>Kamu punya: <span style="color:${canBuy?'#00ff88':'#ff4444'};">${coins}</span> / ${d.price}</span>`;
 
     if (!owned) {
-        actions.innerHTML = `
-            <button class="gacha-btn" style="flex:2;${canBuy?'':'opacity:.5;cursor:not-allowed;'}"
-                onclick="${canBuy?'buyMenuBg(\'egypt\')':''}">${canBuy?'🪙 BELI':'🔒 TERKUNCI'}<br>
-                <span class="coin-small coin-egypt" style="margin:3px auto;width:14px;height:14px;display:block;"></span>500
-            </button>
-            <div style="flex:1;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);color:#C19A6B;text-align:center;line-height:1.8;">
-                KAMU<br><span style="color:${canBuy?'#00ff88':'#ff4444'};">${coins}</span>
-            </div>`;
+        document.getElementById('bgDetailActions').innerHTML = `
+            <button class="gacha-btn" style="flex:1;${canBuy?'':'opacity:.5;cursor:not-allowed;'}"
+                ${canBuy ? `onclick="buyMenuBg('${bgId}')"` : 'disabled'}>
+                ${canBuy ? '🪙 BELI & PASANG' : '🔒 KOIN KURANG'}
+            </button>`;
     } else {
-        actions.innerHTML = `
-            <button class="gacha-btn" style="flex:1;${equipped?'background:#FFD700;border-color:#8B6914;':''}"
-                onclick="equipMenuBg('egypt')">
-                ${equipped ? '✓ TERPASANG' : '▶ PASANG'}
-            </button>
-            ${equipped ? '<button class="gacha-btn" style="flex:1;background:#333;color:#aaa;border-color:#555;" onclick="equipMenuBg(\'none\')">LEPAS</button>' : ''}`;
+        document.getElementById('bgDetailActions').innerHTML = `
+            <button class="gacha-btn" style="flex:1;${equipped?'background:#FFD700;color:#000;border-color:#8B6914;':''}"
+                onclick="equipMenuBg('${equipped ? 'none' : bgId}')">
+                ${equipped ? '✓ LEPAS' : '▶ PASANG'}
+            </button>`;
     }
+
+    const panel = document.getElementById('bgDetailPanel');
+    panel.style.display = '';
+    setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50);
+}
+
+function closeBgDetail() {
+    _bgDetailId = null;
+    const panel = document.getElementById('bgDetailPanel');
+    if (panel) panel.style.display = 'none';
 }
 
 function buyMenuBg(bgId) {
@@ -17156,6 +18669,7 @@ function buyMenuBg(bgId) {
     saveData();
     updateAllCoinDisplays();
     applyMenuBg();
+    closeBgDetail();
     renderBgShopCard();
     showToast('✅ BG ' + def.name + ' dibeli & dipasang!', '#FFD700');
 }
@@ -17164,6 +18678,7 @@ function equipMenuBg(bgId) {
     playerData.equippedBg = bgId;
     saveData();
     applyMenuBg();
+    closeBgDetail();
     renderBgShopCard();
     const msg = bgId === 'none' ? '🖼️ BG dilepas' : '🖼️ BG ' + MENU_BGS[bgId]?.name + ' dipasang!';
     showToast(msg, '#00ff88');
@@ -18258,8 +19773,7 @@ if (currentMode === 'night' && gameMode === 'minigame') {
 
         // Fungsi untuk kembali ke menu
         function backToMenu() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('menu').classList.add('active');
+            showMenuScreen();
         }
 
         // ===== GAME START TRANSITION =====
@@ -18406,6 +19920,7 @@ if (currentMode === 'night' && gameMode === 'minigame') {
         function startGame(mode) {
 
                 initAudio();
+            stopMenuBg(); // Stop menu bg saat game mulai
 
             currentMode = mode;
             
@@ -18619,22 +20134,24 @@ if (currentMode === 'ocean' && gameMode === 'minigame') {
     // Check apakah ada mode yang baru unlock
     checkUnlockModes();
     
-    document.getElementById('finalScoreRun').textContent = 'RUN: ' + scoreRun;
-    document.getElementById('finalScoreJump').textContent = 'JUMP: ' + scoreJump;
-    document.getElementById('coinsEarned').textContent = '+' + sessionCoins + ' COINS';
+    document.getElementById('finalScoreRun').textContent = scoreRun;
+    document.getElementById('finalScoreJump').textContent = scoreJump;
+    document.getElementById('coinsEarned').textContent = '+' + sessionCoins;
     
     // Tampilkan high score
     const hiScoreRunText = playerData.highScoresRun[currentMode] || 0;
     const hiScoreJumpText = playerData.highScoresJump[currentMode] || 0;
-    let newRecordMsg = '';
-    if (scoreRun >= hiScoreRunText) {
-        newRecordMsg += '<br><span style="color: #00ff88; font-size: 14px;">🏆 NEW RUN RECORD!</span>';
+
+    // NEW RECORD badge — inject ke score-value, bukan overwrite semua
+    const runEl  = document.getElementById('finalScoreRun');
+    const jumpEl = document.getElementById('finalScoreJump');
+    runEl.textContent  = scoreRun;
+    jumpEl.textContent = scoreJump;
+    if (scoreRun >= hiScoreRunText && hiScoreRunText > 0) {
+        runEl.innerHTML = scoreRun + ' <span style="font-size:clamp(5px,1.2vw,7px);color:#00ff88;letter-spacing:1px;">★ RECORD</span>';
     }
-    if (scoreJump >= hiScoreJumpText) {
-        newRecordMsg += '<br><span style="color: #FFD700; font-size: 14px;">🏆 NEW JUMP RECORD!</span>';
-    }
-    if (newRecordMsg) {
-        document.getElementById('finalScoreRun').innerHTML = 'RUN: ' + scoreRun + newRecordMsg;
+    if (scoreJump >= hiScoreJumpText && hiScoreJumpText > 0) {
+        jumpEl.innerHTML = scoreJump + ' <span style="font-size:clamp(5px,1.2vw,7px);color:#FFD700;letter-spacing:1px;">★ RECORD</span>';
     }
     
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
