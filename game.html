@@ -254,7 +254,8 @@
    ═══════════════════════════════════════ */
 .menu-player-card {
     position: fixed;
-    top: calc(12px + clamp(36px,8vw,44px) + 6px); /* tepat di bawah coin viewer */
+    /* Portrait: di bawah coin viewer kiri */
+    top: calc(12px + clamp(36px,8vw,44px) + 6px);
     left: 12px;
     z-index: 99;
     cursor: pointer;
@@ -268,94 +269,95 @@
     background: #0d0d0d;
     border: 3px solid #00ff88;
     box-shadow: 4px 4px 0 #006644;
-    padding: 6px 10px 6px 8px;
+    padding: 7px 12px 7px 12px;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: clamp(110px,28vw,160px);
-    max-width: clamp(130px,32vw,190px);
+    flex-direction: column;
+    gap: 3px;
+    min-width: clamp(100px,26vw,150px);
+    max-width: clamp(120px,30vw,175px);
     position: relative;
     overflow: hidden;
 }
 
-/* accent strip kiri — warna bisa di-override per card type */
+/* accent strip kiri */
 .mpc-inner::before {
     content: '';
     position: absolute;
     left: 0; top: 0; bottom: 0;
-    width: 4px;
+    width: 3px;
     background: #00ff88;
-}
-
-/* avatar pixel box */
-.mpc-avatar {
-    width: clamp(22px,5.5vw,28px);
-    height: clamp(22px,5.5vw,28px);
-    background: #111;
-    border: 2px solid #00ff88;
-    box-shadow: 2px 2px 0 #006644;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(11px,2.8vw,14px);
-    flex-shrink: 0;
-    margin-left: 4px; /* space for accent strip */
-}
-
-.mpc-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-    flex: 1;
 }
 
 .mpc-name {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(6px,1.5vw,8px);
+    font-size: clamp(8px,2vw,11px);
     color: #00ff88;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-shadow: 1px 1px 0 #006644;
-    /* extensible: bisa diganti via JS untuk special name color */
+    text-shadow: 2px 2px 0 #006644;
+    line-height: 1.3;
 }
 
 .mpc-tag {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(4px,1vw,5px);
-    color: #333;
-    letter-spacing: 0.5px;
+    font-size: clamp(4px,0.9vw,5px);
+    color: #2a5a3a;
+    letter-spacing: 1px;
     white-space: nowrap;
+    text-transform: uppercase;
 }
 
-/* Theme overrides — ikut menu theme */
+/* ── LANDSCAPE: card inline kanan coin viewer ── */
+@media (max-height: 500px) {
+    /* posisi dihandle JS, CSS hanya atur bentuk */
+    .mpc-inner {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        max-width: clamp(120px,28vw,180px);
+        width: auto;
+        padding: 5px 12px 5px 10px;
+    }
+    .mpc-inner::before {
+        left: 0; right: auto; top: 0; bottom: 0;
+        width: 3px; height: auto;
+    }
+    .mpc-name { font-size: clamp(7px,1.8vw,9px); }
+    .mpc-tag  { font-size: clamp(4px,1vw,5px); }
+}
+
+/* Theme overrides */
 #menu.theme-egypt  .mpc-inner { border-color:#C19A6B; box-shadow:4px 4px 0 #8B6914; }
 #menu.theme-egypt  .mpc-inner::before { background:#C19A6B; }
-#menu.theme-egypt  .mpc-avatar { border-color:#C19A6B; box-shadow:2px 2px 0 #8B6914; }
-#menu.theme-egypt  .mpc-name { color:#C19A6B; text-shadow:1px 1px 0 #8B6914; }
+#menu.theme-egypt  .mpc-name { color:#C19A6B; text-shadow:2px 2px 0 #8B6914; }
+#menu.theme-egypt  .mpc-tag  { color:#6a4a20; }
 
 #menu.theme-day    .mpc-inner { border-color:#42A5F5; box-shadow:4px 4px 0 #1565C0; }
 #menu.theme-day    .mpc-inner::before { background:#42A5F5; }
-#menu.theme-day    .mpc-avatar { border-color:#42A5F5; box-shadow:2px 2px 0 #1565C0; }
-#menu.theme-day    .mpc-name { color:#42A5F5; text-shadow:1px 1px 0 #1565C0; }
+#menu.theme-day    .mpc-name { color:#42A5F5; text-shadow:2px 2px 0 #1565C0; }
+#menu.theme-day    .mpc-tag  { color:#1a4070; }
 
 #menu.theme-night  .mpc-inner { border-color:#C8A8FF; box-shadow:4px 4px 0 #6633cc; }
 #menu.theme-night  .mpc-inner::before { background:#C8A8FF; }
-#menu.theme-night  .mpc-avatar { border-color:#C8A8FF; box-shadow:2px 2px 0 #6633cc; }
-#menu.theme-night  .mpc-name { color:#C8A8FF; text-shadow:1px 1px 0 #6633cc; }
+#menu.theme-night  .mpc-name { color:#C8A8FF; text-shadow:2px 2px 0 #6633cc; }
+#menu.theme-night  .mpc-tag  { color:#4a2a80; }
 
 #menu.theme-ocean  .mpc-inner { border-color:#00E5FF; box-shadow:4px 4px 0 #0096C7; }
 #menu.theme-ocean  .mpc-inner::before { background:#00E5FF; }
-#menu.theme-ocean  .mpc-avatar { border-color:#00E5FF; box-shadow:2px 2px 0 #0096C7; }
-#menu.theme-ocean  .mpc-name { color:#00E5FF; text-shadow:1px 1px 0 #0096C7; }
+#menu.theme-ocean  .mpc-name { color:#00E5FF; text-shadow:2px 2px 0 #0096C7; }
+#menu.theme-ocean  .mpc-tag  { color:#004466; }
 
-/* Guest / not logged in */
-.mpc-inner.guest { border-color:#444; box-shadow:4px 4px 0 #222; }
-.mpc-inner.guest::before { background:#444; }
-.mpc-inner.guest .mpc-avatar { border-color:#333; box-shadow:2px 2px 0 #111; }
-.mpc-inner.guest .mpc-name { color:#555; text-shadow:none; }
+/* Guest */
+.mpc-inner.guest { border-color:#333; box-shadow:4px 4px 0 #111; }
+.mpc-inner.guest::before { background:#333; }
+.mpc-inner.guest .mpc-name { color:#444; text-shadow:none; }
+.mpc-inner.guest .mpc-tag  { color:#222; }
+
+/* hide player card jika menu icons disembunyikan (pas di screen lain) */
+#menu:not(.active) .menu-player-card { display:none; }
 
 .cycling-coin {
     width: 20px;
@@ -3890,14 +3892,11 @@
                 <span id="cyclingCoinText">0</span>
             </div>
 
-            <!-- Player card — di bawah coin viewer, klik buka account menu -->
+            <!-- Player card — di bawah coin viewer -->
             <div class="menu-player-card" id="menuPlayerCard" onclick="showAccountMenu()">
                 <div class="mpc-inner guest" id="mpcInner">
-                    <div class="mpc-avatar" id="mpcAvatar">👤</div>
-                    <div class="mpc-info">
-                        <div class="mpc-name" id="menuPlayerName">—</div>
-                        <div class="mpc-tag" id="mpcTag">TAP UNTUK AKUN</div>
-                    </div>
+                    <div class="mpc-name" id="menuPlayerName">—</div>
+                    <div class="mpc-tag" id="mpcTag">TAP UNTUK AKUN</div>
                 </div>
             </div>
 
@@ -4592,31 +4591,61 @@
         <!-- ═══════ PANE: AKUN ═══════ -->
         <div class="s-pane" id="s-pane-akun">
 
+            <!-- Info Akun -->
             <div class="settings-section">
-                <h3>👤 STATUS LOGIN</h3>
+                <h3>▸ INFO AKUN</h3>
                 <div id="accountInfoRow" class="s-acct-box"></div>
-            </div>
-
-            <div class="settings-section">
-                <h3>🔑 GANTI PASSWORD</h3>
-                <div id="changePwSection">
-                    <input id="cpOld"  type="password" maxlength="32" placeholder="Password lama" class="name-field" style="margin-bottom:8px;">
-                    <input id="cpNew"  type="password" maxlength="32" placeholder="Password baru (min 6)" class="name-field" style="margin-bottom:8px;">
-                    <input id="cpNew2" type="password" maxlength="32" placeholder="Ulangi password baru" class="name-field" style="margin-bottom:12px;">
-                    <button class="btn" onclick="doChangePassword()" style="width:100%;max-width:100%;margin:0;font-size:clamp(8px,2vw,11px);">🔑 SIMPAN PASSWORD</button>
-                    <div id="cpMsg" style="display:none;margin-top:10px;font-size:clamp(6px,1.5vw,8px);text-align:center;font-family:'Press Start 2P',monospace;padding:8px;border:2px solid transparent;"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">
+                    <div style="background:#111;border:2px solid #1a1a1a;padding:8px 10px;">
+                        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(4px,1vw,5px);color:#444;letter-spacing:1px;margin-bottom:5px;">TOTAL KOIN</div>
+                        <div id="acctTotalCoins" style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.2vw,12px);color:#FFD700;text-shadow:2px 2px 0 #8B6914;">0</div>
+                    </div>
+                    <div style="background:#111;border:2px solid #1a1a1a;padding:8px 10px;">
+                        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(4px,1vw,5px);color:#444;letter-spacing:1px;margin-bottom:5px;">BEST RUN</div>
+                        <div id="acctBestRun" style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.2vw,12px);color:#00ff88;text-shadow:2px 2px 0 #006644;">0</div>
+                    </div>
+                    <div style="background:#111;border:2px solid #1a1a1a;padding:8px 10px;">
+                        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(4px,1vw,5px);color:#444;letter-spacing:1px;margin-bottom:5px;">BEST JUMP</div>
+                        <div id="acctBestJump" style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.2vw,12px);color:#FFD700;text-shadow:2px 2px 0 #8B6914;">0</div>
+                    </div>
+                    <div style="background:#111;border:2px solid #1a1a1a;padding:8px 10px;">
+                        <div style="font-family:'Press Start 2P',monospace;font-size:clamp(4px,1vw,5px);color:#444;letter-spacing:1px;margin-bottom:5px;">STREAK</div>
+                        <div id="acctStreak" style="font-family:'Press Start 2P',monospace;font-size:clamp(9px,2.2vw,12px);color:#FF5588;text-shadow:2px 2px 0 #880033;">0/7</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Ganti Password -->
             <div class="settings-section">
-                <h3>⚠ BAHAYA</h3>
+                <h3>▸ GANTI PASSWORD</h3>
+                <div id="changePwSection">
+                    <div style="position:relative;margin-bottom:8px;">
+                        <input id="cpOld" type="password" maxlength="32" placeholder="Password lama" class="name-field" style="margin:0;width:100%;">
+                        <button type="button" onclick="togglePwVis('cpOld',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#444;font-size:16px;cursor:pointer;padding:4px;line-height:1;">👁</button>
+                    </div>
+                    <div style="position:relative;margin-bottom:8px;">
+                        <input id="cpNew" type="password" maxlength="32" placeholder="Password baru (min 6)" class="name-field" style="margin:0;width:100%;">
+                        <button type="button" onclick="togglePwVis('cpNew',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#444;font-size:16px;cursor:pointer;padding:4px;line-height:1;">👁</button>
+                    </div>
+                    <div style="position:relative;margin-bottom:12px;">
+                        <input id="cpNew2" type="password" maxlength="32" placeholder="Ulangi password baru" class="name-field" style="margin:0;width:100%;">
+                        <button type="button" onclick="togglePwVis('cpNew2',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#444;font-size:16px;cursor:pointer;padding:4px;line-height:1;">👁</button>
+                    </div>
+                    <button class="btn" onclick="doChangePassword()" style="width:100%;max-width:100%;margin:0;font-size:clamp(8px,2vw,11px);">SIMPAN PASSWORD</button>
+                    <div id="cpMsg" style="display:none;margin-top:10px;font-size:clamp(6px,1.5vw,8px);text-align:center;font-family:'Press Start 2P',monospace;padding:10px;border:3px solid transparent;"></div>
+                </div>
+            </div>
+
+            <!-- Zona Bahaya -->
+            <div class="settings-section" style="border-color:#883333;box-shadow:4px 4px 0 #440000;">
+                <h3 style="color:#cc4444;border-bottom-color:#883333;text-shadow:2px 2px 0 #440000;">▸ ZONA BAHAYA</h3>
                 <button class="btn secondary" onclick="confirmLogout()" style="width:100%;max-width:100%;margin:0;font-size:clamp(9px,2.2vw,12px);">
-                    🚪 LOGOUT
+                    LOGOUT
                 </button>
             </div>
 
             <div style="text-align:center;padding-bottom:4px;">
-                <button class="btn tertiary" id="adminPanelBtn" onclick="showAdminPanel()" style="display:none;width:100%;max-width:100%;margin:0;">🔐 ADMIN PANEL</button>
+                <button class="btn tertiary" id="adminPanelBtn" onclick="showAdminPanel()" style="display:none;width:100%;max-width:100%;margin:0;">ADMIN PANEL</button>
             </div>
 
         </div>
@@ -7374,68 +7403,52 @@ updateMissionNotification();
 
         // Helper function to hide/show menu icons
         function setMenuIconsVisibility(visible) {
-            const missionIcon = document.querySelector('.mission-icon');
-            const statsIcon   = document.querySelector('.stats-icon');
+            const missionIcon  = document.querySelector('.mission-icon');
+            const statsIcon    = document.querySelector('.stats-icon');
             const settingsIcon = document.querySelector('.settings-icon');
-            const coinViewer = document.querySelector('.menu-coin-viewer');
+            const coinViewer   = document.querySelector('.menu-coin-viewer');
+            const playerCard   = document.querySelector('.menu-player-card');
             const display = visible ? 'flex' : 'none';
-            if (missionIcon) missionIcon.style.display = display;
-            if (statsIcon)   statsIcon.style.display   = display;
+            if (missionIcon)  missionIcon.style.display  = display;
+            if (statsIcon)    statsIcon.style.display    = display;
             if (settingsIcon) settingsIcon.style.display = display;
-            if (coinViewer) coinViewer.style.display = display;
+            if (coinViewer)   coinViewer.style.display   = display;
+            if (playerCard)   playerCard.style.display   = visible ? 'block' : 'none';
         }
 
         function updateMenuPlayerBar() {
             const nameEl  = document.getElementById('menuPlayerName');
             const tagEl   = document.getElementById('mpcTag');
             const innerEl = document.getElementById('mpcInner');
-            const avatarEl= document.getElementById('mpcAvatar');
             if (!nameEl) return;
 
             const name = playerData.name || '';
             const isGuest = !name || isGuestMode;
 
             if (!isGuest) {
-                // ── Logged in ──
                 nameEl.textContent = name.toUpperCase();
-                if (tagEl) tagEl.textContent = '▶ LIHAT AKUN';
+                if (tagEl) {
+                    tagEl.textContent = playerData.cardTitle || '▶ LIHAT AKUN';
+                    tagEl.style.color = '';
+                }
                 if (innerEl) innerEl.classList.remove('guest');
-                if (avatarEl) avatarEl.textContent = '👤';
-
-                // Extensible: apply custom name color / card style
-                // playerData.nameColor  → warna hex nama (misal "#FFD700")
-                // playerData.cardBorder → warna hex border card
-                // playerData.namePrefix → prefix emoji/text sebelum nama
-                if (playerData.nameColor) {
-                    nameEl.style.color = playerData.nameColor;
-                    nameEl.style.textShadow = '';
-                } else {
-                    nameEl.style.color = '';
-                    nameEl.style.textShadow = '';
-                }
-                if (playerData.cardBorder && innerEl) {
-                    innerEl.style.borderColor = playerData.cardBorder;
-                    innerEl.style.boxShadow = '4px 4px 0 ' + playerData.cardBorder + '88';
-                    const strip = innerEl;
-                    strip.style.setProperty('--card-accent', playerData.cardBorder);
-                } else if (innerEl) {
-                    innerEl.style.borderColor = '';
-                    innerEl.style.boxShadow = '';
-                }
-                if (playerData.namePrefix && avatarEl) {
-                    avatarEl.textContent = playerData.namePrefix;
-                }
-                if (playerData.cardTitle && tagEl) {
-                    tagEl.textContent = playerData.cardTitle;
-                    tagEl.style.color = playerData.nameColor || '#555';
+                // custom name color / card border (untuk card system nanti)
+                nameEl.style.color      = playerData.nameColor  || '';
+                nameEl.style.textShadow = playerData.nameColor  ? '2px 2px 0 ' + playerData.nameColor + '66' : '';
+                if (innerEl) {
+                    innerEl.style.borderColor = playerData.cardBorder || '';
+                    innerEl.style.boxShadow   = playerData.cardBorder ? '4px 4px 0 ' + playerData.cardBorder + '88' : '';
                 }
             } else {
-                // ── Guest / not logged in ──
-                nameEl.textContent = 'BELUM LOGIN';
-                nameEl.style.color = '';
+                nameEl.textContent      = 'BELUM LOGIN';
+                nameEl.style.color      = '';
+                nameEl.style.textShadow = '';
                 if (tagEl) { tagEl.textContent = 'TAP UNTUK LOGIN'; tagEl.style.color = ''; }
-                if (innerEl) innerEl.classList.add('guest');
-                if (avatarEl) avatarEl.textContent = '?';
+                if (innerEl) {
+                    innerEl.classList.add('guest');
+                    innerEl.style.borderColor = '';
+                    innerEl.style.boxShadow   = '';
+                }
             }
         }
 
@@ -7444,6 +7457,32 @@ updateMissionNotification();
             if (typeof applyMenuBg === 'function') applyMenuBg();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('menu').classList.add('active');
+            setTimeout(positionPlayerCard, 50);
+        }
+
+        function positionPlayerCard() {
+            const card  = document.querySelector('.menu-player-card');
+            const title = document.querySelector('#menu .title');
+            if (!card || !title) return;
+            if (window.innerHeight <= 500) {
+                // Landscape: card di atas title, pojok kiri sejajar coin viewer
+                // Coin viewer ada di top:12px left:12px
+                // Card kita taruh inline kanan coin viewer (kiri + width coin + gap)
+                const coinViewer = document.querySelector('.menu-coin-viewer');
+                if (coinViewer) {
+                    const cr = coinViewer.getBoundingClientRect();
+                    card.style.top       = cr.top + 'px';
+                    card.style.left      = (cr.right + 8) + 'px';
+                    card.style.transform = 'none';
+                    card.style.position  = 'fixed';
+                }
+            } else {
+                // Portrait: reset ke CSS default
+                card.style.top       = '';
+                card.style.left      = '';
+                card.style.transform = '';
+                card.style.position  = '';
+            }
         }
 
         function showMenu() { playSound('click_back');
@@ -7455,99 +7494,156 @@ updateMissionNotification();
             setMenuIconsVisibility(true);
             updateMenuPlayerBar();
             checkShowAdminBtn();
+            setTimeout(positionPlayerCard, 50);
             
             // Hide pause button
             document.getElementById('pauseBtn').style.display = 'none';
         }
 
-        // Account quick menu — popup kecil di menu utama
+        // Account menu popup
         function showAccountMenu() {
             playSound('open');
-            const name = playerData.name || 'Belum login';
-            const isGuest = isGuestMode;
-            const msg = isGuest
-                ? 'Kamu sedang main offline.\nScore tidak masuk leaderboard.'
-                : `Login sebagai:\n${name}`;
-            const opts = isGuest
-                ? [{ label: '🔄 Coba Login Online', action: 'reload' }]
-                : [
-                    { label: '📊 Statistik & Leaderboard', action: 'stats' },
-                    { label: '⚙️ Pengaturan Akun', action: 'settings' },
-                    { label: '🚪 Logout', action: 'logout' },
-                  ];
+            const name    = playerData.name || '';
+            const isGuest = !name || isGuestMode;
 
-            // Buat overlay popup
             const existing = document.getElementById('accountMenuOverlay');
             if (existing) existing.remove();
 
+            // ── overlay backdrop ──
             const overlay = document.createElement('div');
             overlay.id = 'accountMenuOverlay';
             overlay.style.cssText = `
                 position:fixed;top:0;left:0;width:100%;height:100%;
-                background:rgba(0,0,0,0.7);z-index:999;
+                background:rgba(0,0,0,0.82);z-index:999;
                 display:flex;align-items:center;justify-content:center;
                 font-family:'Press Start 2P',monospace;
+                padding:16px;box-sizing:border-box;
             `;
-            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+            overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
 
+            // ── box ──
             const box = document.createElement('div');
             box.style.cssText = `
-                background:#0a0a0a;border:4px solid #00ff88;
-                box-shadow:8px 8px 0 #003322;padding:24px 20px;
-                min-width:260px;max-width:90vw;text-align:center;
+                background:#0a0a0a;
+                border:4px solid #00ff88;
+                box-shadow:8px 8px 0 #006644;
+                width:100%;max-width:320px;
+                overflow:hidden;
             `;
 
-            const icon = document.createElement('div');
-            icon.style.cssText = 'font-size:36px;margin-bottom:12px;';
-            icon.textContent = isGuest ? '🎮' : '👤';
+            // ── header strip ──
+            const hdr = document.createElement('div');
+            hdr.style.cssText = `
+                background:#0d0d0d;
+                border-bottom:3px solid #00ff88;
+                padding:14px 16px 12px;
+                position:relative;
+            `;
 
-            const nameDiv = document.createElement('div');
-            nameDiv.style.cssText = 'font-size:clamp(8px,2vw,11px);color:#00ff88;margin-bottom:6px;letter-spacing:1px;';
-            nameDiv.textContent = isGuest ? 'OFFLINE MODE' : name.toUpperCase();
+            // name
+            const nameEl = document.createElement('div');
+            nameEl.style.cssText = `
+                font-size:clamp(10px,2.5vw,14px);
+                color:${playerData.nameColor || '#00ff88'};
+                text-shadow:2px 2px 0 #006644;
+                letter-spacing:2px;
+                margin-bottom:5px;
+                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+            `;
+            nameEl.textContent = isGuest ? 'BELUM LOGIN' : name.toUpperCase();
 
-            const subDiv = document.createElement('div');
-            subDiv.style.cssText = 'font-size:clamp(5px,1.2vw,7px);color:#555;margin-bottom:18px;line-height:2;';
-            subDiv.textContent = isGuest ? 'Score tidak masuk leaderboard' : 'Akun terverifikasi ✓';
+            // status badge
+            const badge = document.createElement('div');
+            badge.style.cssText = `
+                display:inline-block;
+                font-size:clamp(5px,1.1vw,6px);
+                color:${isGuest ? '#555' : '#000'};
+                background:${isGuest ? '#222' : '#00ff88'};
+                padding:2px 6px;
+                letter-spacing:1px;
+            `;
+            badge.textContent = isGuest ? 'OFFLINE' : '● ONLINE';
 
-            const hr = document.createElement('div');
-            hr.style.cssText = 'border-top:2px solid #222;margin-bottom:14px;';
+            // close X
+            const xBtn = document.createElement('button');
+            xBtn.style.cssText = `
+                position:absolute;top:10px;right:10px;
+                width:28px;height:28px;
+                background:#1a1a1a;border:2px solid #333;
+                color:#555;font-size:12px;cursor:pointer;
+                font-family:'Press Start 2P',monospace;
+                display:flex;align-items:center;justify-content:center;
+            `;
+            xBtn.textContent = '✕';
+            xBtn.onclick = () => overlay.remove();
 
-            box.appendChild(icon);
-            box.appendChild(nameDiv);
-            box.appendChild(subDiv);
-            box.appendChild(hr);
+            hdr.appendChild(nameEl);
+            hdr.appendChild(badge);
+            hdr.appendChild(xBtn);
 
-            opts.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.style.cssText = `
-                    display:block;width:100%;padding:10px 12px;margin-bottom:10px;
-                    font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.5vw,8px);
-                    background:#1a1a1a;border:2px solid #333;color:#ccc;cursor:pointer;
-                    letter-spacing:1px;text-align:left;transition:all 0.1s;
+            // ── menu items ──
+            const body = document.createElement('div');
+            body.style.cssText = 'padding:10px 12px 12px;display:flex;flex-direction:column;gap:7px;';
+
+            const items = isGuest
+                ? [
+                    { icon:'↺', label:'COBA LOGIN ONLINE', sub:'Reconnect ke server', color:'#00ff88', action:'reload' }
+                  ]
+                : [
+                    { icon:'▶', label:'STATISTIK',         sub:'Skor & leaderboard',  color:'#00ff88', action:'stats'    },
+                    { icon:'⚙', label:'PENGATURAN AKUN',   sub:'Password & profil',   color:'#42A5F5', action:'settings' },
+                    { icon:'✕', label:'LOGOUT',            sub:'Keluar dari akun',    color:'#ff4444', action:'logout'   },
+                  ];
+
+            items.forEach(item => {
+                const row = document.createElement('button');
+                row.style.cssText = `
+                    display:flex;align-items:center;gap:12px;
+                    width:100%;padding:11px 12px;
+                    background:#111;
+                    border:3px solid #1a1a1a;
+                    box-shadow:3px 3px 0 #000;
+                    cursor:pointer;text-align:left;
+                    transition:all 0.1s;
+                    font-family:'Press Start 2P',monospace;
                 `;
-                btn.textContent = opt.label;
-                btn.onmouseover = () => { btn.style.borderColor='#00ff88'; btn.style.color='#00ff88'; };
-                btn.onmouseout = () => { btn.style.borderColor='#333'; btn.style.color='#ccc'; };
-                btn.onclick = () => {
-                    overlay.remove();
-                    if (opt.action === 'reload') location.reload();
-                    else if (opt.action === 'stats') showStats();
-                    else if (opt.action === 'settings') showSettings();
-                    else if (opt.action === 'logout') doLogout();
+                row.innerHTML = `
+                    <div style="
+                        width:32px;height:32px;flex-shrink:0;
+                        background:#0d0d0d;border:2px solid ${item.color}33;
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:14px;color:${item.color};
+                    ">${item.icon}</div>
+                    <div style="min-width:0;flex:1;">
+                        <div style="font-size:clamp(7px,1.8vw,9px);color:${item.color};letter-spacing:1px;margin-bottom:3px;">${item.label}</div>
+                        <div style="font-size:clamp(4px,1vw,6px);color:#444;letter-spacing:0.5px;">${item.sub}</div>
+                    </div>
+                    <div style="font-size:8px;color:#333;">▶</div>
+                `;
+                row.onmouseenter = () => {
+                    row.style.borderColor = item.color + '66';
+                    row.style.background  = item.color + '0d';
                 };
-                box.appendChild(btn);
+                row.onmouseleave = () => {
+                    row.style.borderColor = '#1a1a1a';
+                    row.style.background  = '#111';
+                };
+                row.onclick = () => {
+                    overlay.remove();
+                    if      (item.action === 'reload')   location.reload();
+                    else if (item.action === 'stats')    showStats();
+                    else if (item.action === 'settings') {
+                        showSettings();
+                        // Langsung ke tab akun setelah screen aktif
+                        setTimeout(() => switchSettingsTab('akun', document.querySelector('#settings .s-tab:nth-child(3)')), 50);
+                    }
+                    else if (item.action === 'logout')   confirmLogout();
+                };
+                body.appendChild(row);
             });
 
-            const closeBtn = document.createElement('button');
-            closeBtn.style.cssText = `
-                display:block;width:100%;padding:8px;margin-top:4px;
-                font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.2vw,7px);
-                background:transparent;border:2px solid #222;color:#444;cursor:pointer;letter-spacing:1px;
-            `;
-            closeBtn.textContent = '✕ TUTUP';
-            closeBtn.onclick = () => overlay.remove();
-            box.appendChild(closeBtn);
-
+            box.appendChild(hdr);
+            box.appendChild(body);
             overlay.appendChild(box);
             document.body.appendChild(overlay);
         }
@@ -7709,6 +7805,13 @@ if (!playerData.unlockedModes.includes('ocean')) {
             setMenuIconsVisibility(false);
         }
 
+        function togglePwVis(inputId, btn) {
+            const inp = document.getElementById(inputId);
+            if (!inp) return;
+            if (inp.type === 'password') { inp.type = 'text'; btn.style.color = '#00ff88'; }
+            else { inp.type = 'password'; btn.style.color = '#555'; }
+        }
+
         function showSettings() {
     try { playSound('open'); } catch(e) {}
     setMenuIconsVisibility(false);
@@ -7735,9 +7838,23 @@ if (!playerData.unlockedModes.includes('ocean')) {
         if (accountInfoRow) {
             const name = playerData.name || '';
             accountInfoRow.innerHTML = name
-                ? `👤 ${name.toUpperCase()}`
-                : `<span style="color:#ff6b6b;">— Belum Login —</span>`;
+                ? `<span style="font-size:clamp(9px,2.2vw,12px);letter-spacing:2px;">${name.toUpperCase()}</span>`
+                : `<span style="color:#ff6b6b;font-size:clamp(7px,1.8vw,9px);">— Belum Login —</span>`;
         }
+        // Fill quick stats
+        const allModes = ['egypt','day','night','snow','ocean','sakura','ramadan'];
+        const bestRun  = Math.max(0, ...allModes.map(m => playerData.highScoresRun?.[m]  || 0));
+        const bestJump = Math.max(0, ...allModes.map(m => playerData.highScoresJump?.[m] || 0));
+        const totalCoins = playerData.totalCoins || 0;
+        const streak     = playerData.dailyCheckin?.checkedDays?.length || 0;
+        const elR = document.getElementById('acctBestRun');
+        const elJ = document.getElementById('acctBestJump');
+        const elC = document.getElementById('acctTotalCoins');
+        const elS = document.getElementById('acctStreak');
+        if (elR) elR.textContent = bestRun;
+        if (elJ) elJ.textContent = bestJump;
+        if (elC) elC.textContent = totalCoins;
+        if (elS) elS.textContent = streak + '/7';
     } catch(e) {}
 
     // Reset password form
@@ -7797,9 +7914,26 @@ async function doChangePassword() {
 
 function confirmLogout() {
     playSound('click');
-    if (confirm('Yakin mau logout? Semua data sudah tersimpan di server.')) {
-        doLogout();
-    }
+    const existing = document.getElementById('logoutConfirmOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'logoutConfirmOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;display:flex;align-items:center;justify-content:center;font-family:"Press Start 2P",monospace;padding:16px;box-sizing:border-box;';
+
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#0a0a0a;border:4px solid #cc3333;box-shadow:8px 8px 0 #440000;padding:24px 20px;max-width:300px;width:100%;text-align:center;';
+    box.innerHTML = `
+        <div style="font-size:clamp(10px,2.5vw,14px);color:#cc4444;text-shadow:2px 2px 0 #440000;margin-bottom:10px;letter-spacing:2px;">LOGOUT?</div>
+        <div style="font-size:clamp(5px,1.2vw,7px);color:#555;margin-bottom:20px;line-height:2;">Data tersimpan di server.<br>Bisa login lagi kapanpun.</div>
+        <div style="display:flex;gap:8px;">
+            <button onclick="document.getElementById('logoutConfirmOverlay').remove()" style="flex:1;padding:10px 4px;background:#111;border:3px solid #333;box-shadow:3px 3px 0 #000;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);color:#888;cursor:pointer;">BATAL</button>
+            <button onclick="document.getElementById('logoutConfirmOverlay').remove();doLogout();" style="flex:1;padding:10px 4px;background:#cc3333;border:3px solid #000;box-shadow:3px 3px 0 #440000;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);color:#fff;cursor:pointer;">LOGOUT</button>
+        </div>
+    `;
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
 }
 
         function showStats() {
