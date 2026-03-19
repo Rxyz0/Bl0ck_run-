@@ -329,7 +329,8 @@
 
 /* ── CARD EGYPT equipped ── */
 .mpc-inner.card-egypt {
-    background: #0a0800;
+    /* Gradient gelap hangat, bukan hitam polos */
+    background: linear-gradient(135deg, #1a0e04 0%, #0f0800 50%, #1a0d00 100%);
     border-color: #C19A6B;
     box-shadow: 4px 4px 0 #8B6914;
     animation: egyptCardBorderPulse 3s ease-in-out infinite;
@@ -340,27 +341,41 @@
     animation: egyptAccentScroll 2s linear infinite;
     width: 4px;
 }
+/* Scanline emas */
 .mpc-inner.card-egypt::after {
     opacity: 1;
     background: repeating-linear-gradient(
         0deg, transparent, transparent 3px,
-        rgba(255,215,0,0.03) 3px, rgba(255,215,0,0.03) 4px
+        rgba(255,215,0,0.025) 3px, rgba(255,215,0,0.025) 4px
     );
 }
 .mpc-inner.card-egypt .mpc-name {
     animation: egyptNameGlow 2.5s ease-in-out infinite;
 }
+/* Tag jadi ornamen kecil, bukan title text panjang */
 .mpc-inner.card-egypt .mpc-tag {
-    color: #6a4a20;
-    animation: egyptTagPulse 3s ease-in-out infinite;
+    color: #4a3010;
+    letter-spacing: 3px;
+    animation: egyptTagPulse 4s ease-in-out infinite;
+    font-size: clamp(4px,0.8vw,5px);
+}
+/* Canvas partikel pasir — di dalam card */
+.mpc-sand-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.55;
+    image-rendering: pixelated;
 }
 @keyframes egyptCardBorderPulse {
     0%,100% { border-color:#C19A6B; box-shadow:4px 4px 0 #8B6914; }
-    50%      { border-color:#FFD700; box-shadow:4px 4px 0 #aa7700, 0 0 12px rgba(255,215,0,0.2); }
+    50%      { border-color:#FFD700; box-shadow:4px 4px 0 #aa7700, 0 0 14px rgba(255,215,0,0.25); }
 }
 @keyframes egyptTagPulse {
-    0%,100% { color:#6a4a20; }
-    50%      { color:#C19A6B; }
+    0%,100% { color:#4a3010; }
+    50%      { color:#8B6914; }
 }
 
 /* ── LANDSCAPE: card inline kanan coin viewer ── */
@@ -7619,10 +7634,21 @@ updateMissionNotification();
                 const cd = (typeof CARD_META !== 'undefined') && CARD_META[equippedCard];
                 if (cd && equippedCard !== 'none' && innerEl) {
                     innerEl.classList.add('card-' + equippedCard);
-                    if (tagEl) tagEl.textContent = playerData.cardTitle || cd.title.replace('★ ','');
+                    // Tag jadi ornamen pendek, bukan title panjang
+                    if (tagEl) tagEl.textContent = playerData.cardTag || '☥ · · · ☥';
+                    // Inject canvas partikel pasir kalau belum ada
+                    if (!innerEl.querySelector('.mpc-sand-canvas')) {
+                        const sc = document.createElement('canvas');
+                        sc.className = 'mpc-sand-canvas';
+                        innerEl.insertBefore(sc, innerEl.firstChild);
+                        startSandParticles(sc);
+                    }
                 } else {
-                    // Default — TIDAK override border/warna, biar ikut CSS theme
-                    if (tagEl) tagEl.textContent = playerData.cardTitle || '▶ LIHAT AKUN';
+                    // Default — TIDAK override, ikut CSS theme
+                    if (tagEl) tagEl.textContent = playerData.cardTag || '▶ LIHAT AKUN';
+                    // Hapus canvas pasir kalau ada
+                    const sc = innerEl ? innerEl.querySelector('.mpc-sand-canvas') : null;
+                    if (sc) { sc._stopSand = true; sc.remove(); }
                 }
 
                 // Manual nameColor override (untuk custom warna nanti)
@@ -19108,6 +19134,75 @@ function buyProfileCard(cardId) {
     showToast('✓ Card ' + d.name + ' dibeli & dipasang!', d.color || '#00ff88');
 }
 
+
+// ── SAND PARTICLE SYSTEM untuk card Egypt ──────────────────────────────────
+function startSandParticles(canvas) {
+    if (!canvas) return;
+    const particles = [];
+    const MAX = 18;
+
+    function resize() {
+        const rect = canvas.parentElement?.getBoundingClientRect();
+        if (!rect) return;
+        canvas.width  = Math.round(rect.width);
+        canvas.height = Math.round(rect.height);
+    }
+    resize();
+
+    // Spawn partikel
+    function spawn() {
+        // Warna pasir: oranye/emas/kuning pixel
+        const palette = ['#C19A6B','#FFD700','#E8B84B','#D4882A','#F5C842','#8B6914'];
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: canvas.height + 2,
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: -(0.4 + Math.random() * 0.8),
+            life: 1.0,
+            decay: 0.008 + Math.random() * 0.012,
+            size: Math.random() < 0.4 ? 2 : 1,
+            color: palette[Math.floor(Math.random() * palette.length)],
+            wobble: Math.random() * Math.PI * 2,
+            wobbleSpeed: 0.04 + Math.random() * 0.04,
+        });
+    }
+
+    let frame = 0;
+    function tick() {
+        if (canvas._stopSand || !canvas.isConnected) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Resize tiap 60 frame
+        if (frame % 60 === 0) resize();
+        frame++;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Spawn
+        if (particles.length < MAX && Math.random() < 0.35) spawn();
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.wobble += p.wobbleSpeed;
+            p.x += p.vx + Math.sin(p.wobble) * 0.3;
+            p.y += p.vy;
+            p.vy *= 0.995; // gravity feel
+            p.life -= p.decay;
+
+            if (p.life <= 0 || p.y < -4) { particles.splice(i, 1); continue; }
+
+            // Draw pixel partikel
+            ctx.globalAlpha = p.life * 0.8;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+        }
+        ctx.globalAlpha = 1;
+
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+}
 function equipProfileCard(cardId) {
     playerData.equippedCard = cardId;
     saveData();
