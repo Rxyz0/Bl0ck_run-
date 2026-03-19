@@ -277,6 +277,21 @@
     max-width: clamp(120px,30vw,175px);
     position: relative;
     overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* scanline overlay — hidden by default, shown via card class */
+.mpc-inner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(255,255,255,0.015) 3px, rgba(255,255,255,0.015) 4px
+    );
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
 /* accent strip kiri */
@@ -286,6 +301,7 @@
     left: 0; top: 0; bottom: 0;
     width: 3px;
     background: #00ff88;
+    transition: background 0.3s;
 }
 
 .mpc-name {
@@ -298,6 +314,7 @@
     text-overflow: ellipsis;
     text-shadow: 2px 2px 0 #006644;
     line-height: 1.3;
+    transition: color 0.3s, text-shadow 0.3s;
 }
 
 .mpc-tag {
@@ -307,6 +324,43 @@
     letter-spacing: 1px;
     white-space: nowrap;
     text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+/* ── CARD EGYPT equipped ── */
+.mpc-inner.card-egypt {
+    background: #0a0800;
+    border-color: #C19A6B;
+    box-shadow: 4px 4px 0 #8B6914;
+    animation: egyptCardBorderPulse 3s ease-in-out infinite;
+}
+.mpc-inner.card-egypt::before {
+    background: linear-gradient(180deg, #FFD700, #C19A6B, #FFD700);
+    background-size: 100% 200%;
+    animation: egyptAccentScroll 2s linear infinite;
+    width: 4px;
+}
+.mpc-inner.card-egypt::after {
+    opacity: 1;
+    background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(255,215,0,0.03) 3px, rgba(255,215,0,0.03) 4px
+    );
+}
+.mpc-inner.card-egypt .mpc-name {
+    animation: egyptNameGlow 2.5s ease-in-out infinite;
+}
+.mpc-inner.card-egypt .mpc-tag {
+    color: #6a4a20;
+    animation: egyptTagPulse 3s ease-in-out infinite;
+}
+@keyframes egyptCardBorderPulse {
+    0%,100% { border-color:#C19A6B; box-shadow:4px 4px 0 #8B6914; }
+    50%      { border-color:#FFD700; box-shadow:4px 4px 0 #aa7700, 0 0 12px rgba(255,215,0,0.2); }
+}
+@keyframes egyptTagPulse {
+    0%,100% { color:#6a4a20; }
+    50%      { color:#C19A6B; }
 }
 
 /* ── LANDSCAPE: card inline kanan coin viewer ── */
@@ -3551,152 +3605,268 @@
     text-align: center;
 }
 /* ── BG GRID 2 KOLOM ── */
-.bg-grid-2col {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: clamp(8px,2vw,12px);
-    margin-bottom: 12px;
-}
-.bg-grid-card {
-    background: #111;
-    border: 4px solid #222;
-    box-shadow: 5px 5px 0 #000;
-    cursor: pointer;
+/* ════════════════════════════════════════════
+   LAINNYA TAB — SPLIT LAYOUT
+   Kiri: list BG (scroll), Kanan: detail panel
+   ════════════════════════════════════════════ */
+
+/* Container split */
+.bgl-split {
+    display: flex;
+    height: calc(100vh - 140px); /* full height minus shop header+tabs */
+    gap: 0;
     overflow: hidden;
-    transition: none;
 }
-.bg-grid-card:hover  { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #000; }
-.bg-grid-card:active { transform: translate(3px,3px);  box-shadow: 2px 2px 0 #000; }
-.bg-grid-card.bg-owned    { border-color: #00ff88; box-shadow: 5px 5px 0 #005533; }
-.bg-grid-card.bg-equipped { border-color: #FFD700; box-shadow: 5px 5px 0 #664400; }
-.bg-grid-thumb {
+
+/* Kiri — list */
+.bgl-left {
+    width: clamp(110px, 30vw, 160px);
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    border-right: 3px solid #1a1a1a;
+    background: #080808;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 0;
+}
+.bgl-left::-webkit-scrollbar { width: 3px; }
+.bgl-left::-webkit-scrollbar-thumb { background: #333; }
+
+/* Kanan — detail */
+.bgl-right {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.bgl-right::-webkit-scrollbar { width: 3px; }
+.bgl-right::-webkit-scrollbar-thumb { background: #333; }
+
+/* ── Sidebar item ── */
+.bgl-item {
     width: 100%;
-    height: clamp(68px,18vw,96px);
-    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid #111;
+    position: relative;
+    transition: background 0.1s;
+    display: block;
 }
-.bg-grid-footer {
-    padding: 7px 9px;
+.bgl-item:active { opacity: 0.7; }
+.bgl-item.active  { background: #0d0d0d; }
+.bgl-item.active::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--item-color, #00ff88);
+}
+
+/* canvas thumbnail dalam sidebar */
+.bgl-item-thumb {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* label di bawah thumb */
+.bgl-item-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(5px,1.2vw,7px);
+    padding: 5px 6px 4px;
+    color: #555;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: 2px solid #1a1a1a;
-    background: #0d0d0d;
+    gap: 4px;
+    background: #0a0a0a;
 }
-.bg-grid-name {
+.bgl-item.active .bgl-item-label { color: #ccc; }
+.bgl-item-status {
+    font-size: clamp(4px,0.9vw,5px);
+    padding: 1px 4px;
+    white-space: nowrap;
+}
+.bgl-item-status.owned    { color:#00ff88; }
+.bgl-item-status.equipped { color:#FFD700; }
+
+/* ── Detail panel (kanan) ── */
+.bgl-detail-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #222;
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(6px,1.5vw,8px);
-    color: #ccc;
-}
-.bg-grid-badge {
-    font-family: 'Press Start 2P', monospace;
-    font-size: clamp(5px,1.2vw,7px);
-    padding: 3px 6px;
-    border: 2px solid #333;
-    box-shadow: 2px 2px 0 #000;
-    background: #111;
-    color: #555;
-}
-.bg-grid-badge.badge-owned    { color:#00ff88; border-color:#00ff88; background:#001a0d; }
-.bg-grid-badge.badge-equipped { color:#FFD700; border-color:#FFD700; background:#1a1200; }
-/* ── BG DETAIL PANEL ── */
-.bg-detail-panel {
-    background: #0d0d0d;
-    border: 4px solid #FFD700;
-    box-shadow: 6px 6px 0 #664400;
-    margin-bottom: 16px;
-    overflow: hidden;
-    position: relative;
-}
-.bg-detail-panel::before {
-    content: '';
-    position: absolute; top:0; left:0; right:0; height:4px;
-    background: repeating-linear-gradient(90deg,#FFD700 0,#FFD700 8px,#664400 8px,#664400 16px);
-}
-.bg-detail-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 14px 10px; margin-top: 4px;
-}
-.bg-detail-title {
-    font-family: 'Press Start 2P', monospace;
-    font-size: clamp(9px,2.3vw,12px);
-    color: #FFD700; text-shadow: 2px 2px 0 #664400; letter-spacing: 1px;
-}
-.bg-detail-close {
-    width:28px; height:28px; background:#ff6b6b; border:3px solid #000;
-    box-shadow:3px 3px 0 #cc5555; font-size:14px; color:#000; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    font-family:Arial,sans-serif; font-weight:bold;
-}
-.bg-detail-close:active { transform:translate(2px,2px); box-shadow:1px 1px 0 #cc5555; }
-.bg-detail-features {
-    font-family:'Press Start 2P',monospace; font-size:clamp(7px,1.8vw,9px);
-    color:#aaa; line-height:2;
-    background:#111; border-top:2px solid #1a1a1a; padding:10px 14px;
-}
-.bg-detail-features div { margin:3px 0; }
-.bg-detail-coininfo {
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    padding:8px 14px; font-family:'Press Start 2P',monospace;
-    font-size:clamp(7px,1.8vw,9px); color:#aaa;
-    background:#111; border-top:2px solid #1a1a1a;
-}
-.bg-detail-actions {
-    padding:12px 14px; display:flex; gap:8px; border-top:2px solid #1a1a1a;
-}
-.bg-card {
-    background: #1a1a1a;
-    border: 4px solid #333;
-    margin: 0 0 20px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 6px 6px 0 rgba(0,0,0,.5);
-}
-.bg-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg,transparent,rgba(0,255,136,.4),transparent);
-    animation: shimmer 2s infinite;
-}
-.bg-card.owned { border-color: #00ff88; box-shadow: 6px 6px 0 #006644, 0 0 20px rgba(0,255,136,.2); }
-.bg-card.equipped-bg { border-color: #FFD700; box-shadow: 6px 6px 0 #8B6914, 0 0 20px rgba(255,215,0,.25); }
-.bg-card-header {
-    font-family: 'Press Start 2P', monospace;
-    font-size: clamp(10px,2.8vw,15px);
-    color: #FFD700;
-    padding: 14px 16px 10px;
-    text-shadow: 2px 2px 0 #8B6914;
+    font-size: clamp(6px,1.4vw,8px);
     letter-spacing: 1px;
+    text-align: center;
 }
-.bg-preview-canvas {
-    width: 100%; height: 100px;
+
+/* preview canvas besar */
+.bgl-preview-big {
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 16/9;
     display: block;
     image-rendering: pixelated;
+    border: 3px solid #1a1a1a;
+    box-shadow: 4px 4px 0 #000;
 }
-.bg-card-features {
+
+/* info box */
+.bgl-detail-info {
+    width: 100%;
+    max-width: 320px;
+    background: #0d0d0d;
+    border: 3px solid #1a1a1a;
+    overflow: hidden;
+}
+.bgl-detail-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(9px,2.2vw,12px);
+    padding: 10px 12px 8px;
+    border-bottom: 2px solid #1a1a1a;
+    letter-spacing: 2px;
+}
+.bgl-detail-features {
+    padding: 8px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.bgl-detail-feature {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(4px,1vw,6px);
+    color: #555;
+    letter-spacing: 0.5px;
+}
+
+/* ── Profile card preview (skin card Mesir) ── */
+.bgl-profile-preview {
+    width: 100%;
+    max-width: 320px;
+}
+.bgl-profile-card-big {
+    position: relative;
+    overflow: hidden;
+    padding: 12px 14px 10px;
+    border: 4px solid #C19A6B;
+    box-shadow: 6px 6px 0 #8B6914;
+    background: #0a0800;
+}
+/* Egypt scanline effect */
+.bgl-profile-card-big::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(255,215,0,0.025) 3px,
+        rgba(255,215,0,0.025) 4px
+    );
+    pointer-events: none;
+}
+/* Animated gold accent bar */
+.bgl-card-accent {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, #FFD700, #C19A6B, #FFD700);
+    background-size: 100% 200%;
+    animation: egyptAccentScroll 2s linear infinite;
+}
+@keyframes egyptAccentScroll {
+    0%   { background-position: 0% 0%; }
+    100% { background-position: 0% 200%; }
+}
+.bgl-card-inner {
+    padding-left: 8px;
+}
+.bgl-card-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(9px,2.3vw,13px);
+    letter-spacing: 2px;
+    animation: egyptNameGlow 2.5s ease-in-out infinite;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.bgl-card-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(4px,1vw,6px);
+    color: #8B6914;
+    letter-spacing: 2px;
+}
+/* corner deco */
+.bgl-card-corner {
+    position: absolute;
+    font-size: 10px;
+    opacity: 0.4;
+    animation: cornerFade 3s ease-in-out infinite;
+}
+@keyframes cornerFade {
+    0%,100% { opacity:0.3; } 50% { opacity:0.7; }
+}
+
+/* ── Buy/equip action strip di bawah ── */
+.bgl-action-strip {
+    width: 100%;
+    max-width: 320px;
+    background: #0d0d0d;
+    border: 3px solid #1a1a1a;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.bgl-coin-info {
+    font-family: 'Press Start 2P', monospace;
     font-size: clamp(7px,1.8vw,9px);
-    color: #aaa;
-    padding: 10px 16px;
-    line-height: 2;
-    font-family: 'Press Start 2P', monospace;
-    background: rgba(0,0,0,.3);
-    border-top: 2px solid #222;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
-.bg-card-features div { padding: 2px 0; }
-.bg-card-actions { padding: 14px 16px; display: flex; gap: 10px; align-items: center; }
-.bg-buy-btn {
-    flex: 1;
-    padding: clamp(10px,2.5vh,16px) 12px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: clamp(8px,2vw,11px);
-    border: 4px solid #000;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all .1s;
-    box-shadow: 4px 4px 0 rgba(0,0,0,.5);
+
+.bgl-btn {
+    padding: clamp(9px,2.2vh,12px) clamp(12px,3vw,16px);
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(7px,1.8vw,9px);
+    border:3px solid;
+    cursor:pointer;
+    letter-spacing:1px;
+    transition:all 0.1s;
+    text-align:center;
+    white-space: nowrap;
 }
-.bg-buy-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 rgba(0,0,0,.5); }
+.bgl-btn:active { transform:translate(2px,2px); }
+.bgl-btn.buy    { background:#C19A6B; border-color:#8B6914; box-shadow:3px 3px 0 #4a3000; color:#000; }
+.bgl-btn.equip  { background:#00ff88; border-color:#00ff88; box-shadow:3px 3px 0 #006644; color:#000; }
+.bgl-btn.unequip{ background:#222;    border-color:#FFD700; box-shadow:3px 3px 0 #664400; color:#FFD700; }
+.bgl-btn.locked { background:#1a1a1a; border-color:#333;    box-shadow:3px 3px 0 #111;    color:#444;    cursor:not-allowed; }
+
 .bg-equip-btn {
     flex: 1;
     padding: clamp(10px,2.5vh,16px) 12px;
@@ -4064,7 +4234,7 @@
                 </button>
                 <button id="shopTabBg" onclick="switchShopTab('bg')"
                     style="flex:1;padding:12px 8px;font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.8vw,9px);background:#1a1a1a;color:#555;border:none;cursor:pointer;letter-spacing:1px;">
-                    🖼️ BG MENU
+                    ✦ LAINNYA
                 </button>
             </div>
 
@@ -4333,52 +4503,55 @@
 <!-- ═════════════════════════════════════════════════════ -->
 </div></div><!-- end shopSectionPack -->
 
-            <!-- BG MENU section -->
+            <!-- BG MENU section — split layout -->
             <div id="shopSectionBg" style="display:none;">
-            <div class="shop-content">
+            <div class="bgl-split">
 
-            <!-- Grid 2 kolom -->
-            <div class="bg-grid-2col">
-                <div class="bg-grid-card" id="bgCardEgypt" onclick="openBgDetail('egypt')">
-                    <div class="bg-grid-thumb"><canvas id="bgThumbEgypt" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
-                    <div class="bg-grid-footer">
-                        <span class="bg-grid-name">🏜️ MESIR</span>
-                        <span class="bg-grid-badge" id="bgBadgeEgypt">500🪙</span>
-                    </div>
-                </div>
-                <div class="bg-grid-card" id="bgCardDay" onclick="openBgDetail('day')">
-                    <div class="bg-grid-thumb"><canvas id="bgThumbDay" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
-                    <div class="bg-grid-footer">
-                        <span class="bg-grid-name">☀️ SIANG</span>
-                        <span class="bg-grid-badge" id="bgBadgeDay">500🪙</span>
-                    </div>
-                </div>
-                <div class="bg-grid-card" id="bgCardNight" onclick="openBgDetail('night')">
-                    <div class="bg-grid-thumb" style="background:#04060f;"><canvas id="bgThumbNight" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
-                    <div class="bg-grid-footer">
-                        <span class="bg-grid-name">🌙 MALAM</span>
-                        <span class="bg-grid-badge" id="bgBadgeNight">500🪙</span>
-                    </div>
-                </div>
-                <div class="bg-grid-card" id="bgCardOcean" onclick="openBgDetail('ocean')">
-                    <div class="bg-grid-thumb" style="background:#051e2e;"><canvas id="bgThumbOcean" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas></div>
-                    <div class="bg-grid-footer">
-                        <span class="bg-grid-name">🏖️ PANTAI</span>
-                        <span class="bg-grid-badge" id="bgBadgeOcean">500🪙</span>
-                    </div>
-                </div>
-            </div>
+                <!-- ── KIRI: list sidebar ── -->
+                <div class="bgl-left" id="bgListContainer">
 
-            <!-- Detail panel (muncul saat card diklik) -->
-            <div class="bg-detail-panel" id="bgDetailPanel" style="display:none;">
-                <div class="bg-detail-header">
-                    <span class="bg-detail-title" id="bgDetailTitle"></span>
-                    <button class="bg-detail-close" onclick="closeBgDetail()">×</button>
+                    <button class="bgl-item" id="bgItemEgypt" style="--item-color:#C19A6B;" onclick="selectBgNew('egypt')">
+                        <canvas class="bgl-item-thumb" id="bgThumbEgypt" width="160" height="90"></canvas>
+                        <div class="bgl-item-label">
+                            <span>MESIR</span>
+                            <span class="bgl-item-status" id="bgStatusEgypt"></span>
+                        </div>
+                    </button>
+
+                    <button class="bgl-item" id="bgItemDay" style="--item-color:#FFD700;" onclick="selectBgNew('day')">
+                        <canvas class="bgl-item-thumb" id="bgThumbDay" width="160" height="90"></canvas>
+                        <div class="bgl-item-label">
+                            <span>SIANG</span>
+                            <span class="bgl-item-status" id="bgStatusDay"></span>
+                        </div>
+                    </button>
+
+                    <button class="bgl-item" id="bgItemNight" style="--item-color:#9090FF;" onclick="selectBgNew('night')">
+                        <canvas class="bgl-item-thumb" id="bgThumbNight" width="160" height="90"></canvas>
+                        <div class="bgl-item-label">
+                            <span>MALAM</span>
+                            <span class="bgl-item-status" id="bgStatusNight"></span>
+                        </div>
+                    </button>
+
+                    <button class="bgl-item" id="bgItemOcean" style="--item-color:#00CED1;" onclick="selectBgNew('ocean')">
+                        <canvas class="bgl-item-thumb" id="bgThumbOcean" width="160" height="90"></canvas>
+                        <div class="bgl-item-label">
+                            <span>PANTAI</span>
+                            <span class="bgl-item-status" id="bgStatusOcean"></span>
+                        </div>
+                    </button>
+
                 </div>
-                <div class="bg-detail-features" id="bgDetailFeatures"></div>
-                <div class="bg-detail-coininfo" id="bgDetailCoinInfo"></div>
-                <div class="bg-detail-actions" id="bgDetailActions"></div>
-            </div>
+
+                <!-- ── KANAN: detail panel ── -->
+                <div class="bgl-right" id="bgDetailPanel">
+                    <div class="bgl-detail-empty" id="bgDetailEmpty">
+                        <div style="font-size:24px;opacity:0.3;">🖼️</div>
+                        <div>PILIH BG</div>
+                        <div style="font-size:clamp(4px,1vw,5px);color:#1a1a1a;margin-top:4px;">dari daftar kiri</div>
+                    </div>
+                </div>
 
             </div>
             </div></div><!-- end shopSectionBg -->
@@ -5329,6 +5502,8 @@ function _enterOffline() {
     equippedSkin: 'white',
     equippedBg: 'none',
     ownedBgs: [],
+    ownedCards: [],
+    equippedCard: 'none',
     dailyMissions: { lastReset:null, missions:[], claimedToday:[] },
     achievements: {},
     dailyCheckin: { lastCheckin:null, streak:0, checkedDays:[] }
@@ -7427,17 +7602,33 @@ updateMissionNotification();
 
             if (!isGuest) {
                 nameEl.textContent = name.toUpperCase();
-                if (tagEl) {
-                    tagEl.textContent = playerData.cardTitle || '▶ LIHAT AKUN';
-                    tagEl.style.color = '';
-                }
                 if (innerEl) innerEl.classList.remove('guest');
-                // custom name color / card border (untuk card system nanti)
-                nameEl.style.color      = playerData.nameColor  || '';
-                nameEl.style.textShadow = playerData.nameColor  ? '2px 2px 0 ' + playerData.nameColor + '66' : '';
+
+                // Reset semua inline style & card classes dulu
+                nameEl.style.color      = '';
+                nameEl.style.textShadow = '';
                 if (innerEl) {
-                    innerEl.style.borderColor = playerData.cardBorder || '';
-                    innerEl.style.boxShadow   = playerData.cardBorder ? '4px 4px 0 ' + playerData.cardBorder + '88' : '';
+                    innerEl.style.borderColor = '';
+                    innerEl.style.boxShadow   = '';
+                    // Hapus card classes lama
+                    [...innerEl.classList].forEach(c => { if (c.startsWith('card-')) innerEl.classList.remove(c); });
+                }
+
+                // Apply card style HANYA kalau equippedCard !== 'none'
+                const equippedCard = playerData.equippedCard || 'none';
+                const cd = (typeof CARD_META !== 'undefined') && CARD_META[equippedCard];
+                if (cd && equippedCard !== 'none' && innerEl) {
+                    innerEl.classList.add('card-' + equippedCard);
+                    if (tagEl) tagEl.textContent = playerData.cardTitle || cd.title.replace('★ ','');
+                } else {
+                    // Default — TIDAK override border/warna, biar ikut CSS theme
+                    if (tagEl) tagEl.textContent = playerData.cardTitle || '▶ LIHAT AKUN';
+                }
+
+                // Manual nameColor override (untuk custom warna nanti)
+                if (playerData.nameColor) {
+                    nameEl.style.color      = playerData.nameColor;
+                    nameEl.style.textShadow = '2px 2px 0 ' + playerData.nameColor + '66';
                 }
             } else {
                 nameEl.textContent      = 'BELUM LOGIN';
@@ -18702,120 +18893,237 @@ function drawBgThumb(canvas, bgId) {
 
 // Render aksi card BG di shop (beli / equip)
 const BG_META = {
-    egypt: { name:'🏜️ MESIR',   coinMode:'egypt',  coinClass:'coin-egypt',  price:500, color:'#C19A6B',
-             features:['🌅 Langit sunset pixel animasi','🏛️ Piramida scrolling berlapis','🎨 Tema warna tombol & teks berubah'] },
-    day:   { name:'☀️ SIANG',   coinMode:'day',    coinClass:'coin-day',    price:500, color:'#FFD700',
+    egypt: { name:'🏜️ MESIR',  coinMode:'egypt', coinClass:'coin-egypt', price:600, color:'#C19A6B', shadow:'#8B6914',
+             features:['🌅 Langit sunset pixel animasi','🏛️ Piramida scrolling berlapis','🎨 Tema warna emas berubah'] },
+    day:   { name:'☀️ SIANG',  coinMode:'egypt', coinClass:'coin-egypt', price:600, color:'#FFD700', shadow:'#cc7700',
              features:['☀️ Matahari pixel animasi bersinar','☁️ Awan putih scrolling berlapis','🌳 Pohon & bukit hijau pixel art'] },
-    night: { name:'🌙 MALAM',   coinMode:'night',  coinClass:'coin-night',  price:500, color:'#9090FF',
+    night: { name:'🌙 MALAM',  coinMode:'egypt', coinClass:'coin-egypt', price:600, color:'#9090FF', shadow:'#4444aa',
              features:['✨ Bintang pixel berkedip animasi','🌙 Bulan sabit & komet meluncur','🏙️ Siluet kota pixel scrolling'] },
-    ocean: { name:'🏖️ PANTAI',  coinMode:'ocean',  coinClass:'coin-ocean',  price:500, color:'#00CED1',
+    ocean: { name:'🏖️ PANTAI', coinMode:'egypt', coinClass:'coin-egypt', price:600, color:'#00CED1', shadow:'#007799',
              features:['🌊 Ombak pixel animasi berlapis','🌴 Pohon kelapa & kapal scrolling','🎨 Tema warna biru laut berubah'] },
 };
 
 function renderBgShopCard() {
-    // Gambar thumbnail + update badge tiap card
     ['egypt','day','night','ocean'].forEach(bgId => {
         const cap    = bgId.charAt(0).toUpperCase() + bgId.slice(1);
         const canvas = document.getElementById('bgThumb' + cap);
-        const badge  = document.getElementById('bgBadge' + cap);
-        const card   = document.getElementById('bgCard'  + cap);
-        if (!canvas || !badge || !card) return;
+        const statusEl = document.getElementById('bgStatus' + cap);
+        const item   = document.getElementById('bgItem'  + cap);
+        if (!canvas) return;
 
-        // Gambar thumbnail
         setTimeout(() => drawBgThumb(canvas, bgId), 40);
 
         const owned    = (playerData.ownedBgs || []).includes(bgId);
         const equipped = playerData.equippedBg === bgId;
 
-        // Border card
-        card.classList.toggle('bg-owned',    owned && !equipped);
-        card.classList.toggle('bg-equipped', equipped);
-
-        // Badge
-        if (equipped) {
-            badge.className = 'bg-grid-badge badge-equipped';
-            badge.textContent = '✓ ON';
-        } else if (owned) {
-            badge.className = 'bg-grid-badge badge-owned';
-            badge.textContent = 'OWNED';
-        } else {
-            badge.className = 'bg-grid-badge';
-            badge.textContent = BG_META[bgId].price + '🪙';
+        if (item) item.classList.toggle('active', _bgDetailId === bgId);
+        if (statusEl) {
+            if (equipped)      { statusEl.textContent='✓'; statusEl.className='bgl-item-status equipped'; }
+            else if (owned)    { statusEl.textContent='★'; statusEl.className='bgl-item-status owned'; }
+            else               { statusEl.textContent='';  statusEl.className='bgl-item-status'; }
         }
     });
+    // Re-render detail if one is open
+    if (_bgDetailId) renderBgDetail(_bgDetailId);
 }
 
 let _bgDetailId = null;
-function openBgDetail(bgId) {
-    const d = BG_META[bgId];
+
+function renderBgDetail(bgId) {
+    const d      = BG_META[bgId];
     if (!d) return;
-    playSound('open');
-
-    // Tutup dulu kalau klik yang sama → toggle
-    if (_bgDetailId === bgId) { closeBgDetail(); return; }
-    _bgDetailId = bgId;
-
     const owned    = (playerData.ownedBgs || []).includes(bgId);
     const equipped = playerData.equippedBg === bgId;
-    const coins    = playerData.coins[d.coinMode] || 0;
+    const coins    = playerData.coins['egypt'] || 0;
     const canBuy   = coins >= d.price;
+    const name     = (playerData.name || '???').toUpperCase();
 
-    document.getElementById('bgDetailTitle').textContent   = d.name + ' BG';
-    document.getElementById('bgDetailFeatures').innerHTML  = d.features.map(f => `<div>${f}</div>`).join('');
-    document.getElementById('bgDetailCoinInfo').innerHTML  =
-        `<span class="coin-small ${d.coinClass}" style="width:12px;height:12px;"></span>
-         <span>Kamu punya: <span style="color:${canBuy?'#00ff88':'#ff4444'};">${coins}</span> / ${d.price}</span>`;
+    const panel = document.getElementById('bgDetailPanel');
+    if (!panel) return;
 
-    if (!owned) {
-        document.getElementById('bgDetailActions').innerHTML = `
-            <button class="gacha-btn" style="flex:1;${canBuy?'':'opacity:.5;cursor:not-allowed;'}"
-                ${canBuy ? `onclick="buyMenuBg('${bgId}')"` : 'disabled'}>
-                ${canBuy ? '🪙 BELI & PASANG' : '🔒 KOIN KURANG'}
-            </button>`;
-    } else {
-        document.getElementById('bgDetailActions').innerHTML = `
-            <button class="gacha-btn" style="flex:1;${equipped?'background:#FFD700;color:#000;border-color:#8B6914;':''}"
-                onclick="equipMenuBg('${equipped ? 'none' : bgId}')">
-                ${equipped ? '✓ LEPAS' : '▶ PASANG'}
-            </button>`;
+    // BG button
+    let bgBtnHtml = '';
+    if (equipped)      bgBtnHtml = `<button class="bgl-btn unequip" onclick="equipMenuBg('none')">✕ LEPAS</button>`;
+    else if (owned)    bgBtnHtml = `<button class="bgl-btn equip" onclick="equipMenuBg('${bgId}')">▶ PAKAI</button>`;
+    else               bgBtnHtml = `<button class="bgl-btn ${canBuy?'buy':'locked'}" ${!canBuy?'disabled':''} ${canBuy?`onclick="buyMenuBg('${bgId}')"`:''}>${canBuy?'BELI &amp; PASANG':'KOIN KURANG'}</button>`;
+
+    // Card section (khusus kalau ada CARD_META untuk bgId ini)
+    let cardSectionHtml = '';
+    const cd = (typeof CARD_META !== 'undefined') && CARD_META[bgId];
+    if (cd) {
+        const cardOwned    = (playerData.ownedCards || []).includes(bgId);
+        const cardEquipped = playerData.equippedCard === bgId;
+        const cardCoins    = playerData.coins[cd.coinMode] || 0;
+        const cardCanBuy   = cardCoins >= cd.price;
+
+        let cardBtnHtml = '';
+        if (cardEquipped)   cardBtnHtml = `<button class="bgl-btn unequip" onclick="equipProfileCard('none')">✕ LEPAS</button>`;
+        else if (cardOwned) cardBtnHtml = `<button class="bgl-btn equip" onclick="equipProfileCard('${bgId}')">▶ PAKAI</button>`;
+        else                cardBtnHtml = `<button class="bgl-btn ${cardCanBuy?'buy':'locked'}" ${!cardCanBuy?'disabled':''} ${cardCanBuy?`onclick="buyProfileCard('${bgId}')"`:''}>${cardCanBuy?'BELI CARD':'KOIN KURANG'}</button>`;
+
+        cardSectionHtml = `
+        <div style="width:100%;max-width:320px;">
+            <div style="font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.2vw,6px);color:#444;letter-spacing:2px;margin-bottom:8px;border-top:2px solid #1a1a1a;padding-top:10px;">▸ PROFILE CARD</div>
+
+            <!-- Card preview -->
+            <div class="bgl-profile-card-big" style="margin-bottom:8px;">
+                <div class="bgl-card-accent"></div>
+                <div class="bgl-card-corner" style="top:5px;right:8px;">☥</div>
+                <div class="bgl-card-corner" style="bottom:5px;right:8px;animation-delay:1s;">𓂀</div>
+                <div class="bgl-card-inner">
+                    <div class="bgl-card-name">${name}</div>
+                    <div class="bgl-card-title">${cd.title}</div>
+                </div>
+            </div>
+
+            <!-- Card fitur -->
+            <div class="bgl-detail-info" style="margin-bottom:8px;">
+                <div class="bgl-detail-name" style="color:${cd.color};text-shadow:2px 2px 0 ${cd.shadow};font-size:clamp(7px,1.8vw,9px);">${cd.name}</div>
+                <div class="bgl-detail-features">
+                    ${cd.features.map(f=>`<div class="bgl-detail-feature">${f}</div>`).join('')}
+                </div>
+            </div>
+
+            <!-- Card action strip -->
+            <div class="bgl-action-strip" style="border-color:${cd.color}33;">
+                <div class="bgl-coin-info">
+                    <span class="coin-small coin-egypt" style="width:12px;height:12px;"></span>
+                    <span style="color:${cardCanBuy||cardOwned?cd.color:'#ff4444'}">${cardCoins}</span>
+                    <span style="color:#333;">/ ${cd.price}</span>
+                </div>
+                ${cardBtnHtml}
+            </div>
+        </div>`;
     }
 
-    const panel = document.getElementById('bgDetailPanel');
-    panel.style.display = '';
-    setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50);
+    panel.innerHTML = `
+        <canvas class="bgl-preview-big" id="bgPreviewBig" width="320" height="180"></canvas>
+        <div class="bgl-detail-info">
+            <div class="bgl-detail-name" style="color:${d.color};text-shadow:2px 2px 0 ${d.shadow};">${d.name}</div>
+            <div class="bgl-detail-features">
+                ${d.features.map(f=>`<div class="bgl-detail-feature">${f}</div>`).join('')}
+            </div>
+        </div>
+        <div class="bgl-action-strip" style="border-color:${d.color}33;">
+            <div class="bgl-coin-info">
+                <span class="coin-small coin-egypt" style="width:12px;height:12px;"></span>
+                <span style="color:${canBuy||owned?d.color:'#ff4444'}">${coins}</span>
+                <span style="color:#333;">/ ${d.price}</span>
+            </div>
+            ${bgBtnHtml}
+        </div>
+        ${cardSectionHtml}
+    `;
+
+    setTimeout(() => {
+        const c = document.getElementById('bgPreviewBig');
+        if (c) drawBgThumb(c, bgId);
+    }, 40);
 }
 
+function selectBgNew(bgId) {
+    playSound('tab');
+    const prev = _bgDetailId;
+    _bgDetailId = bgId;
+
+    // Update sidebar active state
+    ['egypt','day','night','ocean'].forEach(id => {
+        const el = document.getElementById('bgItem' + id.charAt(0).toUpperCase() + id.slice(1));
+        if (el) el.classList.toggle('active', id === bgId);
+    });
+
+    // Show empty hint or render
+    const emptyEl = document.getElementById('bgDetailEmpty');
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    renderBgDetail(bgId);
+}
+
+// Legacy aliases
+function selectBgRow(bgId) { selectBgNew(bgId); }
+function openBgDetail(bgId) { selectBgNew(bgId); }
 function closeBgDetail() {
     _bgDetailId = null;
+    ['egypt','day','night','ocean'].forEach(id => {
+        const el = document.getElementById('bgItem' + id.charAt(0).toUpperCase() + id.slice(1));
+        if (el) el.classList.remove('active');
+    });
     const panel = document.getElementById('bgDetailPanel');
-    if (panel) panel.style.display = 'none';
+    if (panel) panel.innerHTML = '<div class="bgl-detail-empty"><div style="font-size:24px;opacity:0.3;">🖼️</div><div>PILIH BG</div></div>';
 }
 
+// ── PROFILE CARD METADATA ──────────────────────────────────────────────────
+const CARD_META = {
+    egypt: {
+        name: '🏜️ MESIR CARD',
+        price: 800,
+        coinMode: 'egypt',
+        color: '#C19A6B',
+        shadow: '#8B6914',
+        borderColor: '#C19A6B',
+        bgColor: '#0a0800',
+        accentAnim: 'egyptAccentScroll',
+        nameAnim: 'egyptNameGlow',
+        title: '★ PHARAOH OF THE DESERT',
+        decos: ['☥','𓂀'],
+        desc: 'Card bergaya Mesir kuno dengan efek emas animasi.',
+        features: ['✦ Border emas animasi berkilau','✦ Teks nama glow gold','✦ Ornamen hieroglif deko','✦ Scanline efek premium'],
+    }
+    // nanti bisa tambah: day, night, ocean, dst
+};
+
 function buyMenuBg(bgId) {
-    const def = MENU_BGS[bgId];
-    if (!def) return;
-    const coins = playerData.coins[def.coinMode] || 0;
-    if (coins < def.price) { showToast('❌ Koin ' + def.coinMode.toUpperCase() + ' kurang!', '#ff4444'); return; }
-    playerData.coins[def.coinMode] -= def.price;
+    const d = BG_META[bgId];
+    if (!d) return;
     if (!playerData.ownedBgs) playerData.ownedBgs = [];
+    if (playerData.ownedBgs.includes(bgId)) return;
+    const coins = playerData.coins[d.coinMode] || 0;
+    if (coins < d.price) { showToast('Koin tidak cukup!', '#ff4444'); return; }
+    playerData.coins[d.coinMode] -= d.price;
     playerData.ownedBgs.push(bgId);
+    // Auto equip
     playerData.equippedBg = bgId;
     saveData();
-    updateAllCoinDisplays();
     applyMenuBg();
-    closeBgDetail();
+    updateAllCoinDisplays();
     renderBgShopCard();
-    showToast('✅ BG ' + def.name + ' dibeli & dipasang!', '#FFD700');
+    showToast('✓ BG ' + d.name + ' dibeli & dipasang!', d.color || '#00ff88');
+}
+
+function buyProfileCard(cardId) {
+    const d = CARD_META[cardId];
+    if (!d) return;
+    if (!playerData.ownedCards) playerData.ownedCards = [];
+    if (playerData.ownedCards.includes(cardId)) return;
+    const coins = playerData.coins[d.coinMode] || 0;
+    if (coins < d.price) { showToast('Koin tidak cukup!', '#ff4444'); return; }
+    playerData.coins[d.coinMode] -= d.price;
+    playerData.ownedCards.push(cardId);
+    // Auto equip
+    playerData.equippedCard = cardId;
+    saveData();
+    updateAllCoinDisplays();
+    renderBgShopCard();
+    updateMenuPlayerBar();
+    showToast('✓ Card ' + d.name + ' dibeli & dipasang!', d.color || '#00ff88');
+}
+
+function equipProfileCard(cardId) {
+    playerData.equippedCard = cardId;
+    saveData();
+    updateMenuPlayerBar();
+    renderBgShopCard();
+    const msg = cardId === 'none' ? 'Card dilepas' : '✓ Card ' + (CARD_META[cardId]?.name||cardId) + ' dipasang!';
+    showToast(msg, CARD_META[cardId]?.color || '#00ff88');
 }
 
 function equipMenuBg(bgId) {
     playerData.equippedBg = bgId;
     saveData();
     applyMenuBg();
-    closeBgDetail();
     renderBgShopCard();
-    const msg = bgId === 'none' ? '🖼️ BG dilepas' : '🖼️ BG ' + MENU_BGS[bgId]?.name + ' dipasang!';
-    showToast(msg, '#00ff88');
+    const msg = bgId === 'none' ? '🖼️ BG dilepas' : '✓ BG ' + (BG_META[bgId]?.name||bgId) + ' dipasang!';
+    showToast(msg, BG_META[bgId]?.color || '#00ff88');
 }
 
 function updateAllCoinDisplays() {
